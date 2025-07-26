@@ -61,7 +61,8 @@ namespace EpubSanitizerCLI
             {
                 PrintVersion();
                 Environment.Exit((int)ExitCode.DONE);
-            }else if(args[0] == "-h")
+            }
+            else if (args[0] == "-h")
             {
                 if (args.Length > 1)
                 {
