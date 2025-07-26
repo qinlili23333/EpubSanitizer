@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "EpubSanitizerCLI": {
+      "commandName": "Project",
+      "commandLineArgs": "-h"
+    }
+  }
+}

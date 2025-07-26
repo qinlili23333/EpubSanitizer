@@ -1,4 +1,6 @@
-﻿namespace EpubSanitizerCLI
+﻿using EpubSanitizerCore;
+
+namespace EpubSanitizerCLI
 {
     public enum ExitCode
     {
@@ -18,6 +20,7 @@
                 PrintUsage();
                 Environment.Exit((int)ExitCode.INVALID_ARGS);
             }
+            ParseArgs(args);
         }
 
         /// <summary>
@@ -46,6 +49,39 @@
             Console.WriteLine("    -v                        Print version information.");
             Console.WriteLine("    -h                        Print this general help.");
             Console.WriteLine("    -h filter_name            Print help of specific filter.");
+        }
+
+        /// <summary>
+        /// Parse all arguments
+        /// </summary>
+        /// <param name="args"></param>
+        static void ParseArgs(string[] args)
+        {
+            if (args[0] == "-v")
+            {
+                PrintVersion();
+                Environment.Exit((int)ExitCode.DONE);
+            }else if(args[0] == "-h")
+            {
+                if (args.Length > 1)
+                {
+                    // TODO: print help of specific filter
+                }
+                else
+                {
+                    PrintUsage();
+                    Environment.Exit((int)ExitCode.DONE);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Print out version
+        /// </summary>
+        static void PrintVersion()
+        {
+            Console.WriteLine($"CLI Version: {typeof(CliEntry).Assembly.GetName().Version}");
+            Console.WriteLine($"Core Version: {typeof(EpubSanitizer).Assembly.GetName().Version}");
         }
     }
 }
