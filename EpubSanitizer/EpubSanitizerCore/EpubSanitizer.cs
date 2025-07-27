@@ -1,4 +1,6 @@
-﻿namespace EpubSanitizerCore
+﻿using System.IO.Compression;
+
+namespace EpubSanitizerCore
 {
     public class EpubSanitizer : ConfigObject
     {
@@ -12,6 +14,10 @@
         /// </summary>
         public ConfigManager Config;
         /// <summary>
+        /// FileSystem instance to hold file
+        /// </summary>
+        private FS.FileSystem FileStorage;
+        /// <summary>
         /// Create a new instance of EpubSanitizer
         /// </summary>
         public EpubSanitizer()
@@ -19,5 +25,27 @@
             Config = new();
         }
 
+        /// <summary>
+        /// Load Epub file to instance, can only call once for each instance
+        /// </summary>
+        /// <param name="archive">Opened Epub file for read</param>
+        public void LoadFile(ZipArchive archive)
+        {
+            if (FileStorage != null)
+            {
+                throw new InvalidOperationException("File already load to instance!");
+            }
+            FileStorage = FS.FileSystem.CreateFS(Config.GetEnum<FS.FS>("cache"));
+            FileStorage.Import(archive);
+        }
+
+        /// <summary>
+        /// Save processed Epub file
+        /// </summary>
+        /// <param name="archive">Empty file for write</param>
+        public void SaveFile(ZipArchive archive)
+        {
+            FileStorage.Export(archive);
+        }
     }
 }

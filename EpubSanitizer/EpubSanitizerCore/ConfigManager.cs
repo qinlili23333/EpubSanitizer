@@ -99,7 +99,7 @@
         /// Get config in int
         /// </summary>
         /// <param name="key">config key</param>
-        /// <returns></returns>
+        /// <returns>config int if exist</returns>
         public int GetInt(string key)
         {
             return GetByType(key, typeof(int));
@@ -108,7 +108,7 @@
         /// Get config in string
         /// </summary>
         /// <param name="key">config key</param>
-        /// <returns></returns>
+        /// <returns>config string if exist</returns>
         public string GetString(string key)
         {
             return GetByType(key, typeof(string));
@@ -117,23 +117,25 @@
         /// Get config in bool
         /// </summary>
         /// <param name="key">config key</param>
-        /// <returns></returns>
+        /// <returns>config bool if exist</returns>
         public bool GetBool(string key)
         {
             return GetByType(key, typeof(bool));
         }
 
+
         /// <summary>
         /// Get enum config
         /// </summary>
+        /// <typeparam name="TEnum">Type of enum</typeparam>
         /// <param name="key">config key</param>
-        /// <param name="Enu">Enum object</param>
-        /// <returns></returns>
-        public dynamic GetEnum(string key, IEnumerable<int> Enu)
+        /// <returns>config in enum if exist</returns>
+        /// <exception cref="ConfigNotFoundException">config not found</exception>
+        public dynamic GetEnum<TEnum>(string key) where TEnum : Enum
         {
             if (ConfigString.TryGetValue(key, out string? str))
             {
-                foreach (var enu in Enu)
+                foreach (TEnum enu in Enum.GetValues(typeof(TEnum)))
                 {
                     if (str.ToLower() == enu.ToString().ToLower())
                     {
