@@ -98,7 +98,7 @@
         /// <summary>
         /// Get config in int
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">config key</param>
         /// <returns></returns>
         public int GetInt(string key)
         {
@@ -107,7 +107,7 @@
         /// <summary>
         /// Get config in string
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">config key</param>
         /// <returns></returns>
         public string GetString(string key)
         {
@@ -116,13 +116,43 @@
         /// <summary>
         /// Get config in bool
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">config key</param>
         /// <returns></returns>
         public bool GetBool(string key)
         {
             return GetByType(key, typeof(bool));
         }
 
+        /// <summary>
+        /// Get enum config
+        /// </summary>
+        /// <param name="key">config key</param>
+        /// <param name="Enu">Enum object</param>
+        /// <returns></returns>
+        public dynamic GetEnum(string key, IEnumerable<int> Enu)
+        {
+            if (ConfigString.TryGetValue(key, out string? str))
+            {
+                foreach (var enu in Enu)
+                {
+                    if (str.ToLower() == enu.ToString().ToLower())
+                    {
+                        ConfigObj[key] = enu;
+                    }
+                }
+                ConfigString.Remove(key);
+                return ConfigObj[key];
+            }
+            if (ConfigObj.TryGetValue(key, out object? value))
+            {
+                return value;
+            }
+            if (DefaultConfigList.TryGetValue(key, out object? defval))
+            {
+                return defval;
+            }
+            throw new ConfigNotFoundException(key);
+        }
 
     }
 }

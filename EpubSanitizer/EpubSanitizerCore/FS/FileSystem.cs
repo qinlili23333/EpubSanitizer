@@ -2,6 +2,18 @@
 
 namespace EpubSanitizerCore.FS
 {
+    internal enum FS
+    {
+        /// <summary>
+        /// Memory based file system
+        /// </summary>
+        Ram,
+        /// <summary>
+        /// Disk based file system
+        /// </summary>
+        Disk
+    }
+
     /// <summary>
     /// Abstract class of file system used for processing
     /// </summary>
@@ -31,5 +43,23 @@ namespace EpubSanitizerCore.FS
         /// </summary>
         /// <param name="EpubFile"></param>
         internal abstract void Export(ZipArchive EpubFile);
+
+
+        /// <summary>
+        /// Internal relationship of enum and class
+        /// </summary>
+        private static readonly Dictionary<FS, Type> Pairs = new(){
+            {FS.Ram,typeof(MemFS)},
+            {FS.Disk,typeof(DiskFS)},
+        };
+        /// <summary>
+        /// Create file system instance
+        /// </summary>
+        /// <param name="fs"></param>
+        /// <returns></returns>
+        internal static FileSystem CreateFS(FS fs)
+        {
+            return (FileSystem)Activator.CreateInstance(Pairs[fs]);
+        }
     }
 }
