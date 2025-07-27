@@ -10,6 +10,11 @@ namespace EpubSanitizerCLI
 
     public class CliEntry
     {
+        static string input = string.Empty;
+
+        static string output = string.Empty;
+
+        static Dictionary<string, string> Config = [];
 
         static void Main(string[] args)
         {
@@ -21,6 +26,8 @@ namespace EpubSanitizerCLI
                 Environment.Exit((int)ExitCode.INVALID_ARGS);
             }
             ParseArgs(args);
+            EpubSanitizer Instance = new();
+            Instance.Config.LoadConfigString(Config);
         }
 
         /// <summary>
@@ -74,6 +81,29 @@ namespace EpubSanitizerCLI
                     Environment.Exit((int)ExitCode.DONE);
                 }
             }
+            // Process normal parse
+            int i;
+            for (i = 0; i < args.Length; i++)
+            {
+                if (args[i].StartsWith("--"))
+                {
+                    if (args[i].Contains("="))
+                    {
+                        var div = args[i].Split('=');
+                        Config.Add(div[0][2..], div[1]);
+                    }
+                    else
+                    {
+                        Config.Add(args[i][2..], "1");
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+            input = args[i];
+            output = (args.Length > i + 1) ? args[i+1] : args[i].Replace(".epub","_out.epub");
         }
 
         /// <summary>

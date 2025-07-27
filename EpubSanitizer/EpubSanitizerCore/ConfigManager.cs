@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace EpubSanitizerCore
+﻿namespace EpubSanitizerCore
 {
     /// <summary>
     /// An exception raised when config not found
@@ -79,7 +77,8 @@ namespace EpubSanitizerCore
                 else if (type == typeof(string))
                 {
                     ConfigObj[key] = str;
-                }else if(type == typeof(bool))
+                }
+                else if (type == typeof(bool))
                 {
                     ConfigObj[key] = bool.Parse(str);
                 }
@@ -112,7 +111,7 @@ namespace EpubSanitizerCore
         /// <returns></returns>
         public string GetString(string key)
         {
-            return GetByType(key,typeof(string));
+            return GetByType(key, typeof(string));
         }
         /// <summary>
         /// Get config in bool
