@@ -2,7 +2,7 @@
 
 namespace EpubSanitizerCore
 {
-    public class EpubSanitizer : ConfigObject
+    public class EpubSanitizer
     {
         /// <inheritdoc />
         static readonly Dictionary<string, object> ConfigList = new() {
@@ -10,6 +10,11 @@ namespace EpubSanitizerCore
             {"compress", 0 },
             {"cache", FS.FS.Ram }
         };
+        static EpubSanitizer()
+        {
+            ConfigManager.AddDefaultConfig(ConfigList);
+        }
+
         /// <summary>
         /// Instance of config manager
         /// </summary>

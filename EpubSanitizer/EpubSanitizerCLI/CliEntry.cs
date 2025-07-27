@@ -48,6 +48,9 @@ namespace EpubSanitizerCLI
             Stream FileStream = File.OpenRead(input);
             ZipArchive EpubFile = new(FileStream, ZipArchiveMode.Read);
             Instance.LoadFile(EpubFile);
+            EpubFile.Dispose();
+            FileStream.Close();
+            Log("Processing...");
         }
 
         /// <summary>

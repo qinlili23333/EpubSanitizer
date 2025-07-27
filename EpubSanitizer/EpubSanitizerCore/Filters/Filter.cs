@@ -3,7 +3,7 @@
     /// <summary>
     /// Abstract class of filter
     /// </summary>
-    internal abstract class Filter : ConfigObject
+    internal abstract class Filter
     {
 
     }

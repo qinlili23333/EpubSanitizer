@@ -4,6 +4,8 @@ namespace EpubSanitizerCore.FS
 {
     internal class MemFS : FileSystem
     {
+        private Dictionary<string, byte[]> Files = [];
+
         internal override void Export(ZipArchive EpubFile)
         {
             throw new NotImplementedException();
@@ -11,7 +13,17 @@ namespace EpubSanitizerCore.FS
 
         internal override void Import(ZipArchive EpubFile)
         {
-            throw new NotImplementedException();
+            foreach (ZipArchiveEntry entry in EpubFile.Entries)
+            {
+                if (entry.FullName.EndsWith('/'))
+                {
+                    continue;
+                }
+                using Stream entryStream = entry.Open();
+                using MemoryStream ms = new();
+                entryStream.CopyTo(ms);
+                Files.Add(entry.FullName, ms.ToArray());
+            }
         }
 
         internal override string Read(string path)
