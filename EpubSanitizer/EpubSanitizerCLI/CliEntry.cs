@@ -103,7 +103,7 @@ namespace EpubSanitizerCLI
                 }
             }
             input = args[i];
-            output = (args.Length > i + 1) ? args[i+1] : args[i].Replace(".epub","_out.epub");
+            output = (args.Length > i + 1) ? args[i + 1] : args[i].Replace(".epub", "_out.epub");
         }
 
         /// <summary>
