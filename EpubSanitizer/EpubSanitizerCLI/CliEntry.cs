@@ -1,15 +1,24 @@
 ﻿using EpubSanitizerCore;
+using System.IO.Compression;
 
 namespace EpubSanitizerCLI
 {
     public enum ExitCode
     {
+        FILE_NOT_EXIST = -2,
         INVALID_ARGS = -1,
         DONE = 0
     }
 
     public class CliEntry
     {
+        static DateTime LastActionTime;
+
+        static CliEntry()
+        {
+            LastActionTime = DateTime.Now; ;
+        }
+
         static string input = string.Empty;
 
         static string output = string.Empty;
@@ -25,9 +34,42 @@ namespace EpubSanitizerCLI
                 PrintUsage();
                 Environment.Exit((int)ExitCode.INVALID_ARGS);
             }
+            Log("Initialize parameters...");
             ParseArgs(args);
+            Log("Creating instance...");
             EpubSanitizer Instance = new();
             Instance.Config.LoadConfigString(Config);
+            if (!File.Exists(input))
+            {
+                Error("Input file not exist!");
+                Environment.Exit((int)ExitCode.FILE_NOT_EXIST);
+            }
+            Log("Loading file...");
+            Stream FileStream = File.OpenRead(input);
+            ZipArchive EpubFile = new(FileStream, ZipArchiveMode.Read);
+            Instance.LoadFile(EpubFile);
+        }
+
+        /// <summary>
+        /// Print log message with time diff
+        /// </summary>
+        /// <param name="message"></param>
+        static void Log(string message)
+        {
+            DateTime dateTime = DateTime.Now;
+            Console.WriteLine($"[{dateTime:hh.mm.ss.fff}]{message}[+{(int)(dateTime - LastActionTime).TotalMilliseconds}ms]");
+            LastActionTime = dateTime;
+        }
+
+        /// <summary>
+        /// Log error message to console
+        /// </summary>
+        /// <param name="message"></param>
+        static void Error(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("[Error]" + message);
+            Console.ResetColor();
         }
 
         /// <summary>
@@ -50,7 +92,7 @@ namespace EpubSanitizerCLI
             Console.WriteLine("    --filter=xxx              The filter used for xhtml processing, default value is 'default' which only enables general filter");
             Console.WriteLine("    --compress=0              Compression level used for compressible file, value in number as CompressionLevel Enum of .NET, default value is 0. Not applicable to non-compressible files.");
             Console.WriteLine("    --cache=ram|disk          Where to store cache during sanitization, ram mode privides faster speed but may consume enormous memory, default value is 'ram'.");
-            Console.WriteLine("    --threads=single|multi    Enable multithread processing or not, multithread provides faster speed on multi core devices, but may affect system responsibility on low end devices, default value is 'single'.");
+            Console.WriteLine("    --threads=single|multi    Enable multithread processing or not, multithread provides faster speed on multi core devices, but may affect system responsibility on low end devices, default value is 'single', currently multithread is not implemented.");
             Console.WriteLine("    --overwrite               Overwrite sanitized file to input file. If process crashed of power lost, you may lose your file. Use at your own risk!");
             Console.WriteLine("Special arguments:");
             Console.WriteLine("    -v                        Print version information.");
@@ -103,7 +145,14 @@ namespace EpubSanitizerCLI
                 }
             }
             input = args[i];
-            output = (args.Length > i + 1) ? args[i + 1] : args[i].Replace(".epub", "_out.epub");
+            if (Config.ContainsKey("overwrite"))
+            {
+                output = input;
+            }
+            else
+            {
+                output = (args.Length > i + 1) ? args[i + 1] : args[i].Replace(".epub", "_out.epub");
+            }
         }
 
         /// <summary>

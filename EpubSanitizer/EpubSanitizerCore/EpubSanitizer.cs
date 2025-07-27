@@ -7,7 +7,8 @@ namespace EpubSanitizerCore
         /// <inheritdoc />
         static readonly Dictionary<string, object> ConfigList = new() {
             {"filter", "default"},
-            {"compress", 0 }
+            {"compress", 0 },
+            {"cache", FS.FS.Ram }
         };
         /// <summary>
         /// Instance of config manager
@@ -26,7 +27,7 @@ namespace EpubSanitizerCore
         }
 
         /// <summary>
-        /// Load Epub file to instance, can only call once for each instance
+        /// Load Epub file to instance, can only call once for each instance, can safely close archive after load
         /// </summary>
         /// <param name="archive">Opened Epub file for read</param>
         public void LoadFile(ZipArchive archive)
