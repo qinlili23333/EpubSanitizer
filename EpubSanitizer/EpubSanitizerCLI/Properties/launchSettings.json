@@ -2,7 +2,7 @@
   "profiles": {
     "EpubSanitizerCLI": {
       "commandName": "Project",
-      "commandLineArgs": "--cache=ram 3.epub 2.epub"
+      "commandLineArgs": "--cache=ram --compress=3 3.epub 2.epub"
     }
   }
 }

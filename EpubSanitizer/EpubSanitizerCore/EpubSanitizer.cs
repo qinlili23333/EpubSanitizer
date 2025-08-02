@@ -40,7 +40,7 @@ namespace EpubSanitizerCore
             {
                 throw new InvalidOperationException("File already load to instance!");
             }
-            FileStorage = FS.FileSystem.CreateFS(Config.GetEnum<FS.FS>("cache"));
+            FileStorage = FS.FileSystem.CreateFS(this, Config.GetEnum<FS.FS>("cache"));
             FileStorage.Import(archive);
         }
 

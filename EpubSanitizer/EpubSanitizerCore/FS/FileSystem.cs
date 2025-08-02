@@ -20,6 +20,16 @@ namespace EpubSanitizerCore.FS
     internal abstract class FileSystem
     {
         /// <summary>
+        /// The instance, mainly used for getting config
+        /// </summary>
+        internal readonly EpubSanitizer Instance;
+
+        internal FileSystem(EpubSanitizer CoreInstance)
+        {
+            Instance = CoreInstance;
+        }
+
+        /// <summary>
         /// Write string content to target path
         /// </summary>
         /// <param name="path">relative path</param>
@@ -60,11 +70,12 @@ namespace EpubSanitizerCore.FS
         /// <summary>
         /// Create file system instance
         /// </summary>
-        /// <param name="fs"></param>
+        /// <param name="Instance">Instance of EpubSanitizer</param>
+        /// <param name="fs">Target file system</param>
         /// <returns></returns>
-        internal static FileSystem CreateFS(FS fs)
+        internal static FileSystem CreateFS(EpubSanitizer Instance, FS fs)
         {
-            return (FileSystem)Activator.CreateInstance(Pairs[fs]);
+            return (FileSystem)Activator.CreateInstance(Pairs[fs], [Instance]);
         }
     }
 }

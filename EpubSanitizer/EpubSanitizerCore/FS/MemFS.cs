@@ -6,6 +6,10 @@ namespace EpubSanitizerCore.FS
     {
         private Dictionary<string, byte[]> Files = [];
 
+        public MemFS(EpubSanitizer CoreInstance) : base(CoreInstance)
+        {
+        }
+
         /// <inheritdoc/>
         internal override void Export(ZipArchive EpubFile)
         {
@@ -23,7 +27,7 @@ namespace EpubSanitizerCore.FS
                 {
                     continue;
                 }
-                ZipArchiveEntry entry = EpubFile.CreateEntry(file.Key, CompressionLevel.Optimal);
+                ZipArchiveEntry entry = EpubFile.CreateEntry(file.Key, (CompressionLevel)Instance.Config.GetInt("compress"));
                 using Stream entryStream = entry.Open();
                 using MemoryStream ms = new(file.Value);
                 ms.CopyTo(entryStream);
@@ -49,7 +53,7 @@ namespace EpubSanitizerCore.FS
         /// <inheritdoc/>
         internal override string ReadString(string path)
         {
-            return Files.TryGetValue(path, out byte[] content) 
+            return Files.TryGetValue(path, out byte[] content)
                 ? System.Text.Encoding.UTF8.GetString(content)
                 : throw new FileNotFoundException($"File '{path}' not found in memory file system.");
         }

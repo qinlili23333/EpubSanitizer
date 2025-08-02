@@ -27,6 +27,10 @@ namespace EpubSanitizerCore.FS
         /// </summary>
         private readonly string Folder = Path.GetTempPath() + "\\" + GenerateRandomStringFromTimestamp();
 
+        public DiskFS(EpubSanitizer CoreInstance) : base(CoreInstance)
+        {
+        }
+
         /// <inheritdoc/>
         internal override void Export(ZipArchive EpubFile)
         {
@@ -47,7 +51,7 @@ namespace EpubSanitizerCore.FS
                 }
                 string relativePath = Path.GetRelativePath(Folder, filePath);
                 string entryName = Path.Combine("EpubSanitizerExport", relativePath).Replace('\\', '/');
-                ZipArchiveEntry entry = EpubFile.CreateEntry(entryName, CompressionLevel.Optimal);
+                ZipArchiveEntry entry = EpubFile.CreateEntry(entryName, (CompressionLevel)Instance.Config.GetInt("compress"));
                 using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
                 using Stream entryStream = entry.Open();
                 fileStream.CopyTo(entryStream);
