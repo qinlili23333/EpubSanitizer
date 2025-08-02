@@ -44,6 +44,10 @@ namespace EpubSanitizerCore.FS
         /// <param name="EpubFile"></param>
         internal abstract void Export(ZipArchive EpubFile);
 
+        /// <summary>
+        /// Dispose all resources used by this file system
+        /// </summary>
+        internal abstract void Dispose();
 
         /// <summary>
         /// Internal relationship of enum and class

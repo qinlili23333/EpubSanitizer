@@ -60,5 +60,13 @@ namespace EpubSanitizerCore
         {
             FileStorage.Export(archive);
         }
+
+        /// <summary>
+        /// Clean up resources used by this instance
+        /// </summary>
+        public void Dispose()
+        {
+            FileStorage.Dispose();
+        }
     }
 }

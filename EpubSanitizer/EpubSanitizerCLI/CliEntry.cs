@@ -51,6 +51,16 @@ namespace EpubSanitizerCLI
             EpubFile.Dispose();
             FileStream.Close();
             Log("Processing...");
+            Instance.Process();
+            Log("Saving file...");
+            FileStream = File.OpenWrite(output);
+            EpubFile = new(FileStream, ZipArchiveMode.Create);
+            Instance.SaveFile(EpubFile);
+            EpubFile.Dispose();
+            FileStream.Close();
+            Log("Cleaning...");
+            Instance.Dispose();
+            Log("Done!");
         }
 
         /// <summary>

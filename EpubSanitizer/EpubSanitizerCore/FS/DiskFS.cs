@@ -51,5 +51,11 @@ namespace EpubSanitizerCore.FS
         {
             throw new NotImplementedException();
         }
+
+        /// <inheritdoc/>
+        internal override void Dispose()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
