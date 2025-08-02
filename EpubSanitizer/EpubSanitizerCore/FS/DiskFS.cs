@@ -62,15 +62,15 @@ namespace EpubSanitizerCore.FS
         }
 
         /// <inheritdoc/>
-        internal override string Read(string path)
+        internal override string ReadString(string path)
         {
-            throw new NotImplementedException();
+            return File.ReadAllText(Path.Combine(Folder, path));
         }
 
         /// <inheritdoc/>
-        internal override void Write(string path, string content)
+        internal override void WriteString(string path, string content)
         {
-            throw new NotImplementedException();
+            File.WriteAllText(Path.Combine(Folder, path), content);
         }
 
         /// <inheritdoc/>

@@ -47,15 +47,17 @@ namespace EpubSanitizerCore.FS
         }
 
         /// <inheritdoc/>
-        internal override string Read(string path)
+        internal override string ReadString(string path)
         {
-            throw new NotImplementedException();
+            return Files.TryGetValue(path, out byte[] content) 
+                ? System.Text.Encoding.UTF8.GetString(content)
+                : throw new FileNotFoundException($"File '{path}' not found in memory file system.");
         }
 
         /// <inheritdoc/>
-        internal override void Write(string path, string content)
+        internal override void WriteString(string path, string content)
         {
-            throw new NotImplementedException();
+            Files[path] = System.Text.Encoding.UTF8.GetBytes(content);
         }
 
         /// <inheritdoc/>
