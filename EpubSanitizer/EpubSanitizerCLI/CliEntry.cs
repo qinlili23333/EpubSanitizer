@@ -1,5 +1,6 @@
 ﻿using EpubSanitizerCore;
 using System.IO.Compression;
+using System.Text;
 
 namespace EpubSanitizerCLI
 {
@@ -54,7 +55,7 @@ namespace EpubSanitizerCLI
             Instance.Process();
             Log("Saving file...");
             FileStream = File.OpenWrite(output);
-            EpubFile = new(FileStream, ZipArchiveMode.Create);
+            EpubFile = new(FileStream, ZipArchiveMode.Create, true, Encoding.UTF8);
             Instance.SaveFile(EpubFile);
             EpubFile.Dispose();
             FileStream.Close();
