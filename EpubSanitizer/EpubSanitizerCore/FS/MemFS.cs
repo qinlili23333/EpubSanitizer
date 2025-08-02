@@ -43,7 +43,7 @@ namespace EpubSanitizerCore.FS
         /// <inheritdoc/>
         internal override void Dispose()
         {
-            throw new NotImplementedException();
+            Files.Clear();
         }
     }
 }
