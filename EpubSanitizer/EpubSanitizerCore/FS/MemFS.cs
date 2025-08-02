@@ -9,7 +9,25 @@ namespace EpubSanitizerCore.FS
         /// <inheritdoc/>
         internal override void Export(ZipArchive EpubFile)
         {
-            throw new NotImplementedException();
+            // write mimetype first
+            ZipArchiveEntry mimetypeEntry = EpubFile.CreateEntry("mimetype", CompressionLevel.NoCompression);
+            using (Stream mimetypeStream = mimetypeEntry.Open())
+            {
+                using StreamWriter writer = new(mimetypeStream);
+                writer.Write("application/epub+zip");
+            }
+            foreach (var file in Files)
+            {
+                // skip mimetype file
+                if (file.Key == "mimetype")
+                {
+                    continue;
+                }
+                ZipArchiveEntry entry = EpubFile.CreateEntry(file.Key, CompressionLevel.Optimal);
+                using Stream entryStream = entry.Open();
+                using MemoryStream ms = new(file.Value);
+                ms.CopyTo(entryStream);
+            }
         }
 
         /// <inheritdoc/>

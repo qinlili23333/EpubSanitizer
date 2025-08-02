@@ -15,7 +15,7 @@ namespace EpubSanitizerCore.FS
             byte[] timestampBytes = BitConverter.GetBytes(timestamp);
             using SHA256 sha256 = SHA256.Create();
             byte[] hashBytes = sha256.ComputeHash(timestampBytes);
-            System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
+            System.Text.StringBuilder stringBuilder = new();
             for (int i = 0; i < 4; i++)
             {
                 stringBuilder.Append(hashBytes[i].ToString("x2"));
@@ -25,12 +25,33 @@ namespace EpubSanitizerCore.FS
         /// <summary>
         /// Folder to hold files
         /// </summary>
-        private readonly string Folder = Path.GetTempPath()+"\\"+ GenerateRandomStringFromTimestamp();
+        private readonly string Folder = Path.GetTempPath() + "\\" + GenerateRandomStringFromTimestamp();
 
         /// <inheritdoc/>
         internal override void Export(ZipArchive EpubFile)
         {
-            throw new NotImplementedException();
+            // write mimetype first
+            ZipArchiveEntry mimetypeEntry = EpubFile.CreateEntry("mimetype", CompressionLevel.NoCompression);
+            using (Stream mimetypeStream = mimetypeEntry.Open())
+            {
+                using StreamWriter writer = new(mimetypeStream);
+                writer.Write("application/epub+zip");
+            }
+
+            foreach (string filePath in Directory.GetFiles(Folder, "*", SearchOption.AllDirectories))
+            {
+                // skip mimetype file
+                if (filePath.EndsWith("mimetype"))
+                {
+                    continue;
+                }
+                string relativePath = Path.GetRelativePath(Folder, filePath);
+                string entryName = Path.Combine("EpubSanitizerExport", relativePath).Replace('\\', '/');
+                ZipArchiveEntry entry = EpubFile.CreateEntry(entryName, CompressionLevel.Optimal);
+                using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+                using Stream entryStream = entry.Open();
+                fileStream.CopyTo(entryStream);
+            }
         }
 
         /// <inheritdoc/>
