@@ -6,5 +6,12 @@
     internal abstract class Filter
     {
 
+        /// <summary>
+        /// All available filters
+        /// </summary>
+        private Dictionary<string, Type> Filters = new(){
+            {"default", typeof(General)},
+            {"general", typeof(General)}
+        };
     }
 }

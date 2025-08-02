@@ -46,6 +46,14 @@ namespace EpubSanitizerCore
         }
 
         /// <summary>
+        /// Process the Epub with all selected filters
+        /// </summary>
+        public void Process()
+        {
+
+        }
+
+        /// <summary>
         /// Save processed Epub file
         /// </summary>
         /// <param name="archive">Empty file for write</param>
