@@ -27,6 +27,10 @@ namespace EpubSanitizerCore
         /// </summary>
         internal FileIndexer Indexer;
         /// <summary>
+        /// Logger function, can be override by user to log messages
+        /// </summary>
+        public Action<string> Logger = (message) => { };
+        /// <summary>
         /// Create a new instance of EpubSanitizer
         /// </summary>
         public EpubSanitizer()

@@ -38,7 +38,10 @@ namespace EpubSanitizerCLI
             Log("Initialize parameters...");
             ParseArgs(args);
             Log("Creating instance...");
-            EpubSanitizer Instance = new();
+            EpubSanitizer Instance = new()
+            {
+                Logger = Log
+            };
             Instance.Config.LoadConfigString(Config);
             if (!File.Exists(input))
             {

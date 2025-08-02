@@ -25,10 +25,11 @@ namespace EpubSanitizerCore.FS
         /// <summary>
         /// Folder to hold files
         /// </summary>
-        private readonly string Folder = Path.GetTempPath() + "\\" + GenerateRandomStringFromTimestamp();
+        private readonly string Folder = Path.GetTempPath() + GenerateRandomStringFromTimestamp();
 
         public DiskFS(EpubSanitizer CoreInstance) : base(CoreInstance)
         {
+            Instance.Logger($"DiskFS uses folder {Folder} to store files. DO NOT remove it from temp folder.");
         }
 
         /// <inheritdoc/>

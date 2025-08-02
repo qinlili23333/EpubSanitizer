@@ -37,6 +37,7 @@ namespace EpubSanitizerCore.FS
         /// <inheritdoc/>
         internal override void Import(ZipArchive EpubFile)
         {
+            long totalsize = 0;
             foreach (ZipArchiveEntry entry in EpubFile.Entries)
             {
                 if (entry.FullName.EndsWith('/'))
@@ -46,8 +47,10 @@ namespace EpubSanitizerCore.FS
                 using Stream entryStream = entry.Open();
                 using MemoryStream ms = new();
                 entryStream.CopyTo(ms);
+                totalsize += ms.Length;
                 Files.Add(entry.FullName, ms.ToArray());
             }
+            Instance.Logger($"MemoryFS uses about {totalsize/1024/1024} MB memory. Watch out your memory pressure.");
         }
 
         /// <inheritdoc/>
