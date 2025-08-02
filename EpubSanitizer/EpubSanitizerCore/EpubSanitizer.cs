@@ -21,7 +21,11 @@ namespace EpubSanitizerCore
         /// <summary>
         /// FileSystem instance to hold file
         /// </summary>
-        private FS.FileSystem FileStorage;
+        internal FS.FileSystem FileStorage;
+        /// <summary>
+        /// FileIndexer instance to index files, used by many filters
+        /// </summary>
+        internal FileIndexer Indexer;
         /// <summary>
         /// Create a new instance of EpubSanitizer
         /// </summary>
@@ -42,6 +46,8 @@ namespace EpubSanitizerCore
             }
             FileStorage = FS.FileSystem.CreateFS(this, Config.GetEnum<FS.FS>("cache"));
             FileStorage.Import(archive);
+            Indexer= new FileIndexer(this);
+            Indexer.IndexFiles();
         }
 
         /// <summary>

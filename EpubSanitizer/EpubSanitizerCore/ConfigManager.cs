@@ -1,14 +1,7 @@
-﻿namespace EpubSanitizerCore
+﻿using static EpubSanitizerCore.Exceptions;
+namespace EpubSanitizerCore
 {
-    /// <summary>
-    /// An exception raised when config not found
-    /// </summary>
-    public class ConfigNotFoundException : Exception
-    {
-        internal ConfigNotFoundException(string message) : base($"'{message}' does not exist in config")
-        {
-        }
-    }
+
     /// <summary>
     /// Config manager for current EpubSanitizer instance
     /// </summary>
