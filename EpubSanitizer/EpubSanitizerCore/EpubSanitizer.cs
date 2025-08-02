@@ -55,7 +55,7 @@ namespace EpubSanitizerCore
         /// <summary>
         /// Save processed Epub file
         /// </summary>
-        /// <param name="archive">Empty file for write</param>
+        /// <param name="archive">Empty file for write, you must create archive with UTF-8 encoding to comply with Epub standard</param>
         public void SaveFile(ZipArchive archive)
         {
             FileStorage.Export(archive);
