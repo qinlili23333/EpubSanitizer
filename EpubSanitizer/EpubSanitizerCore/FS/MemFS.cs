@@ -6,11 +6,13 @@ namespace EpubSanitizerCore.FS
     {
         private Dictionary<string, byte[]> Files = [];
 
+        /// <inheritdoc/>
         internal override void Export(ZipArchive EpubFile)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         internal override void Import(ZipArchive EpubFile)
         {
             foreach (ZipArchiveEntry entry in EpubFile.Entries)
@@ -26,11 +28,13 @@ namespace EpubSanitizerCore.FS
             }
         }
 
+        /// <inheritdoc/>
         internal override string Read(string path)
         {
             throw new NotImplementedException();
         }
 
+        /// <inheritdoc/>
         internal override void Write(string path, string content)
         {
             throw new NotImplementedException();

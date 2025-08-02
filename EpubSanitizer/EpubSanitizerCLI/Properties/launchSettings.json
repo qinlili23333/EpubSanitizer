@@ -2,7 +2,7 @@
   "profiles": {
     "EpubSanitizerCLI": {
       "commandName": "Project",
-      "commandLineArgs": "1.epub 2.epub"
+      "commandLineArgs": "--cache=disk 3.epub 2.epub"
     }
   }
 }

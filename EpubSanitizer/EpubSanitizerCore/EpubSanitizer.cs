@@ -4,7 +4,6 @@ namespace EpubSanitizerCore
 {
     public class EpubSanitizer
     {
-        /// <inheritdoc />
         static readonly Dictionary<string, object> ConfigList = new() {
             {"filter", "default"},
             {"compress", 0 },
