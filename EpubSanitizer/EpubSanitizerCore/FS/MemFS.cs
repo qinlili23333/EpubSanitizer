@@ -2,13 +2,9 @@
 
 namespace EpubSanitizerCore.FS
 {
-    internal class MemFS : FileSystem
+    internal class MemFS(EpubSanitizer CoreInstance) : FileSystem(CoreInstance)
     {
         private Dictionary<string, byte[]> Files = [];
-
-        public MemFS(EpubSanitizer CoreInstance) : base(CoreInstance)
-        {
-        }
 
         /// <inheritdoc/>
         internal override void Export(ZipArchive EpubFile)
@@ -71,6 +67,26 @@ namespace EpubSanitizerCore.FS
         internal override void Dispose()
         {
             Files.Clear();
+        }
+
+        /// <inheritdoc/>
+        internal override void DeleteFile(string path)
+        {
+            Files.Remove(path);
+        }
+
+        /// <inheritdoc/>
+        internal override string GetSHA256(string path)
+        {
+            if (Files.TryGetValue(path, out byte[] content))
+            {
+                byte[] hashBytes = System.Security.Cryptography.SHA256.HashData(content);
+                return Convert.ToHexStringLower(hashBytes);
+            }
+            else
+            {
+                throw new FileNotFoundException($"File '{path}' not found in memory file system.");
+            }
         }
     }
 }

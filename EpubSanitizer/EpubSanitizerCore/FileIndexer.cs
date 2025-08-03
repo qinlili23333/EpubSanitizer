@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using HeyRed.Mime;
+using System.Xml;
 using static EpubSanitizerCore.Exceptions;
 
 namespace EpubSanitizerCore
@@ -8,15 +9,15 @@ namespace EpubSanitizerCore
         /// <summary>
         /// id in the manifest
         /// </summary>
-        string id;
+        internal string id;
         /// <summary>
         /// Path inside Epub file
         /// </summary>
-        string path;
+        internal string path;
         /// <summary>
         /// mimetype of the file
         /// </summary>
-        string mimetype;
+        internal string mimetype;
     }
     internal class FileIndexer
     {
@@ -45,7 +46,6 @@ namespace EpubSanitizerCore
         /// </summary>
         internal void IndexFiles()
         {
-
             string container;
             try
             {
@@ -54,7 +54,6 @@ namespace EpubSanitizerCore
             catch (FileNotFoundException)
             {
                 throw new InvalidEpubException("Container file not found in the Epub file.");
-
             }
             containerDoc.LoadXml(container);
             string opfpath = containerDoc.GetElementsByTagName("rootfile")[0].Attributes["full-path"].Value;
@@ -66,9 +65,34 @@ namespace EpubSanitizerCore
             catch (FileNotFoundException)
             {
                 throw new InvalidEpubException("OPF file not found in the Epub file.");
-
             }
             opfDoc.LoadXml(opfcontent);
+            XmlNodeList manifestNodes = opfDoc.GetElementsByTagName("manifest")[0].ChildNodes;
+            foreach (XmlNode file in manifestNodes)
+            {
+                OpfFile FileInfo = new()
+                {
+                    id = file.Attributes["id"]?.Value ?? string.Empty,
+                    path = file.Attributes["href"]?.Value ?? string.Empty,
+                    mimetype = file.Attributes["media-type"]?.Value ?? string.Empty
+                };
+                if (FileInfo.path == string.Empty)
+                {
+                    Instance.Logger($"Invalid file entry in manifest: {file.OuterXml}, file will be excluded.");
+                    continue;
+                }
+                if (FileInfo.id == string.Empty)
+                {
+                    Instance.Logger($"Lack file id: {file.OuterXml}, use hash as id.");
+                    FileInfo.id = Instance.FileStorage.GetSHA256(FileInfo.path);
+                }
+                if (FileInfo.mimetype == string.Empty)
+                {
+                    Instance.Logger($"Lack file mimetype: {file.OuterXml}, try getting by extension.");
+                    FileInfo.mimetype = MimeTypesMap.GetMimeType(FileInfo.path);
+                }
+                ManifestFiles = [.. ManifestFiles, FileInfo];
+            }
         }
     }
 }

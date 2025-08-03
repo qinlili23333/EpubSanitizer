@@ -41,6 +41,17 @@ namespace EpubSanitizerCore.FS
         /// <param name="path">relative path</param>
         /// <returns>string content</returns>
         internal abstract string ReadString(string path);
+        /// <summary>
+        /// Remove file permanently from file system
+        /// </summary>
+        /// <param name="path">relative path</param>
+        internal abstract void DeleteFile(string path);
+        /// <summary>
+        /// Calculate SHA256 hash of a file
+        /// </summary>
+        /// <param name="path">relative path</param>
+        /// <returns></returns>
+        internal abstract string GetSHA256(string path);
 
         // TODO: support non-text processing
 

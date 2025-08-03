@@ -13,7 +13,7 @@ namespace EpubSanitizerCore.FS
         {
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             byte[] timestampBytes = BitConverter.GetBytes(timestamp);
-            using SHA256 sha256 = SHA256.Create();
+            using SHA256 sha256 = System.Security.Cryptography.SHA256.Create();
             byte[] hashBytes = sha256.ComputeHash(timestampBytes);
             System.Text.StringBuilder stringBuilder = new();
             for (int i = 0; i < 4; i++)
@@ -69,7 +69,7 @@ namespace EpubSanitizerCore.FS
         /// <inheritdoc/>
         internal override string ReadString(string path)
         {
-            if (!File.Exists(Path.Combine(Folder, path)))
+            if (!File.Exists(Path.Combine(Folder, path.Replace('\\', '/'))))
             {
                 throw new FileNotFoundException($"File '{path}' does not exist in the file system.");
             }
@@ -79,13 +79,34 @@ namespace EpubSanitizerCore.FS
         /// <inheritdoc/>
         internal override void WriteString(string path, string content)
         {
-            File.WriteAllText(Path.Combine(Folder, path), content);
+            File.WriteAllText(Path.Combine(Folder, path.Replace('\\', '/')), content);
         }
 
         /// <inheritdoc/>
         internal override void Dispose()
         {
             Directory.Delete(Folder, true);
+        }
+
+        /// <inheritdoc/>
+        internal override void DeleteFile(string path)
+        {
+            File.Delete(Path.Combine(Folder, path.Replace('\\', '/')));
+        }
+
+        /// <inheritdoc/>
+        internal override string GetSHA256(string path)
+        {
+            if (!File.Exists(Path.Combine(Folder, path.Replace('\\', '/'))))
+            {
+                throw new FileNotFoundException($"File '{path}' does not exist in the file system.");
+            }
+            using SHA256 sha256 = System.Security.Cryptography.SHA256.Create();
+            using FileStream fileStream = new(Path.Combine(Folder, path.Replace('\\', '/')), FileMode.Open, FileAccess.Read);
+            {
+                byte[] hashBytes = sha256.ComputeHash(fileStream);
+                return Convert.ToHexStringLower(hashBytes);
+            }
         }
     }
 }
