@@ -35,7 +35,6 @@ namespace EpubSanitizerCLI
                 PrintUsage();
                 Environment.Exit((int)ExitCode.INVALID_ARGS);
             }
-            Log("Initialize parameters...");
             ParseArgs(args);
             Log("Creating instance...");
             EpubSanitizer Instance = new()
@@ -114,6 +113,7 @@ namespace EpubSanitizerCLI
             Console.WriteLine("Special arguments:");
             Console.WriteLine("    -v                        Print version information.");
             Console.WriteLine("    -h                        Print this general help.");
+            Console.WriteLine("    -f                        Print all available filters.");
             Console.WriteLine("    -h filter_name            Print help of specific filter.");
         }
 
@@ -139,6 +139,15 @@ namespace EpubSanitizerCLI
                     PrintUsage();
                     Environment.Exit((int)ExitCode.DONE);
                 }
+            }
+            else if (args[0] == "-f")
+            {
+                Console.WriteLine("Available filters:");
+                foreach (var item in EpubSanitizer.GetFilters())
+                {
+                    Console.Write(item + ",");
+                }
+                Environment.Exit((int)ExitCode.DONE);
             }
             // Process normal parse
             int i;

@@ -69,7 +69,7 @@ namespace EpubSanitizerCore.FS
         /// <inheritdoc/>
         internal override string ReadString(string path)
         {
-            if(!File.Exists(Path.Combine(Folder, path)))
+            if (!File.Exists(Path.Combine(Folder, path)))
             {
                 throw new FileNotFoundException($"File '{path}' does not exist in the file system.");
             }

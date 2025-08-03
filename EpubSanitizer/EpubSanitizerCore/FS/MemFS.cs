@@ -50,7 +50,7 @@ namespace EpubSanitizerCore.FS
                 totalsize += ms.Length;
                 Files.Add(entry.FullName, ms.ToArray());
             }
-            Instance.Logger($"MemoryFS uses about {totalsize/1024/1024} MB memory. Watch out your memory pressure.");
+            Instance.Logger($"MemoryFS uses about {totalsize / 1024 / 1024} MB memory. Watch out your memory pressure.");
         }
 
         /// <inheritdoc/>

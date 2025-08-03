@@ -9,9 +9,10 @@
         /// <summary>
         /// All available filters
         /// </summary>
-        private Dictionary<string, Type> Filters = new(){
+        internal static Dictionary<string, Type> Filters = new(){
             {"default", typeof(General)},
             {"general", typeof(General)}
         };
+
     }
 }

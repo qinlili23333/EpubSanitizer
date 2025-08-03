@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EpubSanitizerCore
+﻿namespace EpubSanitizerCore
 {
     public class Exceptions
     {
@@ -21,7 +15,7 @@ namespace EpubSanitizerCore
         /// <summary>
         /// Epub file is not an Epub file
         /// </summary>
-        public class  InvalidEpubException : Exception
+        public class InvalidEpubException : Exception
         {
             internal InvalidEpubException(string message) : base($"Invalid EPUB file: {message}")
             {

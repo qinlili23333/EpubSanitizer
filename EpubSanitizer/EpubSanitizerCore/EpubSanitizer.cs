@@ -50,7 +50,7 @@ namespace EpubSanitizerCore
             }
             FileStorage = FS.FileSystem.CreateFS(this, Config.GetEnum<FS.FS>("cache"));
             FileStorage.Import(archive);
-            Indexer= new FileIndexer(this);
+            Indexer = new FileIndexer(this);
             Indexer.IndexFiles();
         }
 
@@ -77,6 +77,15 @@ namespace EpubSanitizerCore
         public void Dispose()
         {
             FileStorage.Dispose();
+        }
+
+        /// <summary>
+        /// Static method to get all available filters
+        /// </summary>
+        /// <returns></returns>
+        public static string[] GetFilters()
+        {
+            return [.. Filters.Filter.Filters.Keys];
         }
     }
 }
