@@ -11,6 +11,10 @@ namespace EpubSanitizerCore
         /// </summary>
         internal string id;
         /// <summary>
+        /// Relative path to OPF file
+        /// </summary>
+        internal string opfpath;
+        /// <summary>
         /// Path inside Epub file
         /// </summary>
         internal string path;
@@ -29,6 +33,10 @@ namespace EpubSanitizerCore
         /// XML Document for container file
         /// </summary>
         internal XmlDocument containerDoc = new();
+        /// <summary>
+        /// Path of OPF file, relative to Epub root
+        /// </summary>
+        internal string OpfPath = string.Empty;
         /// <summary>
         /// XML Document for OPF file
         /// </summary>
@@ -56,11 +64,11 @@ namespace EpubSanitizerCore
                 throw new InvalidEpubException("Container file not found in the Epub file.");
             }
             containerDoc.LoadXml(container);
-            string opfpath = containerDoc.GetElementsByTagName("rootfile")[0].Attributes["full-path"].Value;
+            OpfPath = containerDoc.GetElementsByTagName("rootfile")[0].Attributes["full-path"].Value;
             string opfcontent;
             try
             {
-                opfcontent = Instance.FileStorage.ReadString(opfpath);
+                opfcontent = Instance.FileStorage.ReadString(OpfPath);
             }
             catch (FileNotFoundException)
             {
@@ -73,12 +81,31 @@ namespace EpubSanitizerCore
                 OpfFile FileInfo = new()
                 {
                     id = file.Attributes["id"]?.Value ?? string.Empty,
-                    path = file.Attributes["href"]?.Value ?? string.Empty,
+                    opfpath = file.Attributes["href"]?.Value ?? string.Empty,
+                    path = Utils.PathUtil.ComposeOpfPath(OpfPath,file.Attributes["href"]?.Value) ?? string.Empty, 
                     mimetype = file.Attributes["media-type"]?.Value ?? string.Empty
                 };
                 if (FileInfo.path == string.Empty)
                 {
                     Instance.Logger($"Invalid file entry in manifest: {file.OuterXml}, file will be excluded.");
+                    continue;
+                }
+                if (FileInfo.opfpath == '/' + FileInfo.path)
+                {
+                    Instance.Logger($"File '{FileInfo.path}' is absolute path, try normalizing.");
+                    try
+                    {
+                        FileInfo.path = Utils.PathUtil.ComposeRelativePath(OpfPath, FileInfo.path);
+                    }
+                    catch (ArgumentException)
+                    {
+                        Instance.Logger($"File '{FileInfo.path}' is outside of OPF path '{OpfPath}', will be moved.");
+                        // TODO: move file directory to OPF path
+                    }
+                }
+                if(!Instance.FileStorage.FileExists(FileInfo.path))
+                {
+                    Instance.Logger($"File '{FileInfo.path}' not found in Epub file, will be excluded from manifest.");
                     continue;
                 }
                 if (FileInfo.id == string.Empty)
@@ -96,9 +123,9 @@ namespace EpubSanitizerCore
             string[] AllFiles = Instance.FileStorage.GetAllFiles();
             foreach (string file in AllFiles)
             {
-                if (file.StartsWith("META-INF/") || file == "mimetype")
+                if (file.StartsWith("META-INF/") || file == "mimetype" || file == OpfPath)
                 {
-                    continue; // skip container and mimetype files
+                    continue;
                 }
                 if (!ManifestFiles.Any(f => f.path == file))
                 {
