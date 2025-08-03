@@ -93,6 +93,18 @@ namespace EpubSanitizerCore
                 }
                 ManifestFiles = [.. ManifestFiles, FileInfo];
             }
+            string[] AllFiles = Instance.FileStorage.GetAllFiles();
+            foreach (string file in AllFiles)
+            {
+                if (file.StartsWith("META-INF/") || file == "mimetype")
+                {
+                    continue; // skip container and mimetype files
+                }
+                if (!ManifestFiles.Any(f => f.path == file))
+                {
+                    Instance.Logger($"File '{file}' not found in manifest, try adding to list.");
+                }
+            }
         }
     }
 }

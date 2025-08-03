@@ -50,8 +50,19 @@ namespace EpubSanitizerCore.FS
         /// Calculate SHA256 hash of a file
         /// </summary>
         /// <param name="path">relative path</param>
-        /// <returns></returns>
+        /// <returns>SHA256 string</returns>
         internal abstract string GetSHA256(string path);
+        /// <summary>
+        /// Check if a file exists in the file system
+        /// </summary>
+        /// <param name="path">relative path</param>
+        /// <returns>bool indicates whether file exists</returns>
+        internal abstract bool FileExists(string path);
+        /// <summary>
+        /// Get all files in the file system
+        /// </summary>
+        /// <returns>string array of all files</returns>
+        internal abstract string[] GetAllFiles();
 
         // TODO: support non-text processing
 

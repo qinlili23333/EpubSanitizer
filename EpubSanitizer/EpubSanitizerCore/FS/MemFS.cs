@@ -88,5 +88,15 @@ namespace EpubSanitizerCore.FS
                 throw new FileNotFoundException($"File '{path}' not found in memory file system.");
             }
         }
+
+        internal override bool FileExists(string path)
+        {
+            return Files.ContainsKey(path);
+        }
+
+        internal override string[] GetAllFiles()
+        {
+            return Files.Keys.ToArray();
+        }
     }
 }

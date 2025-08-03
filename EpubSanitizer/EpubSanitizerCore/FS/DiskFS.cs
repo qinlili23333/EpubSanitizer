@@ -108,5 +108,15 @@ namespace EpubSanitizerCore.FS
                 return Convert.ToHexStringLower(hashBytes);
             }
         }
+
+        internal override bool FileExists(string path)
+        {
+            return File.Exists(Path.Combine(Folder, path.Replace('\\', '/')));
+        }
+
+        internal override string[] GetAllFiles()
+        {
+            return [.. Directory.GetFiles(Folder, "*", SearchOption.AllDirectories).Select(file => Path.GetRelativePath(Folder, file).Replace('\\', '/'))];
+        }
     }
 }
