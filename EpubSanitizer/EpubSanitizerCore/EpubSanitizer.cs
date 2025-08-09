@@ -59,7 +59,23 @@ namespace EpubSanitizerCore
         /// </summary>
         public void Process()
         {
-
+            Config.GetString("filter").Split(',')
+                .Select(f => f.Trim())
+                .Where(f => !string.IsNullOrEmpty(f))
+                .ToList()
+                .ForEach(filterName =>
+                {
+                    if (Filters.Filter.Filters.TryGetValue(filterName, out Type? filterType))
+                    {
+                        Logger($"Applying filter: {filterName}");
+                        var filterInstance = (Filters.Filter)Activator.CreateInstance(filterType, this);
+                        filterInstance.ProcessFiles();
+                    }
+                    else
+                    {
+                        Logger($"Filter '{filterName}' not found, skipping.");
+                    }
+                });
         }
 
         /// <summary>
