@@ -132,7 +132,8 @@ namespace EpubSanitizerCLI
             {
                 if (args.Length > 1)
                 {
-                    // TODO: print help of specific filter
+                    EpubSanitizer.PrintFilterHelp(args[1]);
+                    Environment.Exit((int)ExitCode.DONE);
                 }
                 else
                 {
