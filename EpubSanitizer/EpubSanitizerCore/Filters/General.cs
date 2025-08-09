@@ -11,5 +11,13 @@
         {
             throw new NotImplementedException();
         }
+
+        public static new void PrintHelp()
+        {
+            Console.WriteLine("General filter is a default filter that does basic processing for standard fixing.");
+            Console.WriteLine("Options:");
+            Console.WriteLine("    --general.deprecateFix=true    Fix deprecated attributes if possible.");
+            Console.WriteLine("    --general.minify=false         Minify XHTML files, may accelerate some reader.");
+        }
     }
 }

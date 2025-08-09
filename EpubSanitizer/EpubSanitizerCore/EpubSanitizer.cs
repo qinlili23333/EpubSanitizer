@@ -87,5 +87,21 @@ namespace EpubSanitizerCore
         {
             return [.. Filters.Filter.Filters.Keys];
         }
+
+        /// <summary>
+        /// Print filter help to console
+        /// </summary>
+        /// <param name="filter">filter name</param>
+        public static void PrintFilterHelp(string filter)
+        {
+            Filters.Filter.Filters.TryGetValue(filter, out Type? filterType);
+            if (filterType == null)
+            {
+                Console.WriteLine($"Filter '{filter}' not found.");
+                return;
+            }
+            filterType.GetMethod("PrintHelp", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+                ?.Invoke(null, null);
+        }
     }
 }

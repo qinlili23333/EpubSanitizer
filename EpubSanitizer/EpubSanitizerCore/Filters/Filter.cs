@@ -2,10 +2,18 @@
 
 namespace EpubSanitizerCore.Filters
 {
+    public interface IHelpProvider
+    {
+        /// <summary>
+        /// When implemented in a type, provides a static method to print help text.
+        /// </summary>
+        static abstract void PrintHelp();
+    }
+
     /// <summary>
     /// Abstract class of filter
     /// </summary>
-    internal abstract class Filter
+    internal abstract class Filter : IHelpProvider
     {
         internal readonly EpubSanitizer Instance;
 
@@ -37,5 +45,10 @@ namespace EpubSanitizerCore.Filters
         /// </summary>
         /// <param name="file">path of file</param>
         internal abstract void Process(string file);
+
+        public static void PrintHelp()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
