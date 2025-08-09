@@ -78,6 +78,11 @@ namespace EpubSanitizerCore
             XmlNodeList manifestNodes = opfDoc.GetElementsByTagName("manifest")[0].ChildNodes;
             foreach (XmlNode file in manifestNodes)
             {
+                // Skip comment nodes
+                if (file.NodeType == XmlNodeType.Comment)
+                {
+                    continue;
+                }
                 OpfFile FileInfo = new()
                 {
                     id = file.Attributes["id"]?.Value ?? string.Empty,
