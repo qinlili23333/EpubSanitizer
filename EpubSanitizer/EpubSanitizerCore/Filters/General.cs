@@ -2,9 +2,21 @@
 {
     internal class General(EpubSanitizer CoreInstance) : SingleThreadFilter(CoreInstance)
     {
+        /// <summary>
+        /// General filter only processes XHTML files.
+        /// </summary>
+        /// <returns>list of XHTML files</returns>
         internal override string[] GetProcessList()
         {
-            throw new NotImplementedException();
+            string[] files = [];
+            foreach (var file in Instance.Indexer.ManifestFiles)
+            {
+                if (file.mimetype == "application/xhtml+xml" || file.mimetype == "application/xml")
+                {
+                    files =[..files,file.path];
+                }
+            }
+            return files;
         }
 
         internal override void Process(string file)
