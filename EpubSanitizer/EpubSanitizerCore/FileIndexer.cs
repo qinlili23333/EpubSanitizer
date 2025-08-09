@@ -135,6 +135,13 @@ namespace EpubSanitizerCore
                 if (!ManifestFiles.Any(f => f.path == file))
                 {
                     Instance.Logger($"File '{file}' not found in manifest, try adding to list.");
+                    OpfFile FileInfo = new()
+                    {
+                        id = Instance.FileStorage.GetSHA256(file),
+                        opfpath = Utils.PathUtil.ComposeRelativePath(OpfPath, file),
+                        path = file,
+                        mimetype = MimeTypesMap.GetMimeType(file)
+                    };
                 }
             }
         }
