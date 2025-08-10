@@ -45,7 +45,7 @@ namespace EpubSanitizerCore.FS
         /// Write byte array content to target path
         /// </summary>
         /// <param name="path">relative path</param>
-        /// <param name="content">string content</param>
+        /// <param name="content">byte array content</param>
         internal abstract void WriteBytes(string path, byte[] content);
         /// <summary>
         /// Read byte array content
