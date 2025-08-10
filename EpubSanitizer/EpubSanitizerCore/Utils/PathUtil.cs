@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EpubSanitizerCore.Utils
+﻿namespace EpubSanitizerCore.Utils
 {
     /// <summary>
     /// A class for all path related methods
@@ -19,7 +13,7 @@ namespace EpubSanitizerCore.Utils
         /// <returns></returns>
         internal static string ComposeOpfPath(string opfPath, string filePath)
         {
-            if(filePath.StartsWith('/'))
+            if (filePath.StartsWith('/'))
             {
                 return filePath[1..];
             }
@@ -38,7 +32,7 @@ namespace EpubSanitizerCore.Utils
             string normalizedOpfPath = opfPath[..(opfPath.LastIndexOf('/') + 1)];
             if (filePath.StartsWith(normalizedOpfPath))
             {
-                return filePath[(normalizedOpfPath.Length)..];
+                return filePath[normalizedOpfPath.Length..];
             }
             else
             {

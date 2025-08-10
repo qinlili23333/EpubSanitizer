@@ -87,7 +87,7 @@ namespace EpubSanitizerCore
                 {
                     id = file.Attributes["id"]?.Value ?? string.Empty,
                     opfpath = file.Attributes["href"]?.Value ?? string.Empty,
-                    path = Utils.PathUtil.ComposeOpfPath(OpfPath,file.Attributes["href"]?.Value) ?? string.Empty, 
+                    path = Utils.PathUtil.ComposeOpfPath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
                     mimetype = file.Attributes["media-type"]?.Value ?? string.Empty
                 };
                 if (FileInfo.path == string.Empty)
@@ -108,7 +108,7 @@ namespace EpubSanitizerCore
                         // TODO: move file directory to OPF path
                     }
                 }
-                if(!Instance.FileStorage.FileExists(FileInfo.path))
+                if (!Instance.FileStorage.FileExists(FileInfo.path))
                 {
                     Instance.Logger($"File '{FileInfo.path}' not found in Epub file, will be excluded from manifest.");
                     continue;
