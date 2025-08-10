@@ -66,6 +66,7 @@ namespace EpubSanitizerCore
                 .ToList()
                 .ForEach(filterName =>
                 {
+                    filterName = filterName.ToLowerInvariant();
                     if (Filters.Filter.Filters.TryGetValue(filterName, out Type? filterType))
                     {
                         Logger($"Applying filter: {filterName}");
