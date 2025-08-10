@@ -130,7 +130,7 @@ namespace EpubSanitizerCore
             {
                 foreach (TEnum enu in Enum.GetValues(typeof(TEnum)))
                 {
-                    if (str.ToLower() == enu.ToString().ToLower())
+                    if (str.Equals(enu.ToString(), StringComparison.InvariantCultureIgnoreCase))
                     {
                         ConfigObj[key] = enu;
                     }
