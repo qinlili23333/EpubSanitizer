@@ -28,7 +28,7 @@
         /// <summary>
         /// All available filters
         /// </summary>
-        internal static Dictionary<string, Type> Filters = new(){
+        internal static readonly Dictionary<string, Type> Filters = new(){
             {"default", typeof(General)},
             {"general", typeof(General)},
             {"vitalsource", typeof(VitalSource)}
