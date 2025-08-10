@@ -4,15 +4,15 @@ using System.Text;
 
 namespace EpubSanitizerCLI
 {
-    public enum ExitCode
+    internal static class CliEntry
     {
-        FILE_NOT_EXIST = -2,
-        INVALID_ARGS = -1,
-        DONE = 0
-    }
+        enum ExitCode
+        {
+            FILE_NOT_EXIST = -2,
+            INVALID_ARGS = -1,
+            DONE = 0
+        }
 
-    public class CliEntry
-    {
         static DateTime LastActionTime;
 
         static CliEntry()
