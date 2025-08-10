@@ -72,6 +72,7 @@ namespace EpubSanitizerCore
                         Logger($"Applying filter: {filterName}");
                         var filterInstance = (Filters.Filter)Activator.CreateInstance(filterType, this);
                         filterInstance.ProcessFiles();
+                        GC.Collect(); // Force garbage collection to clean up resources after filter processing
                     }
                     else
                     {
