@@ -8,6 +8,7 @@ namespace EpubSanitizerCLI
     {
         enum ExitCode
         {
+            IO_ERROR = -3,
             FILE_NOT_EXIST = -2,
             INVALID_ARGS = -1,
             DONE = 0
@@ -59,7 +60,15 @@ namespace EpubSanitizerCLI
             if (File.Exists(output))
             {
                 Log("Removing old file...");
-                File.Delete(output);
+                try
+                {
+                    File.Delete(output);
+                }
+                catch (Exception ex)
+                {
+                    Error("Failed to delete old file: " + ex.Message);
+                    Environment.Exit((int)ExitCode.IO_ERROR);
+                }
             }
             FileStream = File.OpenWrite(output);
             EpubFile = new(FileStream, ZipArchiveMode.Create, true, Encoding.UTF8);
