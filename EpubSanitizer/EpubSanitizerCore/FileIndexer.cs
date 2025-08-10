@@ -153,7 +153,7 @@ namespace EpubSanitizerCore
 
         /// <summary>
         /// Write updated OPF file back to Epub.
-        /// Calling this will result isolated XmlElement in OpfFile object, suggest to only call once before saving Epub file.
+        /// Calling this will result in isolated XmlElement in OpfFile object, suggest to only call once before saving Epub file.
         /// </summary>
         internal void UpdateOpf()
         {
