@@ -9,19 +9,23 @@ namespace EpubSanitizerCore
         /// <summary>
         /// id in the manifest
         /// </summary>
-        internal string id;
+        internal string id = string.Empty;
         /// <summary>
         /// Relative path to OPF file
         /// </summary>
-        internal string opfpath;
+        internal string opfpath = string.Empty;
         /// <summary>
         /// Path inside Epub file
         /// </summary>
-        internal string path;
+        internal string path = string.Empty;
         /// <summary>
         /// mimetype of the file
         /// </summary>
-        internal string mimetype;
+        internal string mimetype = string.Empty;
+        /// <summary>
+        /// Original XML element in the OPF manifest
+        /// </summary>
+        internal XmlElement? originElement;
     }
     internal class FileIndexer
     {
@@ -88,7 +92,8 @@ namespace EpubSanitizerCore
                     id = file.Attributes["id"]?.Value ?? string.Empty,
                     opfpath = file.Attributes["href"]?.Value ?? string.Empty,
                     path = Utils.PathUtil.ComposeOpfPath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
-                    mimetype = file.Attributes["media-type"]?.Value ?? string.Empty
+                    mimetype = file.Attributes["media-type"]?.Value ?? string.Empty,
+                    originElement = file as XmlElement
                 };
                 if (FileInfo.path == string.Empty)
                 {
