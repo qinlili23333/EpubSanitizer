@@ -179,12 +179,12 @@ namespace EpubSanitizerCLI
             input = args[i];
             if (Config.ContainsKey("overwrite"))
             {
-                output = (args.Length > i + 1)? args[i + 1] : input;
+                output = (args.Length > i + 1) ? args[i + 1] : input;
             }
             else
             {
                 output = (args.Length > i + 1) ? args[i + 1] : args[i].Replace(".epub", "_out.epub");
-                if(File.Exists(output))
+                if (File.Exists(output))
                 {
                     Error("Output file already exists! Use --overwrite to overwrite it.");
                     Environment.Exit((int)ExitCode.INVALID_ARGS);

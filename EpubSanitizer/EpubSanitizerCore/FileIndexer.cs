@@ -1,6 +1,5 @@
 ﻿using HeyRed.Mime;
 using System.Xml;
-using System.Xml.Linq;
 using static EpubSanitizerCore.Exceptions;
 
 namespace EpubSanitizerCore
@@ -168,7 +167,7 @@ namespace EpubSanitizerCore
             // Write new manifest entries
             foreach (OpfFile file in ManifestFiles)
             {
-                if(file.originElement!= null)
+                if (file.originElement != null)
                 {
                     // If the file already exists in the manifest, use the original element with updated 
                     file.originElement.SetAttribute("id", file.id);
