@@ -42,6 +42,18 @@ namespace EpubSanitizerCore.FS
         /// <returns>string content</returns>
         internal abstract string ReadString(string path);
         /// <summary>
+        /// Write byte array content to target path
+        /// </summary>
+        /// <param name="path">relative path</param>
+        /// <param name="content">byte array content</param>
+        internal abstract void WriteBytes(string path, byte[] content);
+        /// <summary>
+        /// Read byte array content
+        /// </summary>
+        /// <param name="path">relative path</param>
+        /// <returns>byte array content</returns>
+        internal abstract byte[] ReadBytes(string path);
+        /// <summary>
         /// Remove file permanently from file system
         /// </summary>
         /// <param name="path">relative path</param>
@@ -63,8 +75,6 @@ namespace EpubSanitizerCore.FS
         /// </summary>
         /// <returns>string array of all files</returns>
         internal abstract string[] GetAllFiles();
-
-        // TODO: support non-text processing
 
         /// <summary>
         /// Load content from Epub file

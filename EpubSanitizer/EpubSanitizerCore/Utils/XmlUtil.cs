@@ -28,6 +28,17 @@ namespace EpubSanitizerCore.Utils
         /// <returns>The XML content as a string.</returns>
         public static string ToXmlString(XmlDocument doc, bool minify)
         {
+            return Encoding.UTF8.GetString(ToXmlBytes(doc, minify));
+        }
+
+        /// <summary>
+        /// Serializes an XmlDocument to a byte array with optional indentation (minification).
+        /// </summary>
+        /// <param name="doc">The XmlDocument to serialize.</param>
+        /// <param name="minify">If true, the output is minified (no indentation). If false, it's indented for readability.</param>
+        /// <returns>The XML content as byte array.</returns>
+        public static byte[] ToXmlBytes(XmlDocument doc, bool minify)
+        {
             using var memoryStream = new MemoryStream();
             var settings = new XmlWriterSettings
             {
@@ -39,7 +50,7 @@ namespace EpubSanitizerCore.Utils
             {
                 doc.Save(xmlWriter);
             }
-            return Encoding.UTF8.GetString(memoryStream.ToArray());
+            return memoryStream.ToArray();
         }
     }
 }
