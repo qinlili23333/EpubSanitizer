@@ -94,6 +94,14 @@ namespace EpubSanitizerCore
                 throw new InvalidEpubException("OPF file not found in the Epub file.");
             }
             opfDoc.LoadXml(opfcontent);
+            if (opfDoc.GetElementsByTagName("package")[0] is XmlElement packageElement && packageElement.GetAttribute("version") != "3.0")
+            {
+                Instance.Logger("Epub 2.x found, sanitize is not fully supported. In future version, Epub 2.x file will be updated to 3.x.");
+                return;
+                // For future
+                Instance.Logger("Epub 2.x found, will update to 3.x.");
+                packageElement.SetAttribute("version", "3.0");
+            }
         }
 
         /// <summary>
