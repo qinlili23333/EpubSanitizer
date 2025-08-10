@@ -1,6 +1,6 @@
 # EpubSanitizer
 Make extracted EPUB more comply with standard  
-[Use with NuGet](https://www.nuget.org/packages/Qinlili.EpubSanitizer)  
+[![NuGet Version](https://img.shields.io/nuget/v/Qinlili.EpubSanitizer)](https://www.nuget.org/packages/Qinlili.EpubSanitizer)[![CodeQL](https://github.com/qinlili23333/EpubSanitizer/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/qinlili23333/EpubSanitizer/actions/workflows/github-code-scanning/codeql)[![Codacy Badge](https://app.codacy.com/project/badge/Grade/84e2b3e6b75e4682b96f742dc5d10a4d)](https://app.codacy.com/gh/qinlili23333/EpubSanitizer/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)  
 [See Roadmap](https://github.com/users/qinlili23333/projects/4/views/1)  
 
 ## Why this project?

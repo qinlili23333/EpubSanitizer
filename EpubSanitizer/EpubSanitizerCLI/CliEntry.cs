@@ -17,7 +17,7 @@ namespace EpubSanitizerCLI
 
         static CliEntry()
         {
-            LastActionTime = DateTime.Now; ;
+            LastActionTime = DateTime.Now;
         }
 
         static string input = string.Empty;
