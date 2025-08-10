@@ -81,7 +81,16 @@ namespace EpubSanitizerCore.FS
         {
             File.WriteAllText(Path.Combine(Folder, path.Replace('\\', '/')), content);
         }
-
+        /// <inheritdoc/>
+        internal override void WriteBytes(string path, byte[] content)
+        {
+            File.WriteAllBytes(Path.Combine(Folder, path.Replace('\\', '/')), content);
+        }
+        /// <inheritdoc/>
+        internal override byte[] ReadBytes(string path)
+        {
+            return File.ReadAllBytes(Path.Combine(Folder, path.Replace('\\', '/')));
+        }
         /// <inheritdoc/>
         internal override void Dispose()
         {
@@ -118,5 +127,7 @@ namespace EpubSanitizerCore.FS
         {
             return [.. Directory.GetFiles(Folder, "*", SearchOption.AllDirectories).Select(file => Path.GetRelativePath(Folder, file).Replace('\\', '/'))];
         }
+
+
     }
 }
