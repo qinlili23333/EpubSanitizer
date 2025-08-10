@@ -32,7 +32,7 @@ namespace EpubSanitizerCore.Utils
         }
 
         /// <summary>
-        /// Serializes an XmlDocument to a string with optional indentation (minification).
+        /// Serializes an XmlDocument to a byte array with optional indentation (minification).
         /// </summary>
         /// <param name="doc">The XmlDocument to serialize.</param>
         /// <param name="minify">If true, the output is minified (no indentation). If false, it's indented for readability.</param>
