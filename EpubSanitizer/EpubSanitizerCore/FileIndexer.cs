@@ -58,6 +58,21 @@ namespace EpubSanitizerCore
         /// </summary>
         internal void IndexFiles()
         {
+            LoadOpf();
+            XmlNodeList manifestNodes = opfDoc.GetElementsByTagName("manifest")[0].ChildNodes;
+            foreach (XmlNode file in manifestNodes)
+            {
+                AddManifestFile(file);
+            }
+            CheckMissingFile();
+        }
+
+        /// <summary>
+        /// Parse container xml file then load OPF file.
+        /// </summary>
+        /// <exception cref="InvalidEpubException"></exception>
+        private void LoadOpf()
+        {
             string container;
             try
             {
@@ -79,57 +94,13 @@ namespace EpubSanitizerCore
                 throw new InvalidEpubException("OPF file not found in the Epub file.");
             }
             opfDoc.LoadXml(opfcontent);
-            XmlNodeList manifestNodes = opfDoc.GetElementsByTagName("manifest")[0].ChildNodes;
-            foreach (XmlNode file in manifestNodes)
-            {
-                // Skip comment nodes
-                if (file.NodeType == XmlNodeType.Comment)
-                {
-                    continue;
-                }
-                OpfFile FileInfo = new()
-                {
-                    id = file.Attributes["id"]?.Value ?? string.Empty,
-                    opfpath = file.Attributes["href"]?.Value ?? string.Empty,
-                    path = Utils.PathUtil.ComposeOpfPath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
-                    mimetype = file.Attributes["media-type"]?.Value ?? string.Empty,
-                    originElement = file as XmlElement
-                };
-                if (FileInfo.path == string.Empty)
-                {
-                    Instance.Logger($"Invalid file entry in manifest: {file.OuterXml}, file will be excluded.");
-                    continue;
-                }
-                if (FileInfo.opfpath == '/' + FileInfo.path)
-                {
-                    Instance.Logger($"File '{FileInfo.path}' is absolute path, try normalizing.");
-                    try
-                    {
-                        FileInfo.path = Utils.PathUtil.ComposeRelativePath(OpfPath, FileInfo.path);
-                    }
-                    catch (ArgumentException)
-                    {
-                        Instance.Logger($"File '{FileInfo.path}' is outside of OPF path '{OpfPath}', will be moved.");
-                        // TODO: move file directory to OPF path
-                    }
-                }
-                if (!Instance.FileStorage.FileExists(FileInfo.path))
-                {
-                    Instance.Logger($"File '{FileInfo.path}' not found in Epub file, will be excluded from manifest.");
-                    continue;
-                }
-                if (FileInfo.id == string.Empty)
-                {
-                    Instance.Logger($"Lack file id: {file.OuterXml}, use hash as id.");
-                    FileInfo.id = Instance.FileStorage.GetSHA256(FileInfo.path);
-                }
-                if (FileInfo.mimetype == string.Empty)
-                {
-                    Instance.Logger($"Lack file mimetype: {file.OuterXml}, try getting by extension.");
-                    FileInfo.mimetype = MimeTypesMap.GetMimeType(FileInfo.path);
-                }
-                ManifestFiles = [.. ManifestFiles, FileInfo];
-            }
+        }
+
+        /// <summary>
+        /// Check and add files not in manifest.
+        /// </summary>
+        private void CheckMissingFile()
+        {
             string[] AllFiles = Instance.FileStorage.GetAllFiles();
             foreach (string file in AllFiles)
             {
@@ -150,6 +121,61 @@ namespace EpubSanitizerCore
                     ManifestFiles = [.. ManifestFiles, FileInfo];
                 }
             }
+        }
+
+        /// <summary>
+        /// Parse XmlNode of file item in manifest and add to list
+        /// </summary>
+        /// <param name="file">XmlNode element</param>
+        private void AddManifestFile(XmlNode file)
+        {
+            // Skip comment nodes
+            if (file.NodeType == XmlNodeType.Comment)
+            {
+                return;
+            }
+            OpfFile FileInfo = new()
+            {
+                id = file.Attributes["id"]?.Value ?? string.Empty,
+                opfpath = file.Attributes["href"]?.Value ?? string.Empty,
+                path = Utils.PathUtil.ComposeOpfPath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
+                mimetype = file.Attributes["media-type"]?.Value ?? string.Empty,
+                originElement = file as XmlElement
+            };
+            if (FileInfo.path == string.Empty)
+            {
+                Instance.Logger($"Invalid file entry in manifest: {file.OuterXml}, file will be excluded.");
+                return;
+            }
+            if (FileInfo.opfpath == '/' + FileInfo.path)
+            {
+                Instance.Logger($"File '{FileInfo.path}' is absolute path, try normalizing.");
+                try
+                {
+                    FileInfo.path = Utils.PathUtil.ComposeRelativePath(OpfPath, FileInfo.path);
+                }
+                catch (ArgumentException)
+                {
+                    Instance.Logger($"File '{FileInfo.path}' is outside of OPF path '{OpfPath}', will be moved.");
+                    // TODO: move file directory to OPF path
+                }
+            }
+            if (!Instance.FileStorage.FileExists(FileInfo.path))
+            {
+                Instance.Logger($"File '{FileInfo.path}' not found in Epub file, will be excluded from manifest.");
+                return;
+            }
+            if (FileInfo.id == string.Empty)
+            {
+                Instance.Logger($"Lack file id: {file.OuterXml}, use hash as id.");
+                FileInfo.id = Instance.FileStorage.GetSHA256(FileInfo.path);
+            }
+            if (FileInfo.mimetype == string.Empty)
+            {
+                Instance.Logger($"Lack file mimetype: {file.OuterXml}, try getting by extension.");
+                FileInfo.mimetype = MimeTypesMap.GetMimeType(FileInfo.path);
+            }
+            ManifestFiles = [.. ManifestFiles, FileInfo];
         }
 
         /// <summary>
