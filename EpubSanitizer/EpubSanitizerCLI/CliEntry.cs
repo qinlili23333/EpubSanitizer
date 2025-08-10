@@ -108,7 +108,7 @@ namespace EpubSanitizerCLI
             Console.WriteLine("    --filter=xxx              The filter used for xhtml processing, default value is 'default' which only enables general filter");
             Console.WriteLine("    --compress=0              Compression level used for compressible file, value in number as CompressionLevel Enum of .NET, default value is 0. Not applicable to non-compressible files.");
             Console.WriteLine("    --cache=ram|disk          Where to store cache during sanitization, ram mode privides faster speed but may consume enormous memory, default value is 'ram'.");
-            Console.WriteLine("    --threads=single|multi    Enable multithread processing or not, multithread provides faster speed on multi core devices, but may affect system responsibility on low end devices, default value is 'single', currently multithread is not implemented.");
+            Console.WriteLine("    --threads=single|multi    Enable multithread processing or not, multithread provides faster speed on multi core devices, but may affect system responsibility on low end devices, default value is 'multi'.");
             Console.WriteLine("    --overwrite               Overwrite sanitized file to input file. If process crashed of power lost, you may lose your file. Use at your own risk!");
             Console.WriteLine("Special arguments:");
             Console.WriteLine("    -v                        Print version information.");

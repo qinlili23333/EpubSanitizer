@@ -2,8 +2,16 @@
 
 namespace EpubSanitizerCore.Filters
 {
-    internal class General(EpubSanitizer CoreInstance) : SingleThreadFilter(CoreInstance)
+    internal class General(EpubSanitizer CoreInstance) : MultiThreadFilter(CoreInstance)
     {
+        static readonly Dictionary<string, object> ConfigList = new() {
+            {"general.deprecateFix", true},
+            {"general.minify", false }
+        };
+        static General()
+        {
+            ConfigManager.AddDefaultConfig(ConfigList);
+        }
         /// <summary>
         /// General filter only processes XHTML files.
         /// </summary>
@@ -15,7 +23,7 @@ namespace EpubSanitizerCore.Filters
             {
                 if (file.mimetype == "application/xhtml+xml" || file.mimetype == "application/xml")
                 {
-                    files =[..files,file.path];
+                    files = [.. files, file.path];
                 }
             }
             return files;
@@ -36,7 +44,11 @@ namespace EpubSanitizerCore.Filters
                 return;
             }
             // Process deprecated attributes
-            ProcessDeprecatedAttributes(xhtmlDoc);
+            if (Instance.Config.GetBool("general.deprecateFix"))
+            {
+                ProcessDeprecatedAttributes(xhtmlDoc);
+            }
+
             // Write back the processed content
             Instance.FileStorage.WriteString(file, xhtmlDoc.OuterXml);
         }

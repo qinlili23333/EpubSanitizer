@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace EpubSanitizerCore.Filters
+﻿namespace EpubSanitizerCore.Filters
 {
     /// <summary>
     /// Abstract class of single thread filter
@@ -9,23 +7,32 @@ namespace EpubSanitizerCore.Filters
     {
         internal override void ProcessFiles()
         {
-            string[] files = GetProcessList();
+            ProcessFilesStatic(this);
+        }
+
+        /// <summary>
+        /// Static method to process files in a filter, share to multi thread filter when multi thread disabled
+        /// </summary>
+        /// <param name="filter">Filter instance</param>
+        internal static void ProcessFilesStatic(Filter filter)
+        {
+            string[] files = filter.GetProcessList();
             if (files.Length == 0)
             {
-                Instance.Logger("No files to process in filter " + GetType().Name);
+                filter.Instance.Logger("No files to process in filter " + filter.GetType().Name);
                 return;
             }
-            Instance.Logger($"Processing {files.Length} files in filter {GetType().Name}");
+            filter.Instance.Logger($"Processing {files.Length} files in filter {filter.GetType().Name}");
             foreach (string file in files)
             {
                 try
                 {
-                    Instance.Logger($"Processing file {file} in filter {GetType().Name}");
-                    Process(file);
+                    filter.Instance.Logger($"Processing file {file} in filter {filter.GetType().Name}");
+                    filter.Process(file);
                 }
                 catch (Exception ex)
                 {
-                    Instance.Logger($"Error processing file {file} in filter {GetType().Name}: {ex.Message}");
+                    filter.Instance.Logger($"Error processing file {file} in filter {filter.GetType().Name}: {ex.Message}");
                 }
             }
         }

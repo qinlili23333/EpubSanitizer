@@ -1,7 +1,10 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace EpubSanitizerCore.Filters
+﻿namespace EpubSanitizerCore.Filters
 {
+    public enum Threads
+    {
+        Single = 1,
+        Multi = 2
+    }
     public interface IHelpProvider
     {
         /// <summary>
@@ -17,7 +20,8 @@ namespace EpubSanitizerCore.Filters
     {
         internal readonly EpubSanitizer Instance;
 
-        internal Filter(EpubSanitizer CoreInstance) {
+        internal Filter(EpubSanitizer CoreInstance)
+        {
             Instance = CoreInstance;
         }
 

@@ -7,7 +7,8 @@ namespace EpubSanitizerCore
         static readonly Dictionary<string, object> ConfigList = new() {
             {"filter", "default"},
             {"compress", 0 },
-            {"cache", FS.FS.Ram }
+            {"cache", FS.FS.Ram },
+            {"threads", Filters.Threads.Multi }
         };
         static EpubSanitizer()
         {
