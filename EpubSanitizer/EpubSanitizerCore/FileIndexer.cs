@@ -1,5 +1,6 @@
 ﻿using HeyRed.Mime;
 using System.Xml;
+using System.Xml.Linq;
 using static EpubSanitizerCore.Exceptions;
 
 namespace EpubSanitizerCore
@@ -149,6 +150,42 @@ namespace EpubSanitizerCore
                     };
                 }
             }
+        }
+
+        /// <summary>
+        /// Write updated OPF file back to Epub.
+        /// Calling this will result isolated XmlElement in OpfFile object, suggest to only call once before saving Epub file.
+        /// </summary>
+        internal void UpdateOpf()
+        {
+            Instance.Logger("Updating OPF manifest...");
+            // Remove all existing manifest entries
+            XmlNode manifest = opfDoc.GetElementsByTagName("manifest")[0];
+            while (manifest.HasChildNodes)
+            {
+                manifest.RemoveChild(manifest.FirstChild);
+            }
+            // Write new manifest entries
+            foreach (OpfFile file in ManifestFiles)
+            {
+                if(file.originElement!= null)
+                {
+                    // If the file already exists in the manifest, use the original element with updated 
+                    file.originElement.SetAttribute("id", file.id);
+                    file.originElement.SetAttribute("href", file.opfpath);
+                    file.originElement.SetAttribute("media-type", file.mimetype);
+                    manifest.AppendChild(file.originElement);
+                    continue;
+                }
+                XmlElement newElement = opfDoc.CreateElement("item", "http://www.idpf.org/2007/opf");
+                newElement.SetAttribute("id", file.id);
+                newElement.SetAttribute("href", file.opfpath);
+                newElement.SetAttribute("media-type", file.mimetype);
+                manifest.AppendChild(newElement);
+            }
+            // Save the updated OPF document back to the file system
+            string updatedOpfContent = Utils.XmlUtil.ToXmlString(opfDoc, false);
+            Instance.FileStorage.WriteString(OpfPath, updatedOpfContent);
         }
     }
 }
