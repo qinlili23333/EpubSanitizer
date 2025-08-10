@@ -43,7 +43,7 @@ namespace EpubSanitizerCore.Filters
             }
 
             // Write back the processed content
-            Instance.FileStorage.WriteString(file, Utils.XmlUtil.ToXmlString(xhtmlDoc, false));
+            Instance.FileStorage.WriteBytes(file, Utils.XmlUtil.ToXmlBytes(xhtmlDoc, false));
         }
 
         /// <summary>

@@ -161,7 +161,7 @@ namespace EpubSanitizerCLI
             {
                 if (args[i].StartsWith("--"))
                 {
-                    if (args[i].Contains("="))
+                    if (args[i].Contains('='))
                     {
                         var div = args[i].Split('=');
                         Config.Add(div[0][2..], div[1]);

@@ -28,7 +28,7 @@ namespace EpubSanitizerCore.Utils
         /// <returns>The XML content as a string.</returns>
         public static string ToXmlString(XmlDocument doc, bool minify)
         {
-            return Encoding.UTF8.GetString(ToXmlBytes(doc,minify));
+            return Encoding.UTF8.GetString(ToXmlBytes(doc, minify));
         }
 
         /// <summary>

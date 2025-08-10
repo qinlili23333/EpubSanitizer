@@ -210,8 +210,7 @@ namespace EpubSanitizerCore
                 manifest.AppendChild(newElement);
             }
             // Save the updated OPF document back to the file system
-            string updatedOpfContent = Utils.XmlUtil.ToXmlString(opfDoc, false);
-            Instance.FileStorage.WriteString(OpfPath, updatedOpfContent);
+            Instance.FileStorage.WriteBytes(OpfPath, Utils.XmlUtil.ToXmlBytes(opfDoc, false));
         }
     }
 }
