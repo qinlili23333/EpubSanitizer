@@ -5,8 +5,7 @@ namespace EpubSanitizerCore.Filters
     internal class General(EpubSanitizer CoreInstance) : MultiThreadFilter(CoreInstance)
     {
         static readonly Dictionary<string, object> ConfigList = new() {
-            {"general.deprecateFix", true},
-            {"general.minify", false }
+            {"general.deprecateFix", true}
         };
         static General()
         {
@@ -44,7 +43,7 @@ namespace EpubSanitizerCore.Filters
             }
 
             // Write back the processed content
-            Instance.FileStorage.WriteString(file, xhtmlDoc.OuterXml);
+            Instance.FileStorage.WriteString(file, Utils.XmlUtil.ToXmlString(xhtmlDoc,false));
         }
 
         /// <summary>
@@ -71,7 +70,6 @@ namespace EpubSanitizerCore.Filters
             Console.WriteLine("General filter is a default filter that does basic processing for standard fixing.");
             Console.WriteLine("Options:");
             Console.WriteLine("    --general.deprecateFix=true    Fix deprecated attributes if possible.");
-            Console.WriteLine("    --general.minify=false         Minify XHTML files, may accelerate some reader.");
         }
     }
 }
