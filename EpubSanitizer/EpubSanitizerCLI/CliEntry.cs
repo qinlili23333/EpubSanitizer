@@ -109,7 +109,7 @@ namespace EpubSanitizerCLI
             Console.WriteLine("    --compress=0              Compression level used for compressible file, value in number as CompressionLevel Enum of .NET, default value is 0. Not applicable to non-compressible files.");
             Console.WriteLine("    --cache=ram|disk          Where to store cache during sanitization, ram mode privides faster speed but may consume enormous memory, default value is 'ram'.");
             Console.WriteLine("    --threads=single|multi    Enable multithread processing or not, multithread provides faster speed on multi core devices, but may affect system responsibility on low end devices, default value is 'multi'.");
-            Console.WriteLine("    --overwrite               Overwrite sanitized file to input file. If process crashed of power lost, you may lose your file. Use at your own risk!");
+            Console.WriteLine("    --overwrite               Overwrite sanitized file to existing file. If no output file is provided, output will overwrite original file with this option on. If process crashed of power lost, you may lose your file. Use at your own risk!");
             Console.WriteLine("Special arguments:");
             Console.WriteLine("    -v                        Print version information.");
             Console.WriteLine("    -h                        Print this general help.");
@@ -174,11 +174,16 @@ namespace EpubSanitizerCLI
             input = args[i];
             if (Config.ContainsKey("overwrite"))
             {
-                output = input;
+                output = (args.Length > i + 1)? args[i + 1] : input;
             }
             else
             {
                 output = (args.Length > i + 1) ? args[i + 1] : args[i].Replace(".epub", "_out.epub");
+                if(File.Exists(output))
+                {
+                    Error("Output file already exists! Use --overwrite to overwrite it.");
+                    Environment.Exit((int)ExitCode.INVALID_ARGS);
+                }
             }
         }
 
