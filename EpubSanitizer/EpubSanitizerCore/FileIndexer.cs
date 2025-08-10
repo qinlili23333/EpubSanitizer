@@ -9,19 +9,23 @@ namespace EpubSanitizerCore
         /// <summary>
         /// id in the manifest
         /// </summary>
-        internal string id;
+        internal string id = string.Empty;
         /// <summary>
         /// Relative path to OPF file
         /// </summary>
-        internal string opfpath;
+        internal string opfpath = string.Empty;
         /// <summary>
         /// Path inside Epub file
         /// </summary>
-        internal string path;
+        internal string path = string.Empty;
         /// <summary>
         /// mimetype of the file
         /// </summary>
-        internal string mimetype;
+        internal string mimetype = string.Empty;
+        /// <summary>
+        /// Original XML element in the OPF manifest
+        /// </summary>
+        internal XmlElement? originElement;
     }
     internal class FileIndexer
     {
@@ -88,7 +92,8 @@ namespace EpubSanitizerCore
                     id = file.Attributes["id"]?.Value ?? string.Empty,
                     opfpath = file.Attributes["href"]?.Value ?? string.Empty,
                     path = Utils.PathUtil.ComposeOpfPath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
-                    mimetype = file.Attributes["media-type"]?.Value ?? string.Empty
+                    mimetype = file.Attributes["media-type"]?.Value ?? string.Empty,
+                    originElement = file as XmlElement
                 };
                 if (FileInfo.path == string.Empty)
                 {
@@ -144,6 +149,42 @@ namespace EpubSanitizerCore
                     };
                 }
             }
+        }
+
+        /// <summary>
+        /// Write updated OPF file back to Epub.
+        /// Calling this will result in isolated XmlElement in OpfFile object, suggest to only call once before saving Epub file.
+        /// </summary>
+        internal void UpdateOpf()
+        {
+            Instance.Logger("Updating OPF manifest...");
+            // Remove all existing manifest entries
+            XmlNode manifest = opfDoc.GetElementsByTagName("manifest")[0];
+            while (manifest.HasChildNodes)
+            {
+                manifest.RemoveChild(manifest.FirstChild);
+            }
+            // Write new manifest entries
+            foreach (OpfFile file in ManifestFiles)
+            {
+                if (file.originElement != null)
+                {
+                    // If the file already exists in the manifest, use the original element with updated attributes (id, href, and media-type).
+                    file.originElement.SetAttribute("id", file.id);
+                    file.originElement.SetAttribute("href", file.opfpath);
+                    file.originElement.SetAttribute("media-type", file.mimetype);
+                    manifest.AppendChild(file.originElement);
+                    continue;
+                }
+                XmlElement newElement = opfDoc.CreateElement("item", "http://www.idpf.org/2007/opf");
+                newElement.SetAttribute("id", file.id);
+                newElement.SetAttribute("href", file.opfpath);
+                newElement.SetAttribute("media-type", file.mimetype);
+                manifest.AppendChild(newElement);
+            }
+            // Save the updated OPF document back to the file system
+            string updatedOpfContent = Utils.XmlUtil.ToXmlString(opfDoc, false);
+            Instance.FileStorage.WriteString(OpfPath, updatedOpfContent);
         }
     }
 }

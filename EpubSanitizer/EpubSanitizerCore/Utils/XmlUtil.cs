@@ -28,19 +28,18 @@ namespace EpubSanitizerCore.Utils
         /// <returns>The XML content as a string.</returns>
         public static string ToXmlString(XmlDocument doc, bool minify)
         {
-            // We will use a StringWriter as the target for our XmlWriter
-            using var stringWriter = new StringWriter();
+            using var memoryStream = new MemoryStream();
             var settings = new XmlWriterSettings
             {
+                Encoding = new UTF8Encoding(false),
                 Indent = !minify,
-                Encoding = Encoding.UTF8,
                 OmitXmlDeclaration = false
             };
-            using (var xmlWriter = XmlWriter.Create(stringWriter, settings))
+            using (var xmlWriter = XmlWriter.Create(memoryStream, settings))
             {
                 doc.Save(xmlWriter);
             }
-            return stringWriter.ToString();
+            return Encoding.UTF8.GetString(memoryStream.ToArray());
         }
     }
 }
