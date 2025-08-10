@@ -1,4 +1,6 @@
-﻿namespace EpubSanitizerCore.Filters
+﻿using System.Xml;
+
+namespace EpubSanitizerCore.Filters
 {
     internal class General(EpubSanitizer CoreInstance) : SingleThreadFilter(CoreInstance)
     {
@@ -21,8 +23,42 @@
 
         internal override void Process(string file)
         {
-            throw new NotImplementedException();
+            string content = Instance.FileStorage.ReadString(file);
+            XmlDocument xhtmlDoc = new();
+            try
+            {
+                xhtmlDoc.LoadXml(content);
+            }
+            catch (XmlException ex)
+            {
+                Instance.Logger($"Error loading XHTML file {file}: {ex.Message}");
+                // TODO: try fix invalid XHTML if possible
+                return;
+            }
+            // Process deprecated attributes
+            ProcessDeprecatedAttributes(xhtmlDoc);
+            // Write back the processed content
+            Instance.FileStorage.WriteString(file, xhtmlDoc.OuterXml);
         }
+
+        /// <summary>
+        /// Remove deprecated attributes from XHTML files.
+        /// </summary>
+        /// <param name="doc">XmlDocument object</param>
+        private static void ProcessDeprecatedAttributes(XmlDocument doc)
+        {
+            // Process all nodes
+            foreach (XmlElement element in doc.SelectNodes("//*"))
+            {
+                string[] deprecatedAttributes = { "doc-biblioentry", "doc-endnote" };
+                if (deprecatedAttributes.Contains(element.GetAttribute("role")))
+                {
+                    element.RemoveAttribute("role");
+                }
+            }
+        }
+
+
 
         public static new void PrintHelp()
         {
