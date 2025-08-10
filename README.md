@@ -1,6 +1,6 @@
 # EpubSanitizer
 Make extracted EPUB more comply with standard  
-
+[Use with NuGet](https://www.nuget.org/packages/Qinlili.EpubSanitizer)  
 
 ## Why this project?
 I love Epub more than PDF, but I found due to the generation method difference most Epub files cannot pass EpubCheck, some even cannot work with some readers.  
