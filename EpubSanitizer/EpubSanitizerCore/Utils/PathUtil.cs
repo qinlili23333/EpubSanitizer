@@ -39,5 +39,23 @@
                 throw new ArgumentException($"File path '{filePath}' is not under OPF path '{opfPath}'.");
             }
         }
+
+        /// <summary>
+        /// A static method to get all XHTML files from the EpubSanitizer instance.
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <returns></returns>
+        internal static string[] GetAllXHTMLFiles(EpubSanitizer instance)
+        {
+            string[] files = [];
+            foreach (var file in instance.Indexer.ManifestFiles)
+            {
+                if (file.mimetype == "application/xhtml+xml" || file.mimetype == "application/xml")
+                {
+                    files = [.. files, file.path];
+                }
+            }
+            return files;
+        }
     }
 }

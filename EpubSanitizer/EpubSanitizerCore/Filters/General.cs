@@ -18,16 +18,10 @@ namespace EpubSanitizerCore.Filters
         /// <returns>list of XHTML files</returns>
         internal override string[] GetProcessList()
         {
-            string[] files = [];
-            foreach (var file in Instance.Indexer.ManifestFiles)
-            {
-                if (file.mimetype == "application/xhtml+xml" || file.mimetype == "application/xml")
-                {
-                    files = [.. files, file.path];
-                }
-            }
-            return files;
+            return Utils.PathUtil.GetAllXHTMLFiles(Instance);
         }
+
+
 
         internal override void Process(string file)
         {

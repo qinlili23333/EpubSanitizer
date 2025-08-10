@@ -30,7 +30,8 @@
         /// </summary>
         internal static Dictionary<string, Type> Filters = new(){
             {"default", typeof(General)},
-            {"general", typeof(General)}
+            {"general", typeof(General)},
+            {"vitalsource", typeof(VitalSource)}
         };
 
         /// <summary>
