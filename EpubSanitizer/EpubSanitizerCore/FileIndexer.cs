@@ -147,6 +147,7 @@ namespace EpubSanitizerCore
                         path = file,
                         mimetype = MimeTypesMap.GetMimeType(file)
                     };
+                    ManifestFiles = [.. ManifestFiles, FileInfo];
                 }
             }
         }
