@@ -47,5 +47,23 @@ namespace EpubSanitizerCore.Utils
             }
         }
 
+        /// <summary>
+        /// Epub 3 requires dcterms:modified element to be present in OPF metadata, this function adds it if not present.
+        /// </summary>
+        /// <param name="OpfDoc">OPF XmlDocument object</param>
+        internal static void AddDctermsModifiedIfNeed(XmlDocument OpfDoc)
+        {
+            // Check if dcterms:modified exists
+            List<XmlNode> metadataNodes = [.. OpfDoc.GetElementsByTagName("metadata")[0].ChildNodes.Cast<XmlNode>()];
+            bool hasDctermsModified = metadataNodes.Any(node => node is XmlElement element && element.Name == "meta" && element.GetAttribute("property") == "dcterms:modified");
+            if(!hasDctermsModified)
+            {
+                // Add dcterms:modified element with current date and time
+                XmlElement modifiedElement = OpfDoc.CreateElement("meta", OpfDoc.DocumentElement.NamespaceURI);
+                modifiedElement.SetAttribute("property", "dcterms:modified");
+                modifiedElement.InnerText = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+                OpfDoc.GetElementsByTagName("metadata")[0].AppendChild(modifiedElement);
+            }
+        }
     }
 }
