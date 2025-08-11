@@ -37,7 +37,7 @@ namespace EpubSanitizerCore.Filters
                 return;
             }
             // Process deprecated attributes
-            if (Instance.Config.GetBool("general.deprecateFix"))
+            if (Instance.Config.GetBool("general.deprecateFix") && Instance.TargetEpubVer == 3)
             {
                 ProcessDeprecatedAttributes(xhtmlDoc);
             }

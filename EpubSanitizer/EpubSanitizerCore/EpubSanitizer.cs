@@ -37,7 +37,7 @@ namespace EpubSanitizerCore
         /// <summary>
         /// Epub version, do upgrade to Epub 3 if possible
         /// </summary>
-        private int TargetEpubVer = 3;
+        internal int TargetEpubVer = 3;
         /// <summary>
         /// Create a new instance of EpubSanitizer
         /// </summary>
