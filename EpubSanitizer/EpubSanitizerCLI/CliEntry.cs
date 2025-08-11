@@ -158,7 +158,7 @@ namespace EpubSanitizerCLI
                     }
                     else
                     {
-                        Config.Add(args[i][2..], "1");
+                        Config.Add(args[i][2..], "true");
                     }
                 }
                 else
