@@ -9,7 +9,9 @@ namespace EpubSanitizerCore
             {"compress", 0 },
             {"cache", FS.FS.Ram },
             {"threads", Filters.Threads.Multi },
-            {"sanitizeNcx", true }
+            {"sanitizeNcx", true },
+            {"epubVer", 0 },
+            {"overwrite", false }
         };
         static EpubSanitizer()
         {
@@ -32,6 +34,10 @@ namespace EpubSanitizerCore
         /// Logger function, can be override by user to log messages
         /// </summary>
         public Action<string> Logger = (message) => { };
+        /// <summary>
+        /// Epub version, do upgrade to Epub 3 if possible
+        /// </summary>
+        private int TargetEpubVer = 3;
         /// <summary>
         /// Create a new instance of EpubSanitizer
         /// </summary>
@@ -141,6 +147,7 @@ namespace EpubSanitizerCore
             Console.WriteLine("    --threads=single|multi    Enable multithread processing or not, multithread provides faster speed on multi core devices, but may affect system responsibility on low end devices, default value is 'multi'.");
             Console.WriteLine("    --overwrite               Overwrite sanitized file to existing file. If no output file is provided, output will overwrite original file with this option on. If process crashed of power lost, you may lose your file. Use at your own risk!");
             Console.WriteLine("    --sanitizeNcx=true        Sanitize NCX file, enabled by default.");
+            Console.WriteLine("    --epubVer=0               Target Epub version, default is 0 (auto, only use Epub 2 when source is Epub 2 and overwrite enabled, otehrwise use Epub 3), acceptable value: 0, 2, 3. You cannot force Epub 2 when source is Epub 3, doing such will be ignored.");
             Console.WriteLine("Special arguments:");
             Console.WriteLine("    -v                        Print version information.");
             Console.WriteLine("    -h                        Print this general help.");
