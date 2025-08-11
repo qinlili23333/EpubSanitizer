@@ -8,7 +8,8 @@ namespace EpubSanitizerCore
             {"filter", "default"},
             {"compress", 0 },
             {"cache", FS.FS.Ram },
-            {"threads", Filters.Threads.Multi }
+            {"threads", Filters.Threads.Multi },
+            {"sanitizeNcx", true }
         };
         static EpubSanitizer()
         {
@@ -51,6 +52,7 @@ namespace EpubSanitizerCore
             }
             FileStorage = FS.FileSystem.CreateFS(this, Config.GetEnum<FS.FS>("cache"));
             FileStorage.Import(archive);
+            Logger("Build file index...");
             Indexer = new FileIndexer(this);
             Indexer.IndexFiles();
         }
@@ -122,6 +124,28 @@ namespace EpubSanitizerCore
             }
             filterType.GetMethod("PrintHelp", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
                 ?.Invoke(null, null);
+        }
+
+        /// <summary>
+        /// Print command line usage
+        /// </summary>
+        public static void PrintUsage()
+        {
+            Console.WriteLine("Usage: EpubSanitizerCLI <options> file <output>");
+            Console.WriteLine("e.g. EpubSanitizerCLI --filter=default,vitalsource extract.epub sanitized.epub");
+            Console.WriteLine();
+            Console.WriteLine("Universal options:");
+            Console.WriteLine("    --filter=xxx              The filter used for xhtml processing, default value is 'default' which only enables general filter");
+            Console.WriteLine("    --compress=0              Compression level used for compressible file, value in number as CompressionLevel Enum of .NET, default value is 0. Not applicable to non-compressible files.");
+            Console.WriteLine("    --cache=ram|disk          Where to store cache during sanitization, ram mode privides faster speed but may consume enormous memory, default value is 'ram'.");
+            Console.WriteLine("    --threads=single|multi    Enable multithread processing or not, multithread provides faster speed on multi core devices, but may affect system responsibility on low end devices, default value is 'multi'.");
+            Console.WriteLine("    --overwrite               Overwrite sanitized file to existing file. If no output file is provided, output will overwrite original file with this option on. If process crashed of power lost, you may lose your file. Use at your own risk!");
+            Console.WriteLine("    --sanitizeNcx=true        Sanitize NCX file, enabled by default.");
+            Console.WriteLine("Special arguments:");
+            Console.WriteLine("    -v                        Print version information.");
+            Console.WriteLine("    -h                        Print this general help.");
+            Console.WriteLine("    -f                        Print all available filters.");
+            Console.WriteLine("    -h filter_name            Print help of specific filter.");
         }
     }
 }
