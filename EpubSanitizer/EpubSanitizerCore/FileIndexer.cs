@@ -61,7 +61,12 @@ namespace EpubSanitizerCore
             LoadOpf();
             XmlNodeList manifestNodes = opfDoc.GetElementsByTagName("manifest")[0].ChildNodes;
             foreach (XmlNode file in manifestNodes)
-            {
+            {            
+                // Skip comment nodes
+                if (file.NodeType == XmlNodeType.Comment)
+                {
+                    continue;
+                }
                 AddManifestFile(file);
             }
             CheckMissingFile();
@@ -137,11 +142,6 @@ namespace EpubSanitizerCore
         /// <param name="file">XmlNode element</param>
         private void AddManifestFile(XmlNode file)
         {
-            // Skip comment nodes
-            if (file.NodeType == XmlNodeType.Comment)
-            {
-                return;
-            }
             OpfFile FileInfo = new()
             {
                 id = file.Attributes["id"]?.Value ?? string.Empty,
@@ -150,7 +150,7 @@ namespace EpubSanitizerCore
                 mimetype = file.Attributes["media-type"]?.Value ?? string.Empty,
                 originElement = file as XmlElement
             };
-            if (FileInfo.path == string.Empty)
+            if (FileInfo.path == string.Empty || !Instance.FileStorage.FileExists(FileInfo.path))
             {
                 Instance.Logger($"Invalid file entry in manifest: {file.OuterXml}, file will be excluded.");
                 return;
@@ -167,11 +167,6 @@ namespace EpubSanitizerCore
                     Instance.Logger($"File '{FileInfo.path}' is outside of OPF path '{OpfPath}', will be moved.");
                     // TODO: move file directory to OPF path
                 }
-            }
-            if (!Instance.FileStorage.FileExists(FileInfo.path))
-            {
-                Instance.Logger($"File '{FileInfo.path}' not found in Epub file, will be excluded from manifest.");
-                return;
             }
             if (FileInfo.id == string.Empty)
             {
