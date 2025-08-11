@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.Xml;
+﻿using System.Xml;
 
 namespace EpubSanitizerCore.Utils
 {
@@ -41,7 +40,7 @@ namespace EpubSanitizerCore.Utils
             {
                 // Remove empty elements
                 // Empty elements has no Text child nodes
-                if (node is XmlElement element && !element.HasChildNodes)
+                if (node is XmlElement element && element.Prefix == "dc" && !element.HasChildNodes)
                 {
                     element.ParentNode?.RemoveChild(element);
                 }

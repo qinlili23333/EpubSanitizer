@@ -110,14 +110,14 @@ namespace EpubSanitizerCore
             opfDoc.LoadXml(opfcontent);
             if (opfDoc.GetElementsByTagName("package")[0] is XmlElement packageElement && packageElement.GetAttribute("version") != "3.0")
             {
-                if(Instance.Config.GetInt("epubVer")==3||(Instance.Config.GetInt("epubVer") == 0&& !Instance.Config.GetBool("overwrite")))
+                if (Instance.Config.GetInt("epubVer") == 3 || (Instance.Config.GetInt("epubVer") == 0 && !Instance.Config.GetBool("overwrite")))
                 {
                     Instance.Logger("Epub 2.x found, will upgrade to 3.x.");
                     packageElement.SetAttribute("version", "3.0");
                 }
                 else
                 {
-                    if(Instance.Config.GetInt("epubVer") == 0 && Instance.Config.GetBool("overwrite"))
+                    if (Instance.Config.GetInt("epubVer") == 0 && Instance.Config.GetBool("overwrite"))
                     {
                         Instance.Logger("Epub 2.x found but overwrite is enabled, upgrade will not enable. You can force upgrade with --epubVer=3.");
                     }
@@ -289,7 +289,7 @@ namespace EpubSanitizerCore
                 newElement.SetAttribute("media-type", file.mimetype);
                 manifest.AppendChild(newElement);
             }
-            if(Instance.TargetEpubVer == 3)
+            if (Instance.TargetEpubVer == 3)
             {
                 Utils.OpfUtil.RemoveEmptyMetadataElements(opfDoc);
             }
