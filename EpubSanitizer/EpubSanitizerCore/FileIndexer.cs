@@ -46,6 +46,14 @@ namespace EpubSanitizerCore
         /// </summary>
         internal XmlDocument opfDoc = new();
         /// <summary>
+        /// NCX file path, relative to Epub root, if exists
+        /// </summary>
+        internal string NcxPath = string.Empty;
+        /// <summary>
+        /// NCX XML Document, if exists
+        /// </summary>
+        internal XmlDocument? NcxDoc = null;
+        /// <summary>
         /// List of files in the manifest
         /// </summary>
         internal OpfFile[] ManifestFiles = [];
@@ -61,7 +69,7 @@ namespace EpubSanitizerCore
             LoadOpf();
             XmlNodeList manifestNodes = opfDoc.GetElementsByTagName("manifest")[0].ChildNodes;
             foreach (XmlNode file in manifestNodes)
-            {            
+            {
                 // Skip comment nodes
                 if (file.NodeType == XmlNodeType.Comment)
                 {
@@ -70,6 +78,7 @@ namespace EpubSanitizerCore
                 AddManifestFile(file);
             }
             CheckMissingFile();
+            DetectNcx();
         }
 
         /// <summary>
@@ -179,6 +188,62 @@ namespace EpubSanitizerCore
                 FileInfo.mimetype = MimeTypesMap.GetMimeType(FileInfo.path);
             }
             ManifestFiles = [.. ManifestFiles, FileInfo];
+        }
+
+        /// <summary>
+        /// Find whether there is a NCX file in the Epub.
+        /// </summary>
+        private void DetectNcx()
+        {
+            if (opfDoc.GetElementsByTagName("spine")[0] is XmlElement spineElement && spineElement.GetAttribute("toc") != string.Empty)
+            {
+                string ncxid = spineElement.GetAttribute("toc");
+                foreach (OpfFile file in ManifestFiles)
+                {
+                    if (file.id == ncxid)
+                    {
+                        NcxPath = file.path;
+                        Instance.Logger($"NCX file found: {NcxPath}");
+                        if (file.mimetype != "application/x-dtbncx+xml")
+                        {
+                            Instance.Logger($"NCX mimetype mismatch, fixing...");
+                            file.mimetype = "application/x-dtbncx+xml";
+                        }
+                        string ncxContent = Instance.FileStorage.ReadString(NcxPath);
+                        NcxDoc = new XmlDocument();
+                        NcxDoc.LoadXml(ncxContent);
+                        if (Instance.Config.GetBool("sanitizeNcx"))
+                        {
+                            Instance.Logger("Sanitizing NCX file...");
+                            SanitizeNcx();
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fix common errors in NCX file.
+        /// Only call when NCX file is loaded, otherwise will crash due to null reference.
+        /// </summary>
+        private void SanitizeNcx()
+        {
+            // Fix uid element in NCX file
+            var uid = Utils.NcxUtil.GetUidElement(NcxDoc);
+            if (uid != null)
+            {
+                string ncxuid = uid.GetAttribute("content");
+                string opfuid = Utils.OpfUtil.GetUniqueIdentifier(opfDoc);
+                if (ncxuid != opfuid)
+                {
+                    Instance.Logger($"NCX UID '{ncxuid}' does not match OPF UID '{opfuid}', updating NCX UID.");
+                    uid.SetAttribute("content", opfuid);
+                }
+            }
+            //Write updated NCX file back to Epub.
+            Instance.Logger("Updating NCX file...");
+            Instance.FileStorage.WriteBytes(NcxPath, Utils.XmlUtil.ToXmlBytes(NcxDoc, false));
         }
 
         /// <summary>
