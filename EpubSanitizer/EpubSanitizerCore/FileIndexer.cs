@@ -289,6 +289,10 @@ namespace EpubSanitizerCore
                 newElement.SetAttribute("media-type", file.mimetype);
                 manifest.AppendChild(newElement);
             }
+            if(Instance.TargetEpubVer == 3)
+            {
+                Utils.OpfUtil.RemoveEmptyMetadataElements(opfDoc);
+            }
             // Save the updated OPF document back to the file system
             Instance.FileStorage.WriteBytes(OpfPath, Utils.XmlUtil.ToXmlBytes(opfDoc, false));
         }
