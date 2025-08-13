@@ -41,9 +41,26 @@
         internal abstract string[] GetProcessList();
 
         /// <summary>
+        /// Do preparations for processing
+        /// Do not put heavy compute here
+        /// </summary>
+        internal virtual void PreProcess()
+        {
+
+        }
+
+        /// <summary>
         /// Process all files in the filter
         /// </summary>
         internal abstract void ProcessFiles();
+
+        /// <summary>
+        /// Do post process actions like cleaning or merging
+        /// </summary>
+        internal virtual void PostProcess()
+        {
+
+        }
 
         /// <summary>
         /// Process a single file
