@@ -68,13 +68,15 @@ namespace EpubSanitizerCore
         /// </summary>
         public void Process()
         {
-            Config.GetString("filter").Split(',')
-                .Select(f => f.Trim())
-                .Where(f => !string.IsNullOrEmpty(f))
-                .ToList()
-                .ForEach(filterName =>
+            List<string> filters = [.. Config.GetString("filter").Split(',')
+                .Select(f => f.Trim().ToLowerInvariant())
+                .Where(f => !string.IsNullOrEmpty(f))];
+            if (TargetEpubVer == 3 && !filters.Contains("epub3"))
+            {
+                filters.Add("epub3"); // Add epub3 filter if not specified
+            }
+            filters.ForEach(filterName =>
                 {
-                    filterName = filterName.ToLowerInvariant();
                     if (Filters.Filter.Filters.TryGetValue(filterName, out Type? filterType))
                     {
                         Logger($"Applying filter: {filterName}");
@@ -143,7 +145,7 @@ namespace EpubSanitizerCore
             Console.WriteLine("e.g. EpubSanitizerCLI --filter=default,vitalsource extract.epub sanitized.epub");
             Console.WriteLine();
             Console.WriteLine("Universal options:");
-            Console.WriteLine("    --filter=xxx              The filter used for xhtml processing, default value is 'default' which only enables general filter");
+            Console.WriteLine("    --filter=xxx              The filter used for xhtml processing, default value is 'default' which only enables general filter, and 'epub3' for Epub 3 target.");
             Console.WriteLine("    --compress=0              Compression level used for compressible file, value in number as CompressionLevel Enum of .NET, default value is 0. Not applicable to non-compressible files.");
             Console.WriteLine("    --cache=ram|disk          Where to store cache during sanitization, ram mode privides faster speed but may consume enormous memory, default value is 'ram'.");
             Console.WriteLine("    --threads=single|multi    Enable multithread processing or not, multithread provides faster speed on multi core devices, but may affect system responsibility on low end devices, default value is 'multi'.");

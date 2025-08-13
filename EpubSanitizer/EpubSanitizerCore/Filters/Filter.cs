@@ -31,6 +31,7 @@
         internal static readonly Dictionary<string, Type> Filters = new(){
             {"default", typeof(General)},
             {"general", typeof(General)},
+            {"epub3", typeof(Epub3) },
             {"vitalsource", typeof(VitalSource)}
         };
 

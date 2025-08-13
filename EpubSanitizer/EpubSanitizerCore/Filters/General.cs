@@ -4,13 +4,6 @@ namespace EpubSanitizerCore.Filters
 {
     internal class General(EpubSanitizer CoreInstance) : MultiThreadFilter(CoreInstance)
     {
-        static readonly Dictionary<string, object> ConfigList = new() {
-            {"general.deprecateFix", true}
-        };
-        static General()
-        {
-            ConfigManager.AddDefaultConfig(ConfigList);
-        }
         /// <summary>
         /// General filter only processes XHTML files.
         /// </summary>
@@ -24,6 +17,8 @@ namespace EpubSanitizerCore.Filters
 
         internal override void Process(string file)
         {
+            // So after move deprecate processing to epub3 filter, nothing to do here currently, just skip processing for now
+            return;
             string content = Instance.FileStorage.ReadString(file);
             XmlDocument xhtmlDoc = new();
             try
@@ -33,43 +28,15 @@ namespace EpubSanitizerCore.Filters
             catch (XmlException ex)
             {
                 Instance.Logger($"Error loading XHTML file {file}: {ex.Message}");
-                // TODO: try fix invalid XHTML if possible
                 return;
             }
-            // Process deprecated attributes
-            if (Instance.Config.GetBool("general.deprecateFix") && Instance.TargetEpubVer == 3)
-            {
-                ProcessDeprecatedAttributes(xhtmlDoc);
-            }
-
             // Write back the processed content
             Instance.FileStorage.WriteBytes(file, Utils.XmlUtil.ToXmlBytes(xhtmlDoc, false));
         }
 
-        /// <summary>
-        /// Remove deprecated attributes from XHTML files.
-        /// </summary>
-        /// <param name="doc">XmlDocument object</param>
-        private static void ProcessDeprecatedAttributes(XmlDocument doc)
-        {
-            // Process all nodes
-            foreach (XmlElement element in doc.SelectNodes("//*"))
-            {
-                string[] deprecatedAttributes = { "doc-biblioentry", "doc-endnote" };
-                if (deprecatedAttributes.Contains(element.GetAttribute("role")))
-                {
-                    element.RemoveAttribute("role");
-                }
-            }
-        }
-
-
-
         public static new void PrintHelp()
         {
             Console.WriteLine("General filter is a default filter that does basic processing for standard fixing.");
-            Console.WriteLine("Options:");
-            Console.WriteLine("    --general.deprecateFix=true    Fix deprecated attributes if possible.");
         }
     }
 }
