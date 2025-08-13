@@ -56,7 +56,7 @@ namespace EpubSanitizerCore.Utils
             // Check if dcterms:modified exists
             List<XmlNode> metadataNodes = [.. OpfDoc.GetElementsByTagName("metadata")[0].ChildNodes.Cast<XmlNode>()];
             bool hasDctermsModified = metadataNodes.Any(node => node is XmlElement element && element.Name == "meta" && element.GetAttribute("property") == "dcterms:modified");
-            if(!hasDctermsModified)
+            if (!hasDctermsModified)
             {
                 // Add dcterms:modified element with current date and time
                 XmlElement modifiedElement = OpfDoc.CreateElement("meta", OpfDoc.DocumentElement.NamespaceURI);
