@@ -19,6 +19,11 @@ namespace EpubSanitizerCore.Filters
         {
             Utils.OpfUtil.RemoveEmptyMetadataElements(Instance.Indexer.opfDoc);
             Utils.OpfUtil.AddDctermsModifiedIfNeed(Instance.Indexer.opfDoc);
+            if (!DetectNavInOpf())
+            {
+                Instance.Logger("No nav detected in OPF manifest, creating nav.xhtml based on toc.ncx...");
+                XmlDocument nav = Utils.TocGenerator.Generate(Instance.Indexer.NcxDoc);
+            }
         }
 
         internal override void Process(string file)
@@ -54,6 +59,22 @@ namespace EpubSanitizerCore.Filters
                     element.RemoveAttribute("role");
                 }
             }
+        }
+
+        /// <summary>
+        /// Check whether there is a xhtml file with nav in properties in OPF manifest
+        /// </summary>
+        /// <returns>true if nav is detected, false otherwise</returns>
+        private bool DetectNavInOpf()
+        {
+            foreach (var file in Instance.Indexer.ManifestFiles)
+            {
+                if(file.mimetype== "application/xhtml+xml" && file.originElement.GetAttribute("properties").Split(' ').Contains("nav"))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
