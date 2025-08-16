@@ -1,4 +1,5 @@
 ﻿using EpubSanitizerCore.Utils;
+using System.Text;
 using System.Xml;
 
 namespace EpubSanitizerCore.Filters
@@ -115,15 +116,14 @@ namespace EpubSanitizerCore.Filters
                 }
             }
             // Generate CSS styles for each unique cellpadding and cellspacing value
-            string cssStyles = "";
+            StringBuilder cssStyles = new();
             foreach (var padding in PaddingRecord.Keys)
             {
-                string style = $@"
-.cellpadding{padding} td,
+                string style = $@".cellpadding{padding} td,
 .cellpadding{padding} th {{
     padding: {padding}px;
 }}";
-                cssStyles += style;
+                cssStyles.AppendLine(style);
                 // Apply the class to all tables with this cellpadding
                 foreach (var table in PaddingRecord[padding])
                 {
@@ -133,12 +133,11 @@ namespace EpubSanitizerCore.Filters
             }
             foreach (var spacing in SpacingRecord.Keys)
             {
-                string style = $@"
-.cellspacing{spacing} {{
+                string style = $@".cellspacing{spacing} {{
     border-spacing: {spacing}px;
     border-collapse: separate;
 }}";
-                cssStyles += style;
+                cssStyles.AppendLine(style);
                 // Apply the class to all tables with this cellspacing
                 foreach (var table in SpacingRecord[spacing])
                 {
@@ -146,15 +145,16 @@ namespace EpubSanitizerCore.Filters
                     table.RemoveAttribute("cellspacing");
                 }
             }
-            // If there are any styles, add them to the head of the document
-            if (!string.IsNullOrEmpty(cssStyles))
+            if (cssStyles.Length == 0)
             {
-                XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
-                XmlElement styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
-                styleElement.SetAttribute("type", "text/css");
-                styleElement.InnerText = cssStyles;
-                head.AppendChild(styleElement);
+                return;
             }
+            // If there are any styles, add them to the head of the document
+            XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
+            XmlElement styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
+            styleElement.SetAttribute("type", "text/css");
+            styleElement.InnerText = cssStyles.ToString();
+            head.AppendChild(styleElement);
         }
 
         /// <summary>
