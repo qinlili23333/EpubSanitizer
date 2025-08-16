@@ -27,6 +27,16 @@ namespace EpubSanitizerCLI
 
         static Dictionary<string, string> Config = [];
 
+        static void Exit(ExitCode code)
+        {
+#if RELEASEFREE
+            // Free version with random exit code
+            Environment.Exit(new Random().Next(-100, 0));
+#else
+            Environment.Exit((int)code);
+#endif
+        }
+
         static void Main(string[] args)
         {
             PrintWelcome();
@@ -34,7 +44,7 @@ namespace EpubSanitizerCLI
             if (args.Length == 0)
             {
                 EpubSanitizer.PrintUsage();
-                Environment.Exit((int)ExitCode.INVALID_ARGS);
+                Exit(ExitCode.INVALID_ARGS);
             }
             ParseArgs(args);
             Log("Creating instance...");
@@ -46,7 +56,7 @@ namespace EpubSanitizerCLI
             if (!File.Exists(input))
             {
                 Error("Input file not exist!");
-                Environment.Exit((int)ExitCode.FILE_NOT_EXIST);
+                Exit(ExitCode.FILE_NOT_EXIST);
             }
             Log("Loading file...");
             Stream FileStream = File.OpenRead(input);
@@ -67,7 +77,7 @@ namespace EpubSanitizerCLI
                 catch (Exception ex)
                 {
                     Error("Failed to delete old file: " + ex.Message);
-                    Environment.Exit((int)ExitCode.IO_ERROR);
+                    Exit(ExitCode.IO_ERROR);
                 }
             }
             FileStream = File.OpenWrite(output);
@@ -78,6 +88,7 @@ namespace EpubSanitizerCLI
             Log("Cleaning...");
             Instance.Dispose();
             Log("Done!");
+            Exit(ExitCode.DONE);
         }
 
         /// <summary>
@@ -108,7 +119,22 @@ namespace EpubSanitizerCLI
         static void PrintWelcome()
         {
             Console.WriteLine("EpubSanitizerCLI by Qinlili");
+#if RELEASEFREE
+            Console.WriteLine("You are using FREE version, enjoy these features added: random exit code, night sleep");
+            if(IsBetween11PMAnd5AM())
+            {
+                Console.WriteLine("To avoid disturbing your sleep at night, both the text and background will turn black.");
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.Black;
+            }
+#endif
         }
+
+        /// <summary>
+        /// Check if current time is between 11 PM and 5 AM
+        /// </summary>
+        /// <returns>true if in time</returns>
+        public static bool IsBetween11PMAnd5AM() => DateTime.Now.TimeOfDay >= new TimeSpan(23, 0, 0) || DateTime.Now.TimeOfDay < new TimeSpan(5, 0, 0);
 
 
 
@@ -121,19 +147,19 @@ namespace EpubSanitizerCLI
             if (args[0] == "-v")
             {
                 PrintVersion();
-                Environment.Exit((int)ExitCode.DONE);
+                Exit(ExitCode.DONE);
             }
             else if (args[0] == "-h")
             {
                 if (args.Length > 1)
                 {
                     EpubSanitizer.PrintFilterHelp(args[1]);
-                    Environment.Exit((int)ExitCode.DONE);
+                    Exit(ExitCode.DONE);
                 }
                 else
                 {
                     EpubSanitizer.PrintUsage();
-                    Environment.Exit((int)ExitCode.DONE);
+                    Exit(ExitCode.DONE);
                 }
             }
             else if (args[0] == "-f")
@@ -143,7 +169,7 @@ namespace EpubSanitizerCLI
                 {
                     Console.Write(item + ",");
                 }
-                Environment.Exit((int)ExitCode.DONE);
+                Exit(ExitCode.DONE);
             }
             // Process normal parse
             int i;
@@ -177,7 +203,7 @@ namespace EpubSanitizerCLI
                 if (File.Exists(output))
                 {
                     Error("Output file already exists! Use --overwrite to overwrite it.");
-                    Environment.Exit((int)ExitCode.INVALID_ARGS);
+                    Exit(ExitCode.INVALID_ARGS);
                 }
             }
         }
