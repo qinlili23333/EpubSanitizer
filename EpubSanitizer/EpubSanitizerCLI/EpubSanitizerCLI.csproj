@@ -10,6 +10,16 @@
     <Configurations>Debug;ReleaseFree;ReleasePro</Configurations>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseFree|AnyCPU'">
+    <Optimize>True</Optimize>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleasePro|AnyCPU'">
+    <Optimize>True</Optimize>
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\EpubSanitizerCore\EpubSanitizerCore.csproj" />
   </ItemGroup>
