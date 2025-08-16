@@ -23,6 +23,9 @@ namespace EpubSanitizerCore.Filters
             {
                 Instance.Logger("No nav detected in OPF manifest, creating nav.xhtml based on toc.ncx...");
                 XmlDocument nav = Utils.TocGenerator.Generate(Instance.Indexer.NcxDoc);
+                string navPath = Utils.PathUtil.ComposeOpfPath(Instance.Indexer.OpfPath,"nav.xhtml");
+                Instance.FileStorage.WriteBytes(navPath, Utils.XmlUtil.ToXmlBytes(nav, false));
+
             }
         }
 
@@ -69,7 +72,7 @@ namespace EpubSanitizerCore.Filters
         {
             foreach (var file in Instance.Indexer.ManifestFiles)
             {
-                if(file.mimetype== "application/xhtml+xml" && file.originElement.GetAttribute("properties").Split(' ').Contains("nav"))
+                if (file.mimetype == "application/xhtml+xml" && file.originElement.GetAttribute("properties").Split(' ').Contains("nav"))
                 {
                     return true;
                 }
