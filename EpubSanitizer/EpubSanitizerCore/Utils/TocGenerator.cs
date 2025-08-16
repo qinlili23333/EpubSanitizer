@@ -91,7 +91,7 @@ namespace EpubSanitizerCore.Utils
                     Id = navPoint.GetAttribute("id"),
                     Text = textElement.InnerText,
                     Href = contentElement.GetAttribute("src"),
-                    Order = int.Parse(navPoint.GetAttribute("playOrder")),
+                    Order = int.TryParse(navPoint.GetAttribute("playOrder"), out int playOrder) ? playOrder : 0,
                     Level = level
                 };
                 navItems.Add(item);
