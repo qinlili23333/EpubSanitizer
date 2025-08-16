@@ -68,7 +68,7 @@ namespace EpubSanitizerCore.Utils
                 {
                     lastOlByLevel[navItem.Level - 1].AppendChild(liElement);
                 }
-                
+
             }
             return navDoc;
         }
