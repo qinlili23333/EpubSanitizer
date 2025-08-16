@@ -3,7 +3,7 @@ using System.Xml;
 
 namespace EpubSanitizerCore.Filters
 {
-    internal class Epub3(EpubSanitizer CoreInstance) : SingleThreadFilter(CoreInstance)
+    internal class Epub3(EpubSanitizer CoreInstance) : MultiThreadFilter(CoreInstance)
     {
         static readonly Dictionary<string, object> ConfigList = new() {
             {"epub3.guessToc", false}
