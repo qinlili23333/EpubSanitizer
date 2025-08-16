@@ -65,5 +65,40 @@ namespace EpubSanitizerCore.Utils
                 OpfDoc.GetElementsByTagName("metadata")[0].AppendChild(modifiedElement);
             }
         }
+
+        /// <summary>
+        /// try to guess toc from OPF manifest files and add nav properties if found
+        /// </summary>
+        /// <param name="files">Manifest file list reference</param>
+        /// <returns>true if found and added properties</returns>
+        internal static bool GuessTocFromOpf(ref OpfFile[] files, EpubSanitizer Instance)
+        {
+            foreach (var file in files)
+            {
+                if (file.mimetype == "application/xhtml+xml")
+                {
+                    // file name check passed, check internal structure
+                    XmlDocument doc = new();
+                    try
+                    {
+                        doc.LoadXml(Instance.FileStorage.ReadString(file.path));
+                    }
+                    catch (XmlException)
+                    {
+                        // If the file is not a valid XHTML, skip it
+                        continue;
+                    }
+                    // Check if it has nav element
+                    XmlNodeList navElements = doc.GetElementsByTagName("nav");
+                    if (navElements.Count == 1 && ((XmlElement)navElements[0]).GetAttribute("epub:type") == "toc")
+                    {
+                        // If nav element exists, add nav property
+                        file.properties += " nav";
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 }
