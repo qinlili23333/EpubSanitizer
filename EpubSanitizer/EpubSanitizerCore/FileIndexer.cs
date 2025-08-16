@@ -9,19 +9,23 @@ namespace EpubSanitizerCore
         /// <summary>
         /// id in the manifest
         /// </summary>
-        internal string id = string.Empty;
+        internal required string id;
         /// <summary>
         /// Relative path to OPF file
         /// </summary>
-        internal string opfpath = string.Empty;
+        internal required string opfpath;
         /// <summary>
         /// Path inside Epub file
         /// </summary>
-        internal string path = string.Empty;
+        internal required string path;
         /// <summary>
         /// mimetype of the file
         /// </summary>
-        internal string mimetype = string.Empty;
+        internal required string mimetype;
+        /// <summary>
+        /// properties of the file, used for OPF 3.0
+        /// </summary>
+        internal string properties = string.Empty;
         /// <summary>
         /// Original XML element in the OPF manifest
         /// </summary>
@@ -169,6 +173,7 @@ namespace EpubSanitizerCore
                 opfpath = file.Attributes["href"]?.Value ?? string.Empty,
                 path = Utils.PathUtil.ComposeOpfPath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
                 mimetype = file.Attributes["media-type"]?.Value ?? string.Empty,
+                properties = file.Attributes["properties"]?.Value ?? string.Empty,
                 originElement = file as XmlElement
             };
             if (FileInfo.path == string.Empty || !Instance.FileStorage.FileExists(FileInfo.path))
@@ -280,6 +285,10 @@ namespace EpubSanitizerCore
                     file.originElement.SetAttribute("id", file.id);
                     file.originElement.SetAttribute("href", file.opfpath);
                     file.originElement.SetAttribute("media-type", file.mimetype);
+                    if (file.properties != string.Empty)
+                    {
+                        file.originElement.SetAttribute("properties", file.properties);
+                    }
                     manifest.AppendChild(file.originElement);
                     continue;
                 }
@@ -287,6 +296,10 @@ namespace EpubSanitizerCore
                 newElement.SetAttribute("id", file.id);
                 newElement.SetAttribute("href", file.opfpath);
                 newElement.SetAttribute("media-type", file.mimetype);
+                if (file.properties != string.Empty)
+                {
+                    newElement.SetAttribute("properties", file.properties);
+                }
                 manifest.AppendChild(newElement);
             }
             // Save the updated OPF document back to the file system
