@@ -52,5 +52,27 @@ namespace EpubSanitizerCore.Utils
             }
             return memoryStream.ToArray();
         }
+
+        /// <summary>
+        /// Add class name to XmlElement if it does not already exist.
+        /// </summary>
+        /// <param name="element">element need to add class name</param>
+        /// <param name="className">a dedicated class name</param>
+        public static void AddCssClass(XmlElement element, string className)
+        {
+            if (element == null || string.IsNullOrEmpty(className))
+            {
+                return;
+            }
+            string existingClass = element.GetAttribute("class");
+            if (string.IsNullOrEmpty(existingClass))
+            {
+                element.SetAttribute("class", className);
+            }
+            else if (!existingClass.Split(' ').Contains(className))
+            {
+                element.SetAttribute("class", $"{existingClass} {className}");
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using EpubSanitizerCore.Utils;
+using System.Xml;
 
 namespace EpubSanitizerCore.Filters
 {
@@ -62,7 +63,8 @@ namespace EpubSanitizerCore.Filters
                 Instance.Logger($"Error loading XHTML file {file}: {ex.Message}");
                 return;
             }
-            ProcessDeprecatedAttributes(xhtmlDoc);
+            ProcessDeprecatedRoleAttributes(xhtmlDoc);
+            ProcessTableCellAttributes(xhtmlDoc);
             // Write back the processed content
             Instance.FileStorage.WriteBytes(file, Utils.XmlUtil.ToXmlBytes(xhtmlDoc, false));
         }
@@ -71,7 +73,7 @@ namespace EpubSanitizerCore.Filters
         /// Remove deprecated attributes from XHTML files.
         /// </summary>
         /// <param name="doc">XmlDocument object</param>
-        private static void ProcessDeprecatedAttributes(XmlDocument doc)
+        private static void ProcessDeprecatedRoleAttributes(XmlDocument doc)
         {
             // Process all nodes
             foreach (XmlElement element in doc.SelectNodes("//*"))
@@ -81,6 +83,83 @@ namespace EpubSanitizerCore.Filters
                 {
                     element.RemoveAttribute("role");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Convert cellpadding and cellspacing attributes to CSS styles to comply with Epub 3 standards.
+        /// </summary>
+        /// <param name="doc">XmlDocument object</param>
+        private static void ProcessTableCellAttributes(XmlDocument doc)
+        {
+            // Find all table elements with cellpadding or cellspacing attributes and classify by their values
+            Dictionary<string, List<XmlElement>> PaddingRecord = [];
+            Dictionary<string, List<XmlElement>> SpacingRecord = [];
+            foreach (XmlElement table in doc.GetElementsByTagName("table").Cast<XmlElement>().ToArray())
+            {
+                if (table.HasAttribute("cellpadding"))
+                {
+                    if (PaddingRecord.ContainsKey(table.GetAttribute("cellpadding")))
+                    {
+                        PaddingRecord[table.GetAttribute("cellpadding")].Add(table);
+                    }
+                    else
+                    {
+                        PaddingRecord[table.GetAttribute("cellpadding")] = [table];
+                    }
+                }
+                if (table.HasAttribute("cellspacing"))
+                {
+                    if (SpacingRecord.ContainsKey(table.GetAttribute("cellspacing")))
+                    {
+                        SpacingRecord[table.GetAttribute("cellspacing")].Add(table);
+                    }
+                    else
+                    {
+                        SpacingRecord[table.GetAttribute("cellspacing")] = [table];
+                    }
+                }
+            }
+            // Generate CSS styles for each unique cellpadding and cellspacing value
+            string cssStyles = "";
+            foreach (var padding in PaddingRecord.Keys)
+            {
+                string style = $@"
+.cellpadding{padding} td,
+.cellpadding{padding} th {{
+    padding: {padding}px;
+}}";
+                cssStyles += style;
+                // Apply the class to all tables with this cellpadding
+                foreach (var table in PaddingRecord[padding])
+                {
+                    XmlUtil.AddCssClass(table, $"cellpadding{padding}");
+                    table.RemoveAttribute("cellpadding");
+                }
+            }
+            foreach (var spacing in SpacingRecord.Keys)
+            {
+                string style = $@"
+.cellspacing{spacing} {{
+    border-spacing: {spacing}px;
+    border-collapse: separate;
+}}";
+                cssStyles += style;
+                // Apply the class to all tables with this cellspacing
+                foreach (var table in SpacingRecord[spacing])
+                {
+                    XmlUtil.AddCssClass(table, $"cellspacing{spacing}");
+                    table.RemoveAttribute("cellspacing");
+                }
+            }
+            // If there are any styles, add them to the head of the document
+            if (!string.IsNullOrEmpty(cssStyles))
+            {
+                XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
+                XmlElement styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
+                styleElement.SetAttribute("type", "text/css");
+                styleElement.InnerText = cssStyles;
+                head.AppendChild(styleElement);
             }
         }
 
