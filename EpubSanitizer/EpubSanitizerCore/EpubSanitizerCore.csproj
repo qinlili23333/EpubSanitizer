@@ -19,6 +19,7 @@
     <PackageTags>epub</PackageTags>
     <NeutralLanguage>en-AU</NeutralLanguage>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
   
     
