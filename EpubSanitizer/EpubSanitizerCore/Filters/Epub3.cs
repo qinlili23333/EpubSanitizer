@@ -13,12 +13,6 @@ namespace EpubSanitizerCore.Filters
             ConfigManager.AddDefaultConfig(ConfigList);
         }
 
-        internal override void PreProcess()
-        {
-
-        }
-
-
         internal override string[] GetProcessList()
         {
             return Utils.PathUtil.GetAllXHTMLFiles(Instance);
