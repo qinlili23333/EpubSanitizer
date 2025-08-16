@@ -11,7 +11,7 @@ namespace EpubSanitizerCore.Utils
         internal required string Text { get; set; }
         internal required string Href { get; set; }
         internal required int Order { get; set; }
-        internal int Level { get; set; } = 0; // Default level is 0, can be set to indicate nesting
+        internal int Level { get; set; }
     }
 
     internal static class TocGenerator
@@ -83,7 +83,9 @@ namespace EpubSanitizerCore.Utils
             foreach (XmlElement navPoint in parentElement.ChildNodes)
             {
                 if (navPoint.Name != "navPoint")
+                {
                     continue;
+                }
                 var textElement = navPoint.GetElementsByTagName("text")[0] as XmlElement;
                 var contentElement = navPoint.GetElementsByTagName("content")[0] as XmlElement;
                 NavItem item = new()
