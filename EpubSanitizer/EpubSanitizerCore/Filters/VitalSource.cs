@@ -28,7 +28,7 @@ namespace EpubSanitizerCore.Filters
                 return;
             }
             // Remove scripts
-            List<XmlNode> scriptNodes = xhtmlDoc.GetElementsByTagName("script").Cast<XmlNode>().ToList();
+            List<XmlNode> scriptNodes = [.. xhtmlDoc.GetElementsByTagName("script").Cast<XmlNode>()];
             foreach (XmlNode scriptNode in scriptNodes)
             {
                 if (scriptNode is XmlElement scriptElement)

@@ -40,4 +40,23 @@
     <PackageReference Include="MimeTypesMap" Version="1.0.9" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Res\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Res.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Res.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Res.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Res.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
