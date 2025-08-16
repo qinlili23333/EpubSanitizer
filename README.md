@@ -29,6 +29,34 @@ You can refer to the `EpubSanitizerCLI` project for usage examples.
 
 This project is licensed under the AGPL-v3.0 License or [Qinlili Universal License](https://github.com/qinlili23333/QinliliUniversalLicense).  
 
+## CLI Version Compare
+
+There is some little difference for Free and Pro version on CLI.  
+
+| Features | Free Version | Pro Version |
+| ------- | ----------- | ----------- |
+| All filters for Epub with all options  | ✅ | ✅ |
+| Process unlimited files  | ✅ | ✅ |
+| Latest version available  | ✅ | ✅ |
+| Community support  | ✅ | ✅ |
+| Commercial usage  | ✅ | ✅ |
+| Embed in your project  | ✅ | ✅ |
+| ReadyToRun acceleration  | ❌ | ✅ |
+| Random exit code  | ✅ | ❌ |
+| Black both console text and background at night  | ✅ | ❌ |
+| Support HarmonyOS NEXT  | ❌ | ❌ |
+
+You can get Pro version CLI by any of these methods:  
+- Become a sponsor on [GitHub](https://github.com/sponsors/qinlili23333)/[Buy Me a Coffee](https://www.buymeacoffee.com/qinlili)/[爱发电](https://afdian.com/a/qinliliAPP)  
+- **Mutual follow** with Qinlili on any platform  
+- Download from Ctfile for free (with ads on download page)  
+- Submit your art to [QinliliGallery](https://github.com/qinlili23333/QinliliGallery) as illustrator and authorize Qinlili to use with [Qinlili Universal License](https://github.com/qinlili23333/QinliliUniversalLicense)  
+- Write articles or make videos on social media to promote any project made by Qinlili  
+- **Compile your own version from source code**  
+- Crack from Free version (There will never be any anti-cracking protection, I'm DRM-Free enthusiast)  
+
+**If you call core library in your project there is no version difference.  **
+
 ## Copyright tips
 
 This project will never add features that removing DRM or other copyright protection. We only focus on fixing problems in Epub files with no DRM.  
