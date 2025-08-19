@@ -102,7 +102,7 @@ namespace EpubSanitizerCore
             }
             containerDoc.LoadXml(container);
             XmlNodeList rootfiles = containerDoc.GetElementsByTagName("rootfile");
-            if(rootfiles.Count > 1)
+            if (rootfiles.Count > 1)
             {
                 Instance.Logger("Support to EPUB 3 Multiple-Rendition Publications is not finished. Currently only the first one will be processed.");
             }
@@ -117,6 +117,7 @@ namespace EpubSanitizerCore
                 throw new InvalidEpubException("OPF file not found in the Epub file.");
             }
             opfDoc.LoadXml(opfcontent);
+            Utils.XmlUtil.NormalizeXmlns(opfDoc, "http://www.idpf.org/2007/opf");
             if (opfDoc.GetElementsByTagName("package")[0] is XmlElement packageElement && packageElement.GetAttribute("version") != "3.0")
             {
                 if (Instance.Config.GetInt("epubVer") == 3 || (Instance.Config.GetInt("epubVer") == 0 && !Instance.Config.GetBool("overwrite")))

@@ -74,5 +74,36 @@ namespace EpubSanitizerCore.Utils
                 element.SetAttribute("class", $"{existingClass} {className}");
             }
         }
+
+        /// <summary>
+        /// Normalize xmlns of target namespace URI to no prefix ones
+        /// </summary>
+        /// <param name="doc">XmlDocument object</param>
+        /// <param name="targetNamespaceUri">the namespace require normalize</param>
+        public static void NormalizeXmlns(XmlDocument doc, string targetNamespaceUri)
+        {
+            List<XmlElement> elementsToReplace = [];
+            foreach (XmlElement element in doc.GetElementsByTagName("*"))
+            {
+                if (element.NamespaceURI == targetNamespaceUri)
+                {
+                    elementsToReplace.Add(element);
+                }
+            }
+            foreach (XmlElement oldElement in elementsToReplace)
+            {
+                oldElement.Prefix = string.Empty;
+            }
+            XmlElement root = doc.DocumentElement;
+            foreach (XmlAttribute attr in root.Attributes)
+            {
+                if (attr.Prefix == "xmlns" && attr.Value == targetNamespaceUri)
+                {
+                    root.Attributes.Remove(attr);
+                    break;
+                }
+            }
+            root.SetAttribute("xmlns", targetNamespaceUri);
+        }
     }
 }
