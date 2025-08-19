@@ -101,7 +101,12 @@ namespace EpubSanitizerCore
                 throw new InvalidEpubException("Container file not found in the Epub file.");
             }
             containerDoc.LoadXml(container);
-            OpfPath = containerDoc.GetElementsByTagName("rootfile")[0].Attributes["full-path"].Value;
+            XmlNodeList rootfiles = containerDoc.GetElementsByTagName("rootfile");
+            if(rootfiles.Count > 1)
+            {
+                Instance.Logger("Support to EPUB 3 Multiple-Rendition Publications is not finished. Currently only the first one will be processed.");
+            }
+            OpfPath = rootfiles[0].Attributes["full-path"].Value;
             string opfcontent;
             try
             {
