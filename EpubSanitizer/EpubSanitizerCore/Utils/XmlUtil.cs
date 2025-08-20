@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace EpubSanitizerCore.Utils
 {
@@ -83,12 +84,13 @@ namespace EpubSanitizerCore.Utils
         public static void NormalizeXmlns(XmlDocument doc, string targetNamespaceUri)
         {
             List<XmlElement> elementsToReplace = [];
-            foreach (XmlElement element in doc.GetElementsByTagName("*"))
+            foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
             {
                 if (element.NamespaceURI == targetNamespaceUri)
                 {
                     elementsToReplace.Add(element);
                 }
+
             }
             foreach (XmlElement oldElement in elementsToReplace)
             {
@@ -104,6 +106,22 @@ namespace EpubSanitizerCore.Utils
                 }
             }
             root.SetAttribute("xmlns", targetNamespaceUri);
+            foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            {
+
+                foreach (XmlAttribute attr in element.Attributes.Cast<XmlAttribute>().ToArray())
+                {
+                    if (attr.Prefix != string.Empty && attr.NamespaceURI == targetNamespaceUri)
+                    {
+                        // create a new attribute without prefix
+                        XmlAttribute newAttr = doc.CreateAttribute(attr.LocalName);
+                        newAttr.Value = attr.Value;
+                        element.Attributes.Append(newAttr);
+                        // Remove the prefix and namespace URI from the attribute
+                        element.Attributes.Remove(attr);
+                    }
+                }
+            }
         }
     }
 }
