@@ -123,5 +123,27 @@ namespace EpubSanitizerCore.Utils
                 }
             }
         }
+
+        /// <summary>
+        /// Dictionary of allowed attributes for specific tags.
+        /// </summary>
+        private static readonly Dictionary<string, string[]> AllowAttributes = new()
+        {
+            { "dc:creator", [ "dir", "id", "xml:lang" ] }
+        };
+        /// <summary>
+        /// Check if the attribute is expected for the given tag name.
+        /// </summary>
+        /// <param name="tagName">tag name</param>
+        /// <param name="attributeName">attribute name</param>
+        /// <returns></returns>
+        public static bool ExpectedAttribute(string tagName, string attributeName)
+        {
+            if (AllowAttributes.TryGetValue(tagName, out string[] allowedAttributes))
+            {
+                return allowedAttributes.Contains(attributeName);
+            }
+            return true;
+        }
     }
 }
