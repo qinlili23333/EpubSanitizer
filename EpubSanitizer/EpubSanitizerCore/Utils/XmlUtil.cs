@@ -108,6 +108,23 @@ namespace EpubSanitizerCore.Utils
             root.SetAttribute("xmlns", targetNamespaceUri);
             foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
             {
+                if (element.NamespaceURI == string.Empty)
+                {
+                    // Recreate with proper namespace URI
+                    XmlElement newElement = doc.CreateElement(element.LocalName, targetNamespaceUri);
+                    // Copy attributes and children
+                    foreach (XmlAttribute attr in element.Attributes)
+                    {
+                        newElement.SetAttribute(attr.Name, attr.Value);
+                    }
+                    foreach (XmlNode child in element.ChildNodes)
+                    {
+                        XmlNode importedChild = doc.ImportNode(child, true);
+                        newElement.AppendChild(importedChild);
+                    }
+                    // Replace the old element with the new one
+                    element.ParentNode.ReplaceChild(newElement, element);
+                }
                 foreach (XmlAttribute attr in element.Attributes.Cast<XmlAttribute>().ToArray())
                 {
                     if (attr.Prefix != string.Empty && attr.NamespaceURI == targetNamespaceUri)
