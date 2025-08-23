@@ -47,6 +47,7 @@ There is some little difference for Free and Pro version on CLI.
 | Support HarmonyOS NEXT  | ❌ | ❌ |
 
 You can get Pro version CLI by any of these methods:  
+
 - Become a sponsor on [GitHub](https://github.com/sponsors/qinlili23333)/[Buy Me a Coffee](https://www.buymeacoffee.com/qinlili)/[爱发电](https://afdian.com/a/qinliliAPP)  
 - **Mutual follow** with Qinlili on any platform  
 - Download from Ctfile for free (with ads on download page)  
@@ -55,7 +56,7 @@ You can get Pro version CLI by any of these methods:
 - **Compile your own version from source code**  
 - Crack from Free version (There will never be any anti-cracking protection, I'm DRM-Free enthusiast)  
 
-**If you call core library in your project there is no version difference.  **
+**If you call core library in your project there is no version difference.**  
 
 ## Copyright tips
 
