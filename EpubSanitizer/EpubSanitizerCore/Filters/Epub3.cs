@@ -114,12 +114,16 @@ namespace EpubSanitizerCore.Filters
             XmlDocument xhtmlDoc = new();
             try
             {
-                xhtmlDoc.LoadXml(content);
             }
             catch (XmlException ex)
             {
                 Instance.Logger($"Error loading XHTML file {file}: {ex.Message}");
                 return;
+            }
+            // Remove old school xhtml doctype
+            if (xhtmlDoc.DocumentType != null)
+            {
+                xhtmlDoc.RemoveChild(xhtmlDoc.DocumentType);
             }
             ProcessDeprecatedRoleAttributes(xhtmlDoc);
             ProcessTableCellAttributes(xhtmlDoc);
