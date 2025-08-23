@@ -114,6 +114,7 @@ namespace EpubSanitizerCore.Filters
             XmlDocument xhtmlDoc = new();
             try
             {
+                xhtmlDoc.LoadXml(content.Replace("&nbsp;", "\u00A0"));
             }
             catch (XmlException ex)
             {
