@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using System.Runtime.CompilerServices;
 using System.Xml;
 
 namespace EpubSanitizerCore.FS
@@ -34,7 +33,7 @@ namespace EpubSanitizerCore.FS
         /// <summary>
         /// Dictionary to store cached XmlDocument, key is the relative path in epub
         /// </summary>
-        private Dictionary<string,XmlDocument> XmlCache = [];
+        private Dictionary<string, XmlDocument> XmlCache = [];
 
         /// <summary>
         /// Get XmlDocument from path, will use cache if enabled
@@ -59,12 +58,15 @@ namespace EpubSanitizerCore.FS
                     Instance.Logger($"Error loading XHTML file {path}: {ex.Message}");
                     return null;
                 }
-                catch(FileNotFoundException)
+                catch (FileNotFoundException)
                 {
                     Instance.Logger($"XHTML file {path} not exist.");
                     return null;
                 }
-                XmlCache[path] = doc;
+                if(Instance.Config.GetBool("xmlCache"))
+                {
+                    XmlCache[path] = doc;
+                }
                 return doc;
             }
         }
@@ -154,12 +156,16 @@ namespace EpubSanitizerCore.FS
         /// Export content to a new Epub file
         /// </summary>
         /// <param name="EpubFile"></param>
-        internal virtual void Export(ZipArchive EpubFile) {
-            // write cached xml files first
-            Instance.Logger($"Writing {XmlCache.Count} cached XML files to file system.");
-            foreach (var pair in XmlCache)
+        internal virtual void Export(ZipArchive EpubFile)
+        {
+            if(Instance.Config.GetBool("xmlCache"))
             {
-                WriteBytes(pair.Key, Utils.XmlUtil.ToXmlBytes(pair.Value, false));
+                // write cached xml files first
+                Instance.Logger($"Writing {XmlCache.Count} cached XML files to file system.");
+                foreach (var pair in XmlCache)
+                {
+                    WriteBytes(pair.Key, Utils.XmlUtil.ToXmlBytes(pair.Value, false));
+                }
             }
             // write mimetype first
             ZipArchiveEntry mimetypeEntry = EpubFile.CreateEntry("mimetype", CompressionLevel.NoCompression);
