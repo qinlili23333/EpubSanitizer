@@ -15,16 +15,10 @@ namespace EpubSanitizerCore.Filters
 
         internal override void Process(string file)
         {
-            string content = Instance.FileStorage.ReadString(file);
-            XmlDocument xhtmlDoc = new();
-            try
+            XmlDocument xhtmlDoc = Instance.FileStorage.ReadXml(file);
+            if (xhtmlDoc == null)
             {
-                xhtmlDoc.LoadXml(content);
-            }
-            catch (XmlException ex)
-            {
-                Instance.Logger($"Error loading XHTML file {file}: {ex.Message}");
-                // TODO: try fix invalid XHTML if possible
+                Instance.Logger($"Error loading XHTML file {file}, skipping...");
                 return;
             }
             // Remove scripts
@@ -40,7 +34,7 @@ namespace EpubSanitizerCore.Filters
                 }
             }
             // Write back the processed content
-            Instance.FileStorage.WriteBytes(file, Utils.XmlUtil.ToXmlBytes(xhtmlDoc, false));
+            Instance.FileStorage.WriteXml(file, xhtmlDoc);
         }
 
 

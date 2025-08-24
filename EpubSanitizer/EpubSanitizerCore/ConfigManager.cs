@@ -61,32 +61,38 @@ namespace EpubSanitizerCore
         /// <exception cref="ConfigNotFoundException">config not found</exception>
         private dynamic GetByType(string key, Type type)
         {
-            if (ConfigString.TryGetValue(key, out string? str))
+            lock (ConfigString)
             {
-                if (type == typeof(int))
+                lock (ConfigObj)
                 {
-                    ConfigObj[key] = int.Parse(str);
+                    if (ConfigString.TryGetValue(key, out string? str))
+                    {
+                        if (type == typeof(int))
+                        {
+                            ConfigObj[key] = int.Parse(str);
+                        }
+                        else if (type == typeof(string))
+                        {
+                            ConfigObj[key] = str;
+                        }
+                        else if (type == typeof(bool))
+                        {
+                            ConfigObj[key] = bool.Parse(str);
+                        }
+                        ConfigString.Remove(key);
+                        return Convert.ChangeType(ConfigObj[key], type);
+                    }
+                    if (ConfigObj.TryGetValue(key, out object? value))
+                    {
+                        return Convert.ChangeType(value, type);
+                    }
+                    if (DefaultConfigList.TryGetValue(key, out object? defval))
+                    {
+                        return Convert.ChangeType(defval, type);
+                    }
+                    throw new ConfigNotFoundException(key);
                 }
-                else if (type == typeof(string))
-                {
-                    ConfigObj[key] = str;
-                }
-                else if (type == typeof(bool))
-                {
-                    ConfigObj[key] = bool.Parse(str);
-                }
-                ConfigString.Remove(key);
-                return Convert.ChangeType(ConfigObj[key], type);
             }
-            if (ConfigObj.TryGetValue(key, out object? value))
-            {
-                return Convert.ChangeType(value, type);
-            }
-            if (DefaultConfigList.TryGetValue(key, out object? defval))
-            {
-                return Convert.ChangeType(defval, type);
-            }
-            throw new ConfigNotFoundException(key);
         }
         /// <summary>
         /// Get config in int
@@ -126,27 +132,33 @@ namespace EpubSanitizerCore
         /// <exception cref="ConfigNotFoundException">config not found</exception>
         public dynamic GetEnum<TEnum>(string key) where TEnum : Enum
         {
-            if (ConfigString.TryGetValue(key, out string? str))
+            lock (ConfigString)
             {
-                foreach (TEnum enu in Enum.GetValues(typeof(TEnum)))
+                lock (ConfigObj)
                 {
-                    if (str.Equals(enu.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                    if (ConfigString.TryGetValue(key, out string? str))
                     {
-                        ConfigObj[key] = enu;
+                        foreach (TEnum enu in Enum.GetValues(typeof(TEnum)))
+                        {
+                            if (str.Equals(enu.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                ConfigObj[key] = enu;
+                            }
+                        }
+                        ConfigString.Remove(key);
+                        return ConfigObj[key];
                     }
+                    if (ConfigObj.TryGetValue(key, out object? value))
+                    {
+                        return value;
+                    }
+                    if (DefaultConfigList.TryGetValue(key, out object? defval))
+                    {
+                        return defval;
+                    }
+                    throw new ConfigNotFoundException(key);
                 }
-                ConfigString.Remove(key);
-                return ConfigObj[key];
             }
-            if (ConfigObj.TryGetValue(key, out object? value))
-            {
-                return value;
-            }
-            if (DefaultConfigList.TryGetValue(key, out object? defval))
-            {
-                return defval;
-            }
-            throw new ConfigNotFoundException(key);
         }
 
     }
