@@ -1,4 +1,5 @@
-﻿using System.IO.Compression;
+﻿using System.Collections.Concurrent;
+using System.IO.Compression;
 using System.Xml;
 
 namespace EpubSanitizerCore.FS
@@ -33,7 +34,7 @@ namespace EpubSanitizerCore.FS
         /// <summary>
         /// Dictionary to store cached XmlDocument, key is the relative path in epub
         /// </summary>
-        private Dictionary<string, XmlDocument> XmlCache = [];
+        private ConcurrentDictionary<string, XmlDocument> XmlCache = [];
 
         /// <summary>
         /// Get XmlDocument from path, will use cache if enabled
@@ -81,7 +82,7 @@ namespace EpubSanitizerCore.FS
             if (Instance.Config.GetBool("xmlCache") != true)
             {
                 WriteBytes(path, Utils.XmlUtil.ToXmlBytes(doc, false));
-                XmlCache.Remove(path);
+                XmlCache.TryRemove(path, out _);
             }
             else
             {
@@ -95,7 +96,7 @@ namespace EpubSanitizerCore.FS
         /// <param name="path">relative path</param>
         internal void FlushXmlCache(string path)
         {
-            XmlCache.Remove(path);
+            XmlCache.Remove(path, out _);
         }
 
 

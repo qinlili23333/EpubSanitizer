@@ -1,10 +1,11 @@
-﻿using System.IO.Compression;
+﻿using System.Collections.Concurrent;
+using System.IO.Compression;
 
 namespace EpubSanitizerCore.FS
 {
     internal class MemFS(EpubSanitizer CoreInstance) : FileSystem(CoreInstance)
     {
-        private Dictionary<string, byte[]> Files = [];
+        private ConcurrentDictionary<string, byte[]> Files = [];
 
         /// <inheritdoc/>
         internal override void Export(ZipArchive EpubFile)
@@ -38,7 +39,7 @@ namespace EpubSanitizerCore.FS
                 using MemoryStream ms = new();
                 entryStream.CopyTo(ms);
                 totalsize += ms.Length;
-                Files.Add(entry.FullName, ms.ToArray());
+                Files.TryAdd(entry.FullName, ms.ToArray());
             }
             Instance.Logger($"MemoryFS uses about {totalsize / 1024 / 1024} MB memory. Watch out your memory pressure.");
         }
@@ -77,7 +78,7 @@ namespace EpubSanitizerCore.FS
         /// <inheritdoc/>
         internal override void DeleteFile(string path)
         {
-            Files.Remove(path);
+            Files.TryRemove(path, out _);
         }
 
         /// <inheritdoc/>
