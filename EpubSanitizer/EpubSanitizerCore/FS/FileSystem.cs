@@ -87,6 +87,15 @@ namespace EpubSanitizerCore.FS
             }
         }
 
+        /// <summary>
+        /// Remove xml from cache, use it if you modified the file without using Read/WriteXml functions
+        /// </summary>
+        /// <param name="path">relative path</param>
+        internal void FlushXmlCache(string path)
+        {
+            XmlCache.Remove(path);
+        }
+
 
 
         /// <summary>
