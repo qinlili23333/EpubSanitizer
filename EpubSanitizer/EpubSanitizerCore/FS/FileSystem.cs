@@ -163,10 +163,10 @@ namespace EpubSanitizerCore.FS
             {
                 // write cached xml files first
                 Instance.Logger($"Writing {XmlCache.Count} cached XML files to file system.");
-                foreach (var pair in XmlCache)
+                Parallel.ForEach(XmlCache, pair =>
                 {
                     WriteBytes(pair.Key, Utils.XmlUtil.ToXmlBytes(pair.Value, false));
-                }
+                });
             }
             // write mimetype first
             ZipArchiveEntry mimetypeEntry = EpubFile.CreateEntry("mimetype", CompressionLevel.NoCompression);
