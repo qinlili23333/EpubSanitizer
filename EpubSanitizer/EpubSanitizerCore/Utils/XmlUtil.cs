@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace EpubSanitizerCore.Utils
 {
@@ -136,7 +135,7 @@ namespace EpubSanitizerCore.Utils
                         // Remove the prefix and namespace URI from the attribute
                         element.Attributes.Remove(attr);
                     }
-                    if(attr.Name == "xmlns" && attr.Value == targetNamespaceUri)
+                    if (attr.Name == "xmlns" && attr.Value == targetNamespaceUri)
                     {
                         // Remove the xmlns attribute if it is not needed
                         element.Attributes.Remove(attr);
@@ -199,8 +198,8 @@ namespace EpubSanitizerCore.Utils
         /// <returns></returns>
         public static string GetMetaPropertyFromAttribute(string attributeName)
         {
-            if(MetaPropertyMap.TryGetValue(attributeName, out string value))
-            { 
+            if (MetaPropertyMap.TryGetValue(attributeName, out string value))
+            {
                 return value;
             }
             return attributeName;

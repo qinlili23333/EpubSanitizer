@@ -100,5 +100,25 @@ namespace EpubSanitizerCore.Utils
             }
             return false;
         }
+
+        /// <summary>
+        /// Get paths in spine order from OPF document
+        /// </summary>
+        /// <param name="OpfDoc">OPF XmlDocument object</param>
+        /// <returns>string array of relative paths</returns>
+        internal static string[] GetSpineArray(XmlDocument OpfDoc)
+        {
+            List<string> spineArray = [];
+            XmlNodeList itemrefs = OpfDoc.GetElementsByTagName("spine")[0].ChildNodes;
+            foreach (XmlElement itemref in itemrefs)
+            {
+                string idref = itemref.GetAttribute("idref");
+                if (!string.IsNullOrEmpty(idref))
+                {
+                    spineArray.Add((OpfDoc.SelectSingleNode($"//*[@id='{idref}']") as XmlElement).GetAttribute("href"));
+                }
+            }
+            return spineArray.ToArray();
+        }
     }
 }

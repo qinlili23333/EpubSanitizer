@@ -1,5 +1,4 @@
 ﻿using EpubSanitizerCore.Utils;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml;
 
@@ -33,7 +32,7 @@ namespace EpubSanitizerCore.Filters
                         if (!XmlUtil.ExpectedAttribute(element.Name, attr.Name))
                         {
                             // Create meta element if attribute not empty
-                            if(!string.IsNullOrEmpty(attr.Value))
+                            if (!string.IsNullOrEmpty(attr.Value))
                             {
                                 XmlElement metaElement = Instance.Indexer.opfDoc.CreateElement("meta", "http://www.idpf.org/2007/opf");
                                 metaElement.SetAttribute("property", XmlUtil.GetMetaPropertyFromAttribute(attr.Name));
@@ -69,7 +68,8 @@ namespace EpubSanitizerCore.Filters
                     {
                         // Use MARC Code List for Relators is possible
                         string[] allowRoles = ["exp", "grt", "abr", "act", "adp", "rcp", "anl", "anm", "ann", "anc", "apl", "ape", "app", "arc", "arr", "acp", "adi", "art", "ill", "ard", "asg", "asn", "fmo", "att", "auc", "aue", "aup", "aut", "aqt", "aud", "ato", "ant", "bnd", "bdd", "blw", "bka", "bkd", "bkp", "bjd", "bpd", "bsl", "brl", "brd", "cll", "cop", "ctg", "cas", "cad", "cns", "chr", "cng", "cli", "cor", "col", "clt", "clr", "cmm", "cwt", "com", "cpl", "cpt", "cpe", "cmp", "cmt", "ccp", "cnd", "con", "csl", "csp", "cos", "cot", "coe", "cts", "ctt", "cte", "ctr", "ctb", "cpc", "cph", "crr", "crp", "cst", "cou", "crt", "cov", "cre", "cur", "dnc", "dtc", "dtm", "dte", "dto", "dfd", "dft", "dfe", "dgc", "dgg", "dgs", "dln", "dpc", "dpt", "dsr", "drt", "dis", "dbp", "dst", "djo", "dnr", "drm", "dbd", "dub", "edt", "edc", "edm", "edd", "elg", "elt", "enj", "eng", "egr", "etr", "evp", "exp", "fac", "fld", "fmd", "fds", "flm", "fmp", "fmk", "fpy", "frg", "fmo", "fon", "fnd", "gdv", "gis", "hnr", "hst", "his", "ilu", "ill", "ink", "ins", "itr", "ive", "ivr", "inv", "isb", "jud", "jug", "lbr", "ldr", "lsa", "led", "len", "ltr", "lil", "lit", "lie", "lel", "let", "lee", "lbt", "lse", "lso", "lgd", "ltg", "lyr", "mka", "mfp", "mfr", "mrb", "mrk", "med", "mdc", "mte", "mtk", "mxe", "mod", "mon", "mcp", "mup", "msd", "mus", "nrt", "nan", "onp", "osp", "opn", "orm", "org", "oth", "own", "pan", "ppm", "pta", "pth", "pat", "pnc", "prf", "prf", "pma", "pht", "pad", "ptf", "ptt", "pte", "plt", "pra", "pre", "prt", "pop", "prm", "prc", "pro", "prn", "prs", "pmn", "prd", "prp", "prg", "pdr", "pfr", "crr", "prv", "mfr", "pbl", "pup", "pbl", "pbd", "ppt", "rdd", "rpc", "rap", "rce", "rcd", "red", "rxa", "ren", "rpt", "rps", "rth", "rtm", "res", "rsp", "rst", "rse", "rpy", "rsg", "rsr", "rev", "rbr", "sce", "sad", "aus", "scr", "fac", "scl", "spy", "sec", "sll", "std", "stg", "sgn", "ins", "sng", "swd", "sds", "sde", "spk", "sfx", "spn", "sgd", "stm", "stn", "str", "stl", "sht", "srv", "tch", "tad", "tcd", "tld", "tlg", "tlh", "tlp", "tau", "ths", "trc", "arr", "fac", "trl", "tyd", "tyg", "bkd", "uvp", "vdg", "vfx", "vac", "wit", "wde", "wdc", "wam", "wac", "wal", "wat", "waw", "wfs", "wfw", "wft", "win", "wpr", "wst", "wts"];
-                        if (allowRoles.Contains(metaElement.InnerText)) {
+                        if (allowRoles.Contains(metaElement.InnerText))
+                        {
                             metaElement.SetAttribute("scheme", "marc:relators");
                         }
                         break;
@@ -126,11 +126,72 @@ namespace EpubSanitizerCore.Filters
             {
                 xhtmlDoc.RemoveChild(xhtmlDoc.DocumentType);
             }
+            CheckTitle(xhtmlDoc, file);
             ProcessDeprecatedRoleAttributes(xhtmlDoc);
             ProcessTableCellAttributes(xhtmlDoc);
             // Write back the processed content
             Instance.FileStorage.WriteBytes(file, Utils.XmlUtil.ToXmlBytes(xhtmlDoc, false));
         }
+
+        /// <summary>
+        /// Check title element in xhtml file, if not present, add one based on ncx or first text node
+        /// </summary>
+        /// <param name="doc">XmlDocument object</param>
+        /// <param name="file">file path</param>
+        private void CheckTitle(XmlDocument doc, string file)
+        {
+            XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
+            if (head.GetElementsByTagName("title").Count == 0)
+            {
+                // create title element
+                XmlElement titleElement = doc.CreateElement("title", "http://www.w3.org/1999/xhtml");
+                head.AppendChild(titleElement);
+            }
+            XmlElement title = head.GetElementsByTagName("title")[0] as XmlElement;
+            if (string.IsNullOrWhiteSpace(title.InnerText))
+            {
+                // Try to get title from ncx
+                string ncxTitle = Utils.NcxUtil.GetTitleFromNcx(Instance.Indexer.NcxDoc, Utils.PathUtil.ComposeRelativePath(Instance.Indexer.OpfPath, file));
+                if (!string.IsNullOrEmpty(ncxTitle))
+                {
+                    title.InnerText = ncxTitle;
+                    return;
+                }
+                // Fallback to first text node in body
+                foreach (XmlElement element in (doc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName("*"))
+                {
+                    // only select node with no child but text inside
+                    if (element.ChildNodes.Count == 1 && element.ChildNodes[0].NodeType == XmlNodeType.Text && element.InnerText.Trim().Length > 0)
+                    {
+                        title.InnerText = element.InnerText.Trim();
+                        return;
+                    }
+                }
+                // No text node found, use the file before in ncx with title as title
+                string[] spine = Utils.OpfUtil.GetSpineArray(Instance.Indexer.opfDoc);
+                for (int i = 0; i < spine.Length; i++)
+                {
+                    if (spine[i].StartsWith(Utils.PathUtil.ComposeRelativePath(Instance.Indexer.OpfPath, file)))
+                    {
+                        // found current file in spine
+                        for (int j = i - 1; j >= 0; j--)
+                        {
+                            string prevTitle = Utils.NcxUtil.GetTitleFromNcx(Instance.Indexer.NcxDoc, spine[j]);
+                            if (!string.IsNullOrEmpty(prevTitle))
+                            {
+                                title.InnerText = prevTitle;
+                                return;
+                            }
+                        }
+                        break;
+                    }
+                }
+                // Still no title found, use file name as title
+                title.InnerText = file;
+            }
+        }
+
+
 
         /// <summary>
         /// Remove deprecated attributes from XHTML files.
