@@ -64,7 +64,7 @@ namespace EpubSanitizerCore.FS
                     Instance.Logger($"XHTML file {path} not exist.");
                     return null;
                 }
-                if(Instance.Config.GetBool("xmlCache"))
+                if (Instance.Config.GetBool("xmlCache"))
                 {
                     XmlCache[path] = doc;
                 }
@@ -79,7 +79,7 @@ namespace EpubSanitizerCore.FS
         /// <param name="doc">XmlDocument object</param>
         internal void WriteXml(string path, XmlDocument doc)
         {
-            if (Instance.Config.GetBool("xmlCache") != true)
+            if (!Instance.Config.GetBool("xmlCache"))
             {
                 WriteBytes(path, Utils.XmlUtil.ToXmlBytes(doc, false));
                 XmlCache.TryRemove(path, out _);
@@ -159,7 +159,7 @@ namespace EpubSanitizerCore.FS
         /// <param name="EpubFile"></param>
         internal virtual void Export(ZipArchive EpubFile)
         {
-            if(Instance.Config.GetBool("xmlCache"))
+            if (Instance.Config.GetBool("xmlCache"))
             {
                 // write cached xml files first
                 Instance.Logger($"Writing {XmlCache.Count} cached XML files to file system.");
