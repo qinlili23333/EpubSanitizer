@@ -19,10 +19,12 @@ namespace EpubSanitizerCore.Filters
             UpgradeDcMetaAttributes();
         }
 
-        // 将 Instance.Indexer.OpfDoc 替换为 Instance.Indexer.opfDoc
+        /// <summary>
+        /// Upgrade dc meta attributes to meta elements as per Epub 3 specification
+        /// </summary>
         private void UpgradeDcMetaAttributes()
         {
-            List<XmlNode> metadataNodes = [.. Instance.Indexer.opfDoc.GetElementsByTagName("metadata")[0].ChildNodes.Cast<XmlNode>()];
+            List<XmlNode> metadataNodes = [.. Instance.Indexer.OpfDoc.GetElementsByTagName("metadata")[0].ChildNodes.Cast<XmlNode>()];
             foreach (XmlNode node in metadataNodes)
             {
                 if (node is XmlElement element && element.Prefix == "dc")
@@ -34,7 +36,7 @@ namespace EpubSanitizerCore.Filters
                             // Create meta element if attribute not empty
                             if (!string.IsNullOrEmpty(attr.Value))
                             {
-                                XmlElement metaElement = Instance.Indexer.opfDoc.CreateElement("meta", "http://www.idpf.org/2007/opf");
+                                XmlElement metaElement = Instance.Indexer.OpfDoc.CreateElement("meta", "http://www.idpf.org/2007/opf");
                                 metaElement.SetAttribute("property", XmlUtil.GetMetaPropertyFromAttribute(attr.Name));
                                 metaElement.InnerText = attr.Value;
                                 if (!element.HasAttribute("id"))
@@ -84,8 +86,8 @@ namespace EpubSanitizerCore.Filters
 
         internal override void PostProcess()
         {
-            Utils.OpfUtil.RemoveEmptyMetadataElements(Instance.Indexer.opfDoc);
-            Utils.OpfUtil.AddDctermsModifiedIfNeed(Instance.Indexer.opfDoc);
+            Utils.OpfUtil.RemoveEmptyMetadataElements(Instance.Indexer.OpfDoc);
+            Utils.OpfUtil.AddDctermsModifiedIfNeed(Instance.Indexer.OpfDoc);
             if (!DetectNavInOpf())
             {
                 if (Instance.Config.GetBool("epub3.guessToc"))
@@ -168,7 +170,7 @@ namespace EpubSanitizerCore.Filters
                     }
                 }
                 // No text node found, use the file before in ncx with title as title
-                string[] spine = Utils.OpfUtil.GetSpineArray(Instance.Indexer.opfDoc);
+                string[] spine = Utils.OpfUtil.GetSpineArray(Instance.Indexer.OpfDoc);
                 for (int i = 0; i < spine.Length; i++)
                 {
                     if (spine[i].StartsWith(Utils.PathUtil.ComposeRelativePath(Instance.Indexer.OpfPath, file)))
