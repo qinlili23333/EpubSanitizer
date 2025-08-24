@@ -52,7 +52,7 @@ namespace EpubSanitizerCore.FS
                 XmlDocument doc = new();
                 try
                 {
-                    doc.LoadXml(ReadString(path));
+                    doc.LoadXml(ReadString(path).Replace("&nbsp;", "\u00A0"));
                 }
                 catch (XmlException ex)
                 {
