@@ -290,7 +290,7 @@ namespace EpubSanitizerCore
                     // If the file already exists in the manifest, use the original element with updated attributes (id, href, and media-type).
                     file.originElement.SetAttribute("id", file.id);
                     file.originElement.SetAttribute("href", file.opfpath);
-                    file.originElement.SetAttribute("media-type", file.mimetype);
+                    file.originElement.SetAttribute("media-type", Instance.Config.GetBool("correctMime") ? MimeTypesMap.GetMimeType(file.opfpath) : file.mimetype);
                     if (file.properties != string.Empty)
                     {
                         file.originElement.SetAttribute("properties", file.properties);
