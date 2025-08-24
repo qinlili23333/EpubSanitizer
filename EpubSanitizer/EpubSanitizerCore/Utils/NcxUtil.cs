@@ -24,5 +24,36 @@ namespace EpubSanitizerCore.Utils
             }
             return null;
         }
+
+
+        /// <summary>
+        /// Try get title from ncx file based on file path
+        /// </summary>
+        /// <param name="relativepath">file relative path in opf</param>
+        /// <param name="NcxDoc">NCX XmlDocument object</param>
+        /// <returns>title string if exist, or empty string</returns>
+        internal static string GetTitleFromNcx(XmlDocument NcxDoc, string relativepath)
+        {
+            if (NcxDoc != null)
+            {
+                XmlNodeList contents = NcxDoc.GetElementsByTagName("content");
+                foreach (XmlElement content in contents)
+                {
+                    // use StartsWith to ignore #
+                    if (content.GetAttribute("src").StartsWith(relativepath))
+                    {
+                        XmlElement parent = content.ParentNode as XmlElement;
+                        XmlNodeList texts = parent.GetElementsByTagName("text");
+                        if (texts.Count > 0)
+                        {
+                            return texts[0].InnerText;
+                        }
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
+
     }
 }
