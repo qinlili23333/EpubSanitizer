@@ -1,4 +1,6 @@
 ﻿using System.IO.Compression;
+using System.Runtime.CompilerServices;
+using System.Xml;
 
 namespace EpubSanitizerCore.FS
 {
@@ -28,6 +30,64 @@ namespace EpubSanitizerCore.FS
         {
             Instance = CoreInstance;
         }
+
+        /// <summary>
+        /// Dictionary to store cached XmlDocument, key is the relative path in epub
+        /// </summary>
+        private Dictionary<string,XmlDocument> XmlCache = [];
+
+        /// <summary>
+        /// Get XmlDocument from path, will use cache if enabled
+        /// </summary>
+        /// <param name="path">relative path in epub</param>
+        /// <returns>XmlDocument object if exist, null if file not found or cannot parse</returns>
+        internal XmlDocument? ReadXml(string path)
+        {
+            if (XmlCache.TryGetValue(path, out XmlDocument? value))
+            {
+                return value;
+            }
+            else
+            {
+                XmlDocument doc = new();
+                try
+                {
+                    doc.LoadXml(ReadString(path));
+                }
+                catch (XmlException ex)
+                {
+                    Instance.Logger($"Error loading XHTML file {path}: {ex.Message}");
+                    return null;
+                }
+                catch(FileNotFoundException)
+                {
+                    Instance.Logger($"XHTML file {path} not exist.");
+                    return null;
+                }
+                XmlCache[path] = doc;
+                return doc;
+            }
+        }
+
+        /// <summary>
+        /// Write XmlDocument to path, will use cache if enabled
+        /// </summary>
+        /// <param name="path">relative path</param>
+        /// <param name="doc">XmlDocument object</param>
+        internal void WriteXml(string path, XmlDocument doc)
+        {
+            if (Instance.Config.GetBool("xmlCache") != true)
+            {
+                WriteBytes(path, Utils.XmlUtil.ToXmlBytes(doc, false));
+                XmlCache.Remove(path);
+            }
+            else
+            {
+                XmlCache[path] = doc;
+            }
+        }
+
+
 
         /// <summary>
         /// Write string content to target path
@@ -85,7 +145,21 @@ namespace EpubSanitizerCore.FS
         /// Export content to a new Epub file
         /// </summary>
         /// <param name="EpubFile"></param>
-        internal abstract void Export(ZipArchive EpubFile);
+        internal virtual void Export(ZipArchive EpubFile) {
+            // write cached xml files first
+            Instance.Logger($"Writing {XmlCache.Count} cached XML files to file system.");
+            foreach (var pair in XmlCache)
+            {
+                WriteBytes(pair.Key, Utils.XmlUtil.ToXmlBytes(pair.Value, false));
+            }
+            // write mimetype first
+            ZipArchiveEntry mimetypeEntry = EpubFile.CreateEntry("mimetype", CompressionLevel.NoCompression);
+            using (Stream mimetypeStream = mimetypeEntry.Open())
+            {
+                using StreamWriter writer = new(mimetypeStream);
+                writer.Write("application/epub+zip");
+            }
+        }
 
         /// <summary>
         /// Dispose all resources used by this file system
