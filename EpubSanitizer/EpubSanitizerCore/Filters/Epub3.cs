@@ -61,7 +61,7 @@ namespace EpubSanitizerCore.Filters
         /// Enhance the meta element based on content inference
         /// </summary>
         /// <param name="metaElement">new created meta element</param>
-        private void EnhanceMetaElement(XmlElement metaElement)
+        private static void EnhanceMetaElement(XmlElement metaElement)
         {
             switch (metaElement.GetAttribute("property"))
             {
@@ -141,7 +141,7 @@ namespace EpubSanitizerCore.Filters
             // Process all nodes
             foreach (XmlElement element in doc.SelectNodes("//*"))
             {
-                string[] deprecatedAttributes = { "doc-biblioentry", "doc-endnote" };
+                string[] deprecatedAttributes = ["doc-biblioentry", "doc-endnote"];
                 if (deprecatedAttributes.Contains(element.GetAttribute("role")))
                 {
                     element.RemoveAttribute("role");
