@@ -32,7 +32,8 @@
             {"default", typeof(General)},
             {"general", typeof(General)},
             {"epub3", typeof(Epub3) },
-            {"vitalsource", typeof(VitalSource)}
+            {"vitalsource", typeof(VitalSource)},
+            {"privacy", typeof(Privacy)}
         };
 
         /// <summary>
