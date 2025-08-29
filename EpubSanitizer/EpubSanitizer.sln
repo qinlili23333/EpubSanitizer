@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpubSanitizerCLI", "EpubSan
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpubSanitizerCore", "EpubSanitizerCore\EpubSanitizerCore.csproj", "{AD40ADB8-BC51-4997-8FA4-DD154284F2A0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpubSanitizerWeb", "EpubSanitizerWeb\EpubSanitizerWeb.csproj", "{B2D818D0-93E0-445D-9B53-A9DD6B06E91C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AD40ADB8-BC51-4997-8FA4-DD154284F2A0} = {AD40ADB8-BC51-4997-8FA4-DD154284F2A0}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +31,12 @@ Global
 		{AD40ADB8-BC51-4997-8FA4-DD154284F2A0}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
 		{AD40ADB8-BC51-4997-8FA4-DD154284F2A0}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
 		{AD40ADB8-BC51-4997-8FA4-DD154284F2A0}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
+		{B2D818D0-93E0-445D-9B53-A9DD6B06E91C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2D818D0-93E0-445D-9B53-A9DD6B06E91C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2D818D0-93E0-445D-9B53-A9DD6B06E91C}.ReleaseFree|Any CPU.ActiveCfg = Release|Any CPU
+		{B2D818D0-93E0-445D-9B53-A9DD6B06E91C}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
+		{B2D818D0-93E0-445D-9B53-A9DD6B06E91C}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
+		{B2D818D0-93E0-445D-9B53-A9DD6B06E91C}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
