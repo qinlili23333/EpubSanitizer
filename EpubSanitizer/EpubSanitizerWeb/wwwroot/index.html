@@ -12,9 +12,17 @@
 
 <body>
     <h1>EpubSanitizerWeb</h1>
-  <p>
-    Current Version: <br /><span id="version"><i>loading...</i></span>
-  </p>
+    <p>
+        Current Version: <br /><span id="version"><i>loading...</i></span>
+    </p>
+    <p>
+        Select an EPUB file to sanitize:
+        <input type="file" id="fileInput" accept=".epub" />
+    </p>
+    <p id="status"></p>
+
+    <div id="console-output"></div>
+
 </body>
 
 </html>
