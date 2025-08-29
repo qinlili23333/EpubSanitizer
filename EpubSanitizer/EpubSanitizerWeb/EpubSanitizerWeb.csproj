@@ -8,4 +8,10 @@
   <ItemGroup>
     <ProjectReference Include="..\EpubSanitizerCore\EpubSanitizerCore.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="wwwroot\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
