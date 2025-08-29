@@ -25,6 +25,11 @@ Since usage may varies across versions, please refer to the help message for the
 Add `EpubSanitizerCore` to your project, then you can use the `EpubSanitizer` class to sanitize EPUB files.  
 You can refer to the `EpubSanitizerCLI` project for usage examples.  
 
+## Web Version
+
+EpubSanitizer now provides a web version that can be accessed at [EpubSanitizer Web](https://epubsanitizer.qinlili.bid).  
+This version contains the same functionality as the desktop version, allowing users to sanitize EPUB files directly in their web browser, but without customization options.  
+
 ## License
 
 This project is licensed under the AGPL-v3.0 License or [Qinlili Universal License](https://github.com/qinlili23333/QinliliUniversalLicense).  
