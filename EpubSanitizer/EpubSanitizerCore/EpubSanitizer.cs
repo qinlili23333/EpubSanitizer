@@ -27,7 +27,7 @@ namespace EpubSanitizerCore
         /// <summary>
         /// FileSystem instance to hold file
         /// </summary>
-        internal FS.FileSystem FileStorage;
+        public FS.FileSystem FileStorage { get; internal set; }
         /// <summary>
         /// FileIndexer instance to index files, used by many filters
         /// </summary>
@@ -54,15 +54,20 @@ namespace EpubSanitizerCore
         /// <param name="archive">Opened Epub file for read</param>
         public void LoadFile(ZipArchive archive)
         {
-            if (FileStorage != null)
-            {
-                throw new InvalidOperationException("File already load to instance!");
-            }
-            FileStorage = FS.FileSystem.CreateFS(this, Config.GetEnum<FS.FS>("cache"));
+            FileStorage ??= FS.FileSystem.CreateFS(this, Config.GetEnum<FS.FS>("cache"));
             FileStorage.Import(archive);
             Logger("Build file index...");
             Indexer = new FileIndexer(this);
             Indexer.IndexFiles();
+        }
+
+        /// <summary>
+        /// Initialize an empty file system, used when you want to create a new Epub from scratch
+        /// </summary>
+        public void InitializeEmptyFS()
+        {
+            FileStorage ??= FS.FileSystem.CreateFS(this, Config.GetEnum<FS.FS>("cache"));
+            Indexer = new FileIndexer(this);
         }
 
         /// <summary>

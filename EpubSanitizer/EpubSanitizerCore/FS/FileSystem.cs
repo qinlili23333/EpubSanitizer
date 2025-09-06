@@ -19,7 +19,7 @@ namespace EpubSanitizerCore.FS
     /// <summary>
     /// Abstract class of file system used for processing
     /// </summary>
-    internal abstract class FileSystem
+    public abstract class FileSystem
     {
         /// <summary>
         /// The instance, mainly used for getting config
@@ -106,47 +106,47 @@ namespace EpubSanitizerCore.FS
         /// </summary>
         /// <param name="path">relative path</param>
         /// <param name="content">string content</param>
-        internal abstract void WriteString(string path, string content);
+        public abstract void WriteString(string path, string content);
         /// <summary>
         /// Read string content
         /// </summary>
         /// <param name="path">relative path</param>
         /// <returns>string content</returns>
-        internal abstract string ReadString(string path);
+        public abstract string ReadString(string path);
         /// <summary>
         /// Write byte array content to target path
         /// </summary>
         /// <param name="path">relative path</param>
         /// <param name="content">byte array content</param>
-        internal abstract void WriteBytes(string path, byte[] content);
+        public abstract void WriteBytes(string path, byte[] content);
         /// <summary>
         /// Read byte array content
         /// </summary>
         /// <param name="path">relative path</param>
         /// <returns>byte array content</returns>
-        internal abstract byte[] ReadBytes(string path);
+        public abstract byte[] ReadBytes(string path);
         /// <summary>
         /// Remove file permanently from file system
         /// </summary>
         /// <param name="path">relative path</param>
-        internal abstract void DeleteFile(string path);
+        public abstract void DeleteFile(string path);
         /// <summary>
         /// Calculate SHA256 hash of a file
         /// </summary>
         /// <param name="path">relative path</param>
         /// <returns>SHA256 string</returns>
-        internal abstract string GetSHA256(string path);
+        public abstract string GetSHA256(string path);
         /// <summary>
         /// Check if a file exists in the file system
         /// </summary>
         /// <param name="path">relative path</param>
         /// <returns>bool indicates whether file exists</returns>
-        internal abstract bool FileExists(string path);
+        public abstract bool FileExists(string path);
         /// <summary>
         /// Get all files in the file system
         /// </summary>
         /// <returns>string array of all files</returns>
-        internal abstract string[] GetAllFiles();
+        public abstract string[] GetAllFiles();
 
         /// <summary>
         /// Load content from Epub file

@@ -60,7 +60,7 @@ namespace EpubSanitizerCore.FS
         }
 
         /// <inheritdoc/>
-        internal override string ReadString(string path)
+        public override string ReadString(string path)
         {
             if (!File.Exists(Path.Combine(Folder, path.Replace('\\', '/'))))
             {
@@ -70,17 +70,17 @@ namespace EpubSanitizerCore.FS
         }
 
         /// <inheritdoc/>
-        internal override void WriteString(string path, string content)
+        public override void WriteString(string path, string content)
         {
             File.WriteAllText(Path.Combine(Folder, path.Replace('\\', '/')), content);
         }
         /// <inheritdoc/>
-        internal override void WriteBytes(string path, byte[] content)
+        public override void WriteBytes(string path, byte[] content)
         {
             File.WriteAllBytes(Path.Combine(Folder, path.Replace('\\', '/')), content);
         }
         /// <inheritdoc/>
-        internal override byte[] ReadBytes(string path)
+        public override byte[] ReadBytes(string path)
         {
             return File.ReadAllBytes(Path.Combine(Folder, path.Replace('\\', '/')));
         }
@@ -91,13 +91,13 @@ namespace EpubSanitizerCore.FS
         }
 
         /// <inheritdoc/>
-        internal override void DeleteFile(string path)
+        public override void DeleteFile(string path)
         {
             File.Delete(Path.Combine(Folder, path.Replace('\\', '/')));
         }
 
         /// <inheritdoc/>
-        internal override string GetSHA256(string path)
+        public override string GetSHA256(string path)
         {
             if (!File.Exists(Path.Combine(Folder, path.Replace('\\', '/'))))
             {
@@ -111,12 +111,12 @@ namespace EpubSanitizerCore.FS
             }
         }
 
-        internal override bool FileExists(string path)
+        public override bool FileExists(string path)
         {
             return File.Exists(Path.Combine(Folder, path.Replace('\\', '/')));
         }
 
-        internal override string[] GetAllFiles()
+        public override string[] GetAllFiles()
         {
             return [.. Directory.GetFiles(Folder, "*", SearchOption.AllDirectories).Select(file => Path.GetRelativePath(Folder, file).Replace('\\', '/'))];
         }

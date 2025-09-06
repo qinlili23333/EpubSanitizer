@@ -45,7 +45,7 @@ namespace EpubSanitizerCore.FS
         }
 
         /// <inheritdoc/>
-        internal override string ReadString(string path)
+        public override string ReadString(string path)
         {
             return Files.TryGetValue(path, out byte[] content)
                 ? System.Text.Encoding.UTF8.GetString(content)
@@ -53,17 +53,17 @@ namespace EpubSanitizerCore.FS
         }
 
         /// <inheritdoc/>
-        internal override void WriteString(string path, string content)
+        public override void WriteString(string path, string content)
         {
             Files[path] = System.Text.Encoding.UTF8.GetBytes(content);
         }
         /// <inheritdoc/>
-        internal override void WriteBytes(string path, byte[] content)
+        public override void WriteBytes(string path, byte[] content)
         {
             Files[path] = content;
         }
         /// <inheritdoc/>
-        internal override byte[] ReadBytes(string path)
+        public override byte[] ReadBytes(string path)
         {
             return Files.TryGetValue(path, out byte[] content)
                 ? content
@@ -76,13 +76,13 @@ namespace EpubSanitizerCore.FS
         }
 
         /// <inheritdoc/>
-        internal override void DeleteFile(string path)
+        public override void DeleteFile(string path)
         {
             Files.TryRemove(path, out _);
         }
 
         /// <inheritdoc/>
-        internal override string GetSHA256(string path)
+        public override string GetSHA256(string path)
         {
             if (Files.TryGetValue(path, out byte[] content))
             {
@@ -95,12 +95,12 @@ namespace EpubSanitizerCore.FS
             }
         }
 
-        internal override bool FileExists(string path)
+        public override bool FileExists(string path)
         {
             return Files.ContainsKey(path);
         }
 
-        internal override string[] GetAllFiles()
+        public override string[] GetAllFiles()
         {
             return Files.Keys.ToArray();
         }
