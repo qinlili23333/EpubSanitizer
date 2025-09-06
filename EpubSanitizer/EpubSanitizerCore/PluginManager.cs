@@ -11,7 +11,7 @@ namespace EpubSanitizerCore
         /// <summary>
         /// OnLoad will be called when plugin is loaded
         /// </summary>
-        internal abstract void OnLoad();
+        internal abstract void OnLoad(Version CoreVersion);
     }
 
     public static class PluginManager
@@ -60,8 +60,8 @@ namespace EpubSanitizerCore
                     var pluginEntryType = plug.GetType(plugin + ".PluginEntry");
                     if (pluginEntryType != null && typeof(PluginInterface).IsAssignableFrom(pluginEntryType))
                     {
-                        var pluginInstance = (PluginInterface?)Activator.CreateInstance(pluginEntryType);
-                        pluginInstance?.OnLoad();
+                        var pluginInstance = (PluginInterface?)Activator.CreateInstance(pluginEntryType) ?? throw new Exception("Failed to create instance of plugin: " + plugin);
+                        pluginInstance.OnLoad(typeof(PluginManager).Assembly.GetName().Version);
                     }
                 }
             }
