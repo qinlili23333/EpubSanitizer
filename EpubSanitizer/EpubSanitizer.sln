@@ -12,6 +12,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpubSanitizerWeb", "EpubSan
 		{AD40ADB8-BC51-4997-8FA4-DD154284F2A0} = {AD40ADB8-BC51-4997-8FA4-DD154284F2A0}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoPlugin", "Plugins\DemoPlugin\DemoPlugin.csproj", "{920A6C4A-6E0D-4215-A967-719F4DCE187E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,9 +41,18 @@ Global
 		{B2D818D0-93E0-445D-9B53-A9DD6B06E91C}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
 		{B2D818D0-93E0-445D-9B53-A9DD6B06E91C}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
 		{B2D818D0-93E0-445D-9B53-A9DD6B06E91C}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
+		{920A6C4A-6E0D-4215-A967-719F4DCE187E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{920A6C4A-6E0D-4215-A967-719F4DCE187E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{920A6C4A-6E0D-4215-A967-719F4DCE187E}.ReleaseFree|Any CPU.ActiveCfg = Release|Any CPU
+		{920A6C4A-6E0D-4215-A967-719F4DCE187E}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
+		{920A6C4A-6E0D-4215-A967-719F4DCE187E}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
+		{920A6C4A-6E0D-4215-A967-719F4DCE187E}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{920A6C4A-6E0D-4215-A967-719F4DCE187E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E975EFF4-6CC5-4B9F-B2BF-884364C54CBA}

@@ -47,6 +47,10 @@ namespace EpubSanitizerCLI
                 Exit(ExitCode.INVALID_ARGS);
             }
             ParseArgs(args);
+            if (Config.ContainsKey("enablePlugins"))
+            {
+                PluginManager.EnablePlugins();
+            }
             Log("Creating instance...");
             EpubSanitizer Instance = new()
             {
