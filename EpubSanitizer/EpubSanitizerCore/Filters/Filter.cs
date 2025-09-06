@@ -28,7 +28,7 @@
         /// <summary>
         /// All available filters
         /// </summary>
-        internal static readonly Dictionary<string, Type> Filters = new(){
+        internal static Dictionary<string, Type> Filters = new(){
             {"default", typeof(General)},
             {"general", typeof(General)},
             {"epub3", typeof(Epub3) },
