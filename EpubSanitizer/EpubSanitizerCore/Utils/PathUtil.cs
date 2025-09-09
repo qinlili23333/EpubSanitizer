@@ -8,43 +8,43 @@
         /// <summary>
         /// Calculate the full path of a file in OPF, given the OPF path and the file path.
         /// </summary>
-        /// <param name="opfPath">OPF path</param>
+        /// <param name="basePath">base file path</param>
         /// <param name="filePath">File path in OPF manifest</param>
         /// <returns></returns>
-        internal static string ComposeOpfPath(string opfPath, string filePath)
+        internal static string ComposeFromRelativePath(string basePath, string filePath)
         {
             if (filePath.StartsWith('/'))
             {
                 return filePath[1..];
             }
-            string normalizedOpfPath = opfPath[..(opfPath.LastIndexOf('/') + 1)];
+            string normalizedOpfPath = basePath[..(basePath.LastIndexOf('/') + 1)];
             return normalizedOpfPath + filePath;
         }
 
         /// <summary>
         /// Calculate the relative path of a file which should be used in OPF
         /// </summary>
-        /// <param name="opfPath">OPF path</param>
+        /// <param name="basePath">base file path</param>
         /// <param name="filePath">absolute file path</param>
         /// <returns></returns>
-        internal static string ComposeRelativePath(string opfPath, string filePath)
+        internal static string ComposeRelativePath(string basePath, string filePath)
         {
-            string normalizedOpfPath = opfPath[..(opfPath.LastIndexOf('/') + 1)];
+            string normalizedOpfPath = basePath[..(basePath.LastIndexOf('/') + 1)];
             if (filePath.StartsWith(normalizedOpfPath))
             {
                 return filePath[normalizedOpfPath.Length..];
             }
             else
             {
-                throw new ArgumentException($"File path '{filePath}' is not under OPF path '{opfPath}'.");
+                throw new ArgumentException($"File path '{filePath}' is not under base path '{basePath}'.");
             }
         }
 
         /// <summary>
         /// A static method to get all XHTML files from the EpubSanitizer instance.
         /// </summary>
-        /// <param name="instance"></param>
-        /// <returns></returns>
+        /// <param name="instance">EpubSanitizer Instance</param>
+        /// <returns>array of xhtml files</returns>
         internal static string[] GetAllXHTMLFiles(EpubSanitizer instance)
         {
             string[] files = [];
