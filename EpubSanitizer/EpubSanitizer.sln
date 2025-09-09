@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{02EA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoPlugin", "Plugins\DemoPlugin\DemoPlugin.csproj", "{920A6C4A-6E0D-4215-A967-719F4DCE187E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CssPlugin", "Plugins\CssPlugin\CssPlugin.csproj", "{9CC635FE-77F8-4C1B-B356-442195F5CEC0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,12 +49,19 @@ Global
 		{920A6C4A-6E0D-4215-A967-719F4DCE187E}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
 		{920A6C4A-6E0D-4215-A967-719F4DCE187E}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
 		{920A6C4A-6E0D-4215-A967-719F4DCE187E}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
+		{9CC635FE-77F8-4C1B-B356-442195F5CEC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CC635FE-77F8-4C1B-B356-442195F5CEC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CC635FE-77F8-4C1B-B356-442195F5CEC0}.ReleaseFree|Any CPU.ActiveCfg = Release|Any CPU
+		{9CC635FE-77F8-4C1B-B356-442195F5CEC0}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
+		{9CC635FE-77F8-4C1B-B356-442195F5CEC0}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
+		{9CC635FE-77F8-4C1B-B356-442195F5CEC0}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{920A6C4A-6E0D-4215-A967-719F4DCE187E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{9CC635FE-77F8-4C1B-B356-442195F5CEC0} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E975EFF4-6CC5-4B9F-B2BF-884364C54CBA}
