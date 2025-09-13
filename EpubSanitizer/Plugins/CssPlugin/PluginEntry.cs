@@ -6,7 +6,7 @@
         {
             if (CoreVersion < Version.Parse(MinimumCoreVersion))
             {
-                throw new Exception($"Plugin DemoPlugin requires minimum core version {MinimumCoreVersion}, current core version is {CoreVersion}");
+                throw new Exception($"Plugin CssPlugin requires minimum core version {MinimumCoreVersion}, current core version is {CoreVersion}");
             }
             Filters.Filter.Filters.Add("css", typeof(CssFilter));
             Console.WriteLine("CssPlugin filter registered as 'css'");
