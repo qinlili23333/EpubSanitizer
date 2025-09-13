@@ -177,7 +177,7 @@ namespace EpubSanitizerCore
             {
                 id = file.Attributes["id"]?.Value ?? string.Empty,
                 opfpath = file.Attributes["href"]?.Value ?? string.Empty,
-                path = Utils.PathUtil.ComposeOpfPath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
+                path = Utils.PathUtil.ComposeFromRelativePath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
                 mimetype = file.Attributes["media-type"]?.Value ?? string.Empty,
                 properties = file.Attributes["properties"]?.Value ?? string.Empty,
                 originElement = file as XmlElement

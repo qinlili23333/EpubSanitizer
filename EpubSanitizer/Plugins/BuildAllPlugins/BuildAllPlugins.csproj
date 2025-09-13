@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CssPlugin\CssPlugin.csproj" />
+    <ProjectReference Include="..\DemoPlugin\DemoPlugin.csproj" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="@echo off&#xA;rem Use relative paths based on the solution directory to make the script portable.&#xA;set &quot;SOURCE_DIR=$(SolutionDir)\Plugins\BuildAllPlugins\bin\$(ConfigurationName)\net9.0&quot;&#xA;&#xA;rem Set the destination directory based on the build configuration.&#xA;set &quot;DEST_DIR=&quot;&#xA;if &quot;$(ConfigurationName)&quot;==&quot;Debug&quot; (&#xA;    set &quot;DEST_DIR=$(SolutionDir)\EpubSanitizerCLI\bin\Debug\net9.0&quot;&#xA;) else if &quot;$(ConfigurationName)&quot;==&quot;Release&quot; (&#xA;    set &quot;DEST_DIR=$(SolutionDir)\EpubSanitizerCLI\bin\ReleasePro\net9.0&quot;&#xA;)&#xA;&#xA;rem Exit if the destination directory is not set.&#xA;if &quot;%25DEST_DIR%25&quot;==&quot;&quot; (&#xA;    echo Warning: No destination directory specified for this configuration.&#xA;    exit /b&#xA;)&#xA;&#xA;rem Create the destination directory if it doesn't exist.&#xA;if not exist &quot;%25DEST_DIR%25&quot; (&#xA;    echo Creating destination directory: %25DEST_DIR%25&#xA;    mkdir &quot;%25DEST_DIR%25&quot;&#xA;)&#xA;&#xA;echo Copying DLLs from &quot;%25SOURCE_DIR%25&quot; to &quot;%25DEST_DIR%25&quot; (skipping existing)...&#xA;&#xA;rem Loop through all DLL files in the source directory.&#xA;for %25%25f in (&quot;%25SOURCE_DIR%25\*.dll&quot;) do (&#xA;    echo Copying %25%25~nxf&#xA;    copy /Y &quot;%25%25f&quot; &quot;%25DEST_DIR%25&quot; &gt; nul&#xA;)&#xD;&#xA;&#xD;&#xA;echo Also copy PDB for debug build&#xD;&#xA;if &quot;$(ConfigurationName)&quot;==&quot;Debug&quot; (&#xD;&#xA;for %25%25f in (&quot;%25SOURCE_DIR%25\*.pdb&quot;) do (&#xA;    echo Copying %25%25~nxf&#xA;    copy /Y &quot;%25%25f&quot; &quot;%25DEST_DIR%25&quot; &gt; nul&#xA;)&#xD;&#xA;)&#xA;&#xA;echo Post-build event finished." />
+  </Target>
+
+</Project>

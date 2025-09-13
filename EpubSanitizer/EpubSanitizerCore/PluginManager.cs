@@ -21,6 +21,7 @@ namespace EpubSanitizerCore
         /// </summary>
         public static readonly string[] Plugins = [
             "EpubSanitizerCore.Plugins.DemoPlugin",
+            "EpubSanitizerCore.Plugins.CssPlugin",
         ];
 
         /// <summary>
@@ -37,7 +38,7 @@ namespace EpubSanitizerCore
         /// <param name="pluginName">plugin assembly name</param>
         public static void EnablePlugin(string pluginName)
         {
-            if(!Plugins.Contains(pluginName))
+            if (!Plugins.Contains(pluginName))
             {
                 throw new ArgumentException("Plugin not supported: " + pluginName);
             }

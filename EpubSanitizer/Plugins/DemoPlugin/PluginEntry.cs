@@ -4,7 +4,7 @@
     {
         internal override void OnLoad(Version CoreVersion)
         {
-            if(CoreVersion < Version.Parse(MinimumCoreVersion))
+            if (CoreVersion < Version.Parse(MinimumCoreVersion))
             {
                 throw new Exception($"Plugin DemoPlugin requires minimum core version {MinimumCoreVersion}, current core version is {CoreVersion}");
             }
