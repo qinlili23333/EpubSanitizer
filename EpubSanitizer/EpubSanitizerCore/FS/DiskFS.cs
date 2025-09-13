@@ -107,7 +107,7 @@ namespace EpubSanitizerCore.FS
             using FileStream fileStream = new(Path.Combine(Folder, path.Replace('\\', '/')), FileMode.Open, FileAccess.Read);
             {
                 byte[] hashBytes = sha256.ComputeHash(fileStream);
-                return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                return Convert.ToHexStringLower(hashBytes);
             }
         }
 
