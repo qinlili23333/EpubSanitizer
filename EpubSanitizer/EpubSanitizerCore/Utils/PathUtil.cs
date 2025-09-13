@@ -17,8 +17,37 @@
             {
                 return filePath[1..];
             }
-            string normalizedOpfPath = basePath[..(basePath.LastIndexOf('/') + 1)];
-            return normalizedOpfPath + filePath;
+            if(filePath.StartsWith('.'))
+            {
+                // Handle ./ and ../
+                var baseParts = basePath.Split('/').ToList();
+                var fileParts = filePath.Split('/').ToList();
+                baseParts.RemoveAt(baseParts.Count - 1); // Remove the file part
+                foreach (var part in fileParts)
+                {
+                    if (part == ".")
+                    {
+                        continue;
+                    }
+                    else if (part == "..")
+                    {
+                        if (baseParts.Count > 0)
+                        {
+                            baseParts.RemoveAt(baseParts.Count - 1);
+                        }
+                    }
+                    else
+                    {
+                        baseParts.Add(part);
+                    }
+                }
+                return string.Join('/', baseParts);
+            }
+            else
+            {
+                string normalizedOpfPath = basePath[..(basePath.LastIndexOf('/') + 1)];
+                return normalizedOpfPath + filePath;
+            }
         }
 
         /// <summary>
