@@ -87,7 +87,7 @@ namespace EpubSanitizerCore.FS
             if (Files.TryGetValue(path, out byte[] content))
             {
                 byte[] hashBytes = System.Security.Cryptography.SHA256.HashData(content);
-                return Convert.ToHexStringLower(hashBytes);
+                return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
             }
             else
             {
