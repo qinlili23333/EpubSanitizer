@@ -167,6 +167,16 @@ namespace EpubSanitizerCore
             Console.WriteLine("    -h                        Print this general help.");
             Console.WriteLine("    -f                        Print all available filters.");
             Console.WriteLine("    -h filter_name            Print help of specific filter.");
+            Console.WriteLine("    --test                    Run internal tests to verify functionality.");
+        }
+
+        /// <summary>
+        /// Run tests for duplicate ID fixing functionality
+        /// </summary>
+        /// <returns>True if tests pass, false otherwise</returns>
+        public static bool RunTests()
+        {
+            return Filters.DuplicateIdTestHelper.TestDuplicateIdFix(message => Console.WriteLine($"[TEST] {message}"));
         }
     }
 }

@@ -175,6 +175,21 @@ namespace EpubSanitizerCLI
                 }
                 Exit(ExitCode.DONE);
             }
+            else if (args[0] == "--test")
+            {
+                Log("Running duplicate ID fix test...");
+                bool testResult = EpubSanitizer.RunTests();
+                if (testResult)
+                {
+                    Log("✅ Test PASSED! Duplicate ID fix is working correctly.");
+                    Exit(ExitCode.DONE);
+                }
+                else
+                {
+                    Error("❌ Test FAILED! There's an issue with the duplicate ID fix.");
+                    Exit(ExitCode.INVALID_ARGS);
+                }
+            }
             // Process normal parse
             int i;
             for (i = 0; i < args.Length; i++)
