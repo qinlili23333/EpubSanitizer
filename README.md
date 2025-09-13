@@ -11,7 +11,7 @@ I love Epub more than PDF, but I found due to the generation method difference m
 
 So I made this project to fix the common problems in EPUB files, and make them more comply with standard.  
 
-The standard I follow is the latest Epub 3 standard, which currently is 3.3.  
+The standard I follow is the latest Epub 3 standard, which currently is 3.3. Although you can supply with `--epubVer=2` to avoid upgrading Epub 2 to 3, but this project is not designed to output Epub 2 compatible file as this flag only disable some sanitization which is only required since Epub 3. PR for better Epub 2 is welcome, but is not my current focus.  
 
 ## Project structure
 
