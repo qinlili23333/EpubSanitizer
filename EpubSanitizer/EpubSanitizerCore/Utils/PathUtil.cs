@@ -17,7 +17,7 @@
             {
                 return filePath[1..];
             }
-            if(filePath.StartsWith('.'))
+            if (filePath.StartsWith('.'))
             {
                 // Handle ./ and ../
                 var baseParts = basePath.Split('/').ToList();

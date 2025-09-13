@@ -2,11 +2,8 @@
 using AngleSharp.Css;
 using AngleSharp.Css.Dom;
 using AngleSharp.Css.Parser;
-using AngleSharp.Css.Values;
 using EpubSanitizerCore.Filters;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
 namespace EpubSanitizerCore.Plugins.CssPlugin
 {
@@ -32,12 +29,12 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
             var stylesheet = cssParser.ParseStyleSheet(cssString);
             RemoveInvalidUrlInCss(stylesheet, file);
             var stringWriter = new StringWriter();
-            IStyleFormatter formatter = Instance.Config.GetBool("css.minify") ? new MinifyStyleFormatter():new PrettyStyleFormatter(); // Or CssCompactFormatter for minified output
+            IStyleFormatter formatter = Instance.Config.GetBool("css.minify") ? new MinifyStyleFormatter() : new PrettyStyleFormatter(); // Or CssCompactFormatter for minified output
             stylesheet.ToCss(stringWriter, formatter);
             Instance.FileStorage.WriteString(file, stringWriter.ToString());
         }
 
-        private void RemoveInvalidUrlInCss(ICssStyleSheet sheet,string file)
+        private void RemoveInvalidUrlInCss(ICssStyleSheet sheet, string file)
         {
             foreach (var rule in sheet.Rules.OfType<ICssStyleRule>())
             {
@@ -48,7 +45,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                         // Simple check for invalid URL, can be improved
                         string path = ConvertUrlToPath(decl.Value);
                         // Ignore data URLs and absolute URLs
-                        if (path.StartsWith("data")||path.StartsWith("http"))
+                        if (path.StartsWith("data") || path.StartsWith("http"))
                         {
                             continue;
                         }
