@@ -93,7 +93,7 @@ namespace EpubSanitizerCore.Utils
                     if (navElements.Count == 1 && ((XmlElement)navElements[0]).GetAttribute("epub:type") == "toc")
                     {
                         // If nav element exists, add nav property
-                        file.properties += " nav";
+                        file.properties = [.. file.properties, "nav"];
                         return true;
                     }
                 }

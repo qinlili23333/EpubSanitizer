@@ -314,7 +314,7 @@ namespace EpubSanitizerCore.Filters
                 path = navPath,
                 id = "toc_generated",
                 mimetype = "application/xhtml+xml",
-                properties = "nav"
+                properties = ["nav"]
             };
             Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, NavFile];
         }

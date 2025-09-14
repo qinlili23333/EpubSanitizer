@@ -25,7 +25,7 @@ namespace EpubSanitizerCore
         /// <summary>
         /// properties of the file, used for OPF 3.0
         /// </summary>
-        internal string properties = string.Empty;
+        internal string[] properties = [];
         /// <summary>
         /// Original XML element in the OPF manifest
         /// </summary>
@@ -179,7 +179,7 @@ namespace EpubSanitizerCore
                 opfpath = file.Attributes["href"]?.Value ?? string.Empty,
                 path = Utils.PathUtil.ComposeFromRelativePath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
                 mimetype = file.Attributes["media-type"]?.Value ?? string.Empty,
-                properties = file.Attributes["properties"]?.Value ?? string.Empty,
+                properties = file.Attributes?["properties"]?.Value?.Split(' ') ?? [],
                 originElement = file as XmlElement
             };
             if (FileInfo.path == string.Empty || !Instance.FileStorage.FileExists(FileInfo.path))
@@ -291,9 +291,9 @@ namespace EpubSanitizerCore
                     file.originElement.SetAttribute("id", file.id);
                     file.originElement.SetAttribute("href", file.opfpath);
                     file.originElement.SetAttribute("media-type", Instance.Config.GetBool("correctMime") ? MimeTypesMap.GetMimeType(file.opfpath) : file.mimetype);
-                    if (file.properties != string.Empty)
+                    if (file.properties.Count() != 0)
                     {
-                        file.originElement.SetAttribute("properties", file.properties);
+                        file.originElement.SetAttribute("properties", string.Join(' ',file.properties));
                     }
                     manifest.AppendChild(file.originElement);
                     continue;
@@ -302,9 +302,9 @@ namespace EpubSanitizerCore
                 newElement.SetAttribute("id", file.id);
                 newElement.SetAttribute("href", file.opfpath);
                 newElement.SetAttribute("media-type", file.mimetype);
-                if (file.properties != string.Empty)
+                if (file.properties.Length != 0)
                 {
-                    newElement.SetAttribute("properties", file.properties);
+                    newElement.SetAttribute("properties", string.Join(' ', file.properties));
                 }
                 manifest.AppendChild(newElement);
             }
