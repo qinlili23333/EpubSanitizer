@@ -24,8 +24,25 @@ namespace EpubSanitizerCore.Filters
                 return;
             }
             FixDuokanNoteID(xhtmlDoc);
+            FixExternalLink(xhtmlDoc);
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Add http:// to all external links that missing scheme
+        /// </summary>
+        /// <param name="doc"></param>
+        private void FixExternalLink(XmlDocument doc)
+        {
+            foreach (XmlElement element in (doc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName("a"))
+            {
+                string link = element.GetAttribute("href");
+                if (link != string.Empty && link[0] != '/' && link[0] != '.' && !Instance.FileStorage.FileExists("link") && link.Contains('.'))
+                {
+                    element.SetAttribute("href", "http://" + link);
+                }
+            }
         }
 
         /// <summary>
