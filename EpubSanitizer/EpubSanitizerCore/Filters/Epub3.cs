@@ -125,6 +125,7 @@ namespace EpubSanitizerCore.Filters
             }
             CheckTitle(xhtmlDoc, file);
             CheckScripted(xhtmlDoc, file);
+            CheckSvg(xhtmlDoc, file);
             ProcessDeprecatedRoleAttributes(xhtmlDoc);
             ProcessTableCellAttributes(xhtmlDoc);
             // Write back the processed content
@@ -144,6 +145,23 @@ namespace EpubSanitizerCore.Filters
                 if (item != null && !item.properties.Contains("scripted"))
                 {
                     item.properties = [.. item.properties, "scripted"];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Check if there is any svg element in xhtml file, if yes, ensure svg in properties in OPF manifest
+        /// </summary>
+        /// <param name="doc">XmlDocument object</param>
+        /// <param name="file">file path</param>
+        private void CheckSvg(XmlDocument doc, string file)
+        {
+            if (doc.GetElementsByTagName("svg").Count > 0)
+            {
+                OpfFile item = Utils.OpfUtil.GetItemFromManifest(Instance.Indexer.ManifestFiles, file);
+                if (item != null && !item.properties.Contains("svg"))
+                {
+                    item.properties = [.. item.properties, "svg"];
                 }
             }
         }
