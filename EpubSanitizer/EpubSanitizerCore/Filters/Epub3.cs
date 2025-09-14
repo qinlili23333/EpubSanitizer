@@ -124,10 +124,28 @@ namespace EpubSanitizerCore.Filters
                 xhtmlDoc.RemoveChild(xhtmlDoc.DocumentType);
             }
             CheckTitle(xhtmlDoc, file);
+            CheckScripted(xhtmlDoc, file);
             ProcessDeprecatedRoleAttributes(xhtmlDoc);
             ProcessTableCellAttributes(xhtmlDoc);
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Check if there is any script element in xhtml file, if yes, ensure scripted in properties in OPF manifest
+        /// </summary>
+        /// <param name="doc">XmlDocument object</param>
+        /// <param name="file">file path</param>
+        private void CheckScripted(XmlDocument doc, string file)
+        {
+            if (doc.GetElementsByTagName("script").Count > 0)
+            {
+                OpfFile item = Utils.OpfUtil.GetItemFromManifest(Instance.Indexer.ManifestFiles, file);
+                if (item != null && !item.properties.Contains("scripted"))
+                {
+                    item.properties = [.. item.properties, "scripted"];
+                }
+            }
         }
 
         /// <summary>

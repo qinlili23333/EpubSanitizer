@@ -293,7 +293,7 @@ namespace EpubSanitizerCore
                     file.originElement.SetAttribute("media-type", Instance.Config.GetBool("correctMime") ? MimeTypesMap.GetMimeType(file.opfpath) : file.mimetype);
                     if (file.properties.Count() != 0)
                     {
-                        file.originElement.SetAttribute("properties", string.Join(' ',file.properties));
+                        file.originElement.SetAttribute("properties", string.Join(' ', file.properties));
                     }
                     manifest.AppendChild(file.originElement);
                     continue;

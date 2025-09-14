@@ -120,5 +120,23 @@ namespace EpubSanitizerCore.Utils
             }
             return spineArray.ToArray();
         }
+
+        /// <summary>
+        /// Get OpfFile item from manifest by path
+        /// </summary>
+        /// <param name="files">file list in Indexer</param>
+        /// <param name="path">path in epub</param>
+        /// <returns>OpfFile item if exists, or null</returns>
+        internal static OpfFile? GetItemFromManifest(OpfFile[] files, string path)
+        {
+            for (int i = 0; i < files.Length; i++)
+            {
+                if (files[i].path == path)
+                {
+                    return files[i];
+                }
+            }
+            return null;
+        }
     }
 }
