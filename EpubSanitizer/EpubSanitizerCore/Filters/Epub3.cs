@@ -31,7 +31,7 @@ namespace EpubSanitizerCore.Filters
                 {
                     foreach (XmlAttribute attr in element.Attributes.Cast<XmlAttribute>().ToArray())
                     {
-                        if (!XmlUtil.ExpectedAttribute(element.Name, attr.Name))
+                        if (!attr.Name.StartsWith("xmlns") && !XmlUtil.ExpectedAttribute(element.Name, attr.Name))
                         {
                             // Create meta element if attribute not empty
                             if (!string.IsNullOrEmpty(attr.Value))
