@@ -17,21 +17,37 @@ namespace EpubSanitizerCore.Filters
 
         internal override void Process(string file)
         {
-            // So after move deprecate processing to epub3 filter, nothing to do here currently, just skip processing for now
-            return;
-            string content = Instance.FileStorage.ReadString(file);
-            XmlDocument xhtmlDoc = new();
-            try
+            XmlDocument xhtmlDoc = Instance.FileStorage.ReadXml(file);
+            if (xhtmlDoc == null)
             {
-                xhtmlDoc.LoadXml(content);
-            }
-            catch (XmlException ex)
-            {
-                Instance.Logger($"Error loading XHTML file {file}: {ex.Message}");
+                Instance.Logger($"Error loading XHTML file {file}, skipping...");
                 return;
             }
+            FixDuokanNoteID(xhtmlDoc);
             // Write back the processed content
-            Instance.FileStorage.WriteBytes(file, Utils.XmlUtil.ToXmlBytes(xhtmlDoc, false));
+            Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Fix duplicate note ID created by Duokan
+        /// </summary>
+        /// <param name="doc">xhtml XmlDocument object</param>
+        private static void FixDuokanNoteID(XmlDocument doc)
+        {
+            foreach (XmlElement element in (doc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName("aside"))
+            {
+                string id = element.GetAttribute("id");
+                if (id != string.Empty)
+                {
+                    foreach (XmlElement child in element.GetElementsByTagName("*"))
+                    {
+                        if (child.GetAttribute("id") == id)
+                        {
+                            child.RemoveAttribute("id");
+                        }
+                    }
+                }
+            }
         }
 
         public static new void PrintHelp()
