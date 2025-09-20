@@ -91,15 +91,15 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
                 "image/webp",
                 "image/tiff"
             ];
-            string[] files = [];
+            List<string> files = [];
             foreach (var file in Instance.Indexer.ManifestFiles)
             {
                 if (supportedMimeTypes.Contains(file.mimetype))
                 {
-                    files = [.. files, file.path];
+                    files.Add(file.path);
                 }
             }
-            return files;
+            return files.ToArray(); ;
         }
 
         internal override void Process(string file)
@@ -143,7 +143,7 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
             byte[] compressedData = new byte[(int)output.length];
             Marshal.Copy(output.data, compressedData, 0, compressedData.Length);
             NativeMethods.c_free_byte_array(output);
-            if(compressedData.Length >= inputData.Length)
+            if (compressedData.Length >= inputData.Length)
             {
                 // No size reduction, skip
                 Instance.Logger($"Caesium compression did not reduce size for file {file}, skipping.");
