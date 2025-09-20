@@ -99,7 +99,7 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
                     files.Add(file.path);
                 }
             }
-            return files.ToArray(); ;
+            return files.ToArray();
         }
 
         internal override void Process(string file)
