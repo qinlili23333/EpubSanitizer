@@ -1,7 +1,4 @@
-﻿using EpubSanitizerCore;
-using EpubSanitizerCore.Filters;
-
-namespace EpubSanitizerCore.Plugins.CaesiumPlugin
+﻿namespace EpubSanitizerCore.Plugins.CaesiumPlugin
 {
     internal class PluginEntry : PluginInterface
     {
@@ -9,12 +6,12 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
         {
             if (CoreVersion < Version.Parse(MinimumCoreVersion))
             {
-                throw new Exception($"Plugin CssPlugin requires minimum core version {MinimumCoreVersion}, current core version is {CoreVersion}");
+                throw new Exception($"Plugin CaesiumPlugin requires minimum core version {MinimumCoreVersion}, current core version is {CoreVersion}");
             }
             Filters.Filter.Filters.Add("caesium", typeof(Caesium));
-            Console.WriteLine("CssPlugin filter registered as 'css'");
+            Console.WriteLine("CaesiumPlugin filter registered as 'caesium'");
         }
 
-        private string MinimumCoreVersion = "1.3.0";
+        private readonly string MinimumCoreVersion = "1.4.0";
     }
 }
