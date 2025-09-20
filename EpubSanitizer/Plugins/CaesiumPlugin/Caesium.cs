@@ -74,7 +74,7 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
     internal class Caesium(EpubSanitizer CoreInstance) : MultiThreadFilter(CoreInstance)
     {
         static readonly Dictionary<string, object> ConfigList = new() {
-            {"caesium.loseless", true},
+            {"caesium.lossless", true},
             {"caesium.quality", 99}
         };
         static Caesium()
@@ -111,14 +111,14 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
                 jpeg_quality = (uint)Instance.Config.GetInt("caesium.quality"),
                 jpeg_chroma_subsampling = 0,
                 jpeg_progressive = false,
-                jpeg_optimize = Instance.Config.GetBool("caesium.loseless"),
+                jpeg_optimize = Instance.Config.GetBool("caesium.lossless"),
                 png_quality = (uint)Instance.Config.GetInt("caesium.quality"),
                 png_optimization_level = 6,
                 png_force_zopfli = true,
-                png_optimize = Instance.Config.GetBool("caesium.loseless"),
+                png_optimize = Instance.Config.GetBool("caesium.lossless"),
                 gif_quality = (uint)Instance.Config.GetInt("caesium.quality"),
                 webp_quality = (uint)Instance.Config.GetInt("caesium.quality"),
-                webp_lossless = Instance.Config.GetBool("caesium.loseless"),
+                webp_lossless = Instance.Config.GetBool("caesium.lossless"),
                 tiff_compression = 1,
                 tiff_deflate_level = 6,
                 width = 0,
@@ -152,7 +152,7 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
         {
             Console.WriteLine("Filter applied to image files. Compression by libcaesium");
             Console.WriteLine("Options:");
-            Console.WriteLine("    --caesium.loseless=true    Whether to perform loseless compression, default is true.");
+            Console.WriteLine("    --caesium.lossless=true    Whether to perform loseless compression, default is true.");
             Console.WriteLine("    --caesium.quality=99       Quality when loseless is disabled. Default is 99.");
         }
     }
