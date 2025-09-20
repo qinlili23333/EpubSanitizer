@@ -29,6 +29,30 @@ namespace EpubSanitizerCore.Filters
             {
                 if (node is XmlElement element && element.Prefix == "dc")
                 {
+                    if (element.LocalName == "date" && element.HasAttribute("event"))
+                    {
+                        switch (element.GetAttribute("event"))
+                        {
+                            case "creation":
+                                var newElement = Instance.Indexer.OpfDoc.CreateElement("meta", "http://www.idpf.org/2007/opf");
+                                newElement.SetAttribute("property", "dcterms:created");
+                                newElement.InnerText = element.InnerText + "T12:00:00Z";
+                                element.ParentNode.InsertAfter(newElement, element);
+                                element.ParentNode.RemoveChild(element);
+                                continue;
+                            case "modification":
+                                var modElement = Instance.Indexer.OpfDoc.CreateElement("meta", "http://www.idpf.org/2007/opf");
+                                modElement.SetAttribute("property", "dcterms:modified");
+                                modElement.InnerText = element.InnerText + "T12:00:00Z";
+                                element.ParentNode.InsertAfter(modElement, element);
+                                element.ParentNode.RemoveChild(element);
+                                continue;
+                            default:
+                                // Other event types are only removed
+                                element.RemoveAttribute("event");
+                                continue;
+                        }
+                    }
                     foreach (XmlAttribute attr in element.Attributes.Cast<XmlAttribute>().ToArray())
                     {
                         if (!attr.Name.StartsWith("xmlns") && !XmlUtil.ExpectedAttribute(element.Name, attr.Name))
