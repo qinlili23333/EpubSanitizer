@@ -134,7 +134,10 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
             if (!result.success)
             {
                 string error = Marshal.PtrToStringAnsi(result.error_message) ?? "Unknown error";
-                NativeMethods.c_free_string(result.error_message); // free error string
+                if (result.error_message != IntPtr.Zero)
+                {
+                    NativeMethods.c_free_string(result.error_message); // free error string
+                }
                 throw new FormatException($"Caesium compression failed: {error}");
             }
             byte[] compressedData = new byte[(int)output.length];
