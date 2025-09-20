@@ -41,7 +41,8 @@ namespace EpubSanitizerCore.Filters
         public static new void PrintHelp()
         {
             Console.WriteLine("Kobo filter removes unnecessary elements for Kobo books.");
-            Console.WriteLine("No options available for this filter");
+            Console.WriteLine("No options available for this filter.");
+            Console.WriteLine("You should put this filter before Epub3 filter.");
         }
     }
 }

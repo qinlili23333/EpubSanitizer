@@ -163,12 +163,19 @@ namespace EpubSanitizerCore.Filters
         /// <param name="file">file path</param>
         private void CheckScripted(XmlDocument doc, string file)
         {
+            OpfFile item = Utils.OpfUtil.GetItemFromManifest(Instance.Indexer.ManifestFiles, file);
             if (doc.GetElementsByTagName("script").Count > 0)
             {
-                OpfFile item = Utils.OpfUtil.GetItemFromManifest(Instance.Indexer.ManifestFiles, file);
                 if (item != null && !item.properties.Contains("scripted"))
                 {
                     item.properties = [.. item.properties, "scripted"];
+                }
+            }
+            else
+            {
+                if (item != null && item.properties.Contains("scripted"))
+                {
+                    item.properties = [.. item.properties.Where(p => p != "scripted")];
                 }
             }
         }
@@ -180,12 +187,19 @@ namespace EpubSanitizerCore.Filters
         /// <param name="file">file path</param>
         private void CheckSvg(XmlDocument doc, string file)
         {
+            OpfFile item = Utils.OpfUtil.GetItemFromManifest(Instance.Indexer.ManifestFiles, file);
             if (doc.GetElementsByTagName("svg").Count > 0)
             {
-                OpfFile item = Utils.OpfUtil.GetItemFromManifest(Instance.Indexer.ManifestFiles, file);
                 if (item != null && !item.properties.Contains("svg"))
                 {
                     item.properties = [.. item.properties, "svg"];
+                }
+            }
+            else
+            {
+                if (item != null && item.properties.Contains("svg"))
+                {
+                    item.properties = [.. item.properties.Where(p => p != "svg")];
                 }
             }
         }
