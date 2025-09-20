@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.IO.Compression;
+using System.Text;
 
 namespace EpubSanitizerCore.FS
 {
@@ -48,7 +49,7 @@ namespace EpubSanitizerCore.FS
         public override string ReadString(string path)
         {
             return Files.TryGetValue(path, out byte[] content)
-                ? System.Text.Encoding.UTF8.GetString(content)
+                ? System.Text.Encoding.UTF8.GetString((content.Length >= 3 && content[0] == 0xEF && content[1] == 0xBB && content[2] == 0xBF)? [.. content.Skip(3)] : content)
                 : throw new FileNotFoundException($"File '{path}' not found in memory file system.");
         }
 
