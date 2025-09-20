@@ -83,14 +83,14 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
         }
         internal override string[] GetProcessList()
         {
-            string[] supportedMimeTypes = new string[]
-            {
+            string[] supportedMimeTypes =
+            [
                 "image/jpeg",
                 "image/png",
                 "image/gif",
                 "image/webp",
                 "image/tiff"
-            };
+            ];
             string[] files = [];
             foreach (var file in Instance.Indexer.ManifestFiles)
             {
@@ -140,6 +140,12 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
             byte[] compressedData = new byte[(int)output.length];
             Marshal.Copy(output.data, compressedData, 0, compressedData.Length);
             NativeMethods.c_free_byte_array(output);
+            if(compressedData.Length >= inputData.Length)
+            {
+                // No size reduction, skip
+                Instance.Logger($"Caesium compression did not reduce size for file {file}, skipping.");
+                return;
+            }
             Instance.FileStorage.WriteBytes(file, compressedData);
         }
         public static new void PrintHelp()
