@@ -156,7 +156,7 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
             Console.WriteLine("Filter applied to image files. Compression by libcaesium");
             Console.WriteLine("Options:");
             Console.WriteLine("    --caesium.lossless=true    Whether to perform lossless compression, default is true.");
-            Console.WriteLine("    --caesium.quality=99       Quality when loseless is disabled. Default is 99.");
+            Console.WriteLine("    --caesium.quality=99       Quality when lossless is disabled. Default is 99.");
         }
     }
 }
