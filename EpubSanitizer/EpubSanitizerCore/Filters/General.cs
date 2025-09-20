@@ -45,7 +45,7 @@ namespace EpubSanitizerCore.Filters
                 {
                     continue;
                 }
-                if (link != string.Empty && link[0] != '/' && link[0] != '.' && !Instance.FileStorage.FileExists(PathUtil.ComposeFromRelativePath(file, link)) && link.Split('/')[0].Split('.').Length>=3)
+                if (link != string.Empty && link[0] != '/' && link[0] != '.' && !Instance.FileStorage.FileExists(PathUtil.ComposeFromRelativePath(file, link)) && link.Split('/')[0].Split('.').Length >= 3)
                 {
                     element.SetAttribute("href", "http://" + link);
                 }
