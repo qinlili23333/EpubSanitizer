@@ -66,15 +66,15 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
         /// <returns>array of css files</returns>
         internal static string[] GetAllCssFiles(EpubSanitizer instance)
         {
-            string[] files = [];
+            List<string> files = [];
             foreach (var file in instance.Indexer.ManifestFiles)
             {
                 if (file.mimetype == "text/css")
                 {
-                    files = [.. files, file.path];
+                    files.Add(file.path);
                 }
             }
-            return files;
+            return files.ToArray();
         }
 
         /// <summary>

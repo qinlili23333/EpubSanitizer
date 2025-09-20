@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36015.10
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11012.119 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpubSanitizerCLI", "EpubSanitizerCLI\EpubSanitizerCLI.csproj", "{0994F52E-260D-46E6-AE9E-2BF8DA82782B}"
 EndProject
@@ -19,6 +19,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CssPlugin", "Plugins\CssPlugin\CssPlugin.csproj", "{9CC635FE-77F8-4C1B-B356-442195F5CEC0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildAllPlugins", "Plugins\BuildAllPlugins\BuildAllPlugins.csproj", "{D18FD634-4FD3-4927-81EF-F0B69E15AA67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaesiumPlugin", "Plugins\CaesiumPlugin\CaesiumPlugin.csproj", "{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,12 @@ Global
 		{D18FD634-4FD3-4927-81EF-F0B69E15AA67}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
 		{D18FD634-4FD3-4927-81EF-F0B69E15AA67}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
 		{D18FD634-4FD3-4927-81EF-F0B69E15AA67}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
+		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB}.ReleaseFree|Any CPU.ActiveCfg = Release|Any CPU
+		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
+		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
+		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,6 +79,7 @@ Global
 		{920A6C4A-6E0D-4215-A967-719F4DCE187E} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{9CC635FE-77F8-4C1B-B356-442195F5CEC0} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{D18FD634-4FD3-4927-81EF-F0B69E15AA67} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E975EFF4-6CC5-4B9F-B2BF-884364C54CBA}

@@ -22,6 +22,7 @@ namespace EpubSanitizerCore
         public static readonly string[] Plugins = [
             "EpubSanitizerCore.Plugins.DemoPlugin",
             "EpubSanitizerCore.Plugins.CssPlugin",
+            "EpubSanitizerCore.Plugins.CaesiumPlugin",
         ];
 
         /// <summary>
