@@ -33,7 +33,8 @@
             {"general", typeof(General)},
             {"epub3", typeof(Epub3) },
             {"vitalsource", typeof(VitalSource)},
-            {"privacy", typeof(Privacy)}
+            {"privacy", typeof(Privacy)},
+            {"kobo", typeof(Kobo)}
         };
 
         /// <summary>
