@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using EpubSanitizerCore.Utils;
+using System.Xml;
 
 namespace EpubSanitizerCore.Filters
 {
@@ -24,21 +25,27 @@ namespace EpubSanitizerCore.Filters
                 return;
             }
             FixDuokanNoteID(xhtmlDoc);
-            FixExternalLink(xhtmlDoc);
+            FixExternalLink(file, xhtmlDoc);
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
         }
 
+
         /// <summary>
         /// Add http:// to all external links that missing scheme
         /// </summary>
-        /// <param name="doc"></param>
-        private void FixExternalLink(XmlDocument doc)
+        /// <param name="doc">xhtml XmlDocument object</param>
+        /// <param name="file">file path</param>
+        private void FixExternalLink(string file, XmlDocument doc)
         {
             foreach (XmlElement element in (doc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName("a"))
             {
                 string link = element.GetAttribute("href");
-                if (link != string.Empty && link[0] != '/' && link[0] != '.' && !Instance.FileStorage.FileExists("link") && link.Contains('.'))
+                if (link.StartsWith("http"))
+                {
+                    continue;
+                }
+                if (link != string.Empty && link[0] != '/' && link[0] != '.' && !Instance.FileStorage.FileExists(PathUtil.ComposeFromRelativePath(file, link)) && link.Split('/')[0].Split('.').Length>=3)
                 {
                     element.SetAttribute("href", "http://" + link);
                 }
