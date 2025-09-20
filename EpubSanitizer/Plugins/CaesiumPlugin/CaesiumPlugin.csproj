@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>EpubSanitizerCore.Plugins.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<AssemblyName>EpubSanitizerCore.Plugins.$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\EpubSanitizerCore\EpubSanitizerCore.csproj">
+			<Private>False</Private>
+		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="caesium.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+	  <Exec Command="if not exist caesium.dll (&#xD;&#xA;    call BuildCaesium.bat&#xD;&#xA;)" />
+	</Target>
+
+</Project>
