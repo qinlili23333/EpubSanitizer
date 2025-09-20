@@ -78,6 +78,10 @@ namespace EpubSanitizerCore
             List<string> filters = [.. Config.GetString("filter").Split(',')
                 .Select(f => f.Trim().ToLowerInvariant())
                 .Where(f => !string.IsNullOrEmpty(f))];
+            if (filters.Contains("all"))
+            {
+                filters = [.. Filters.Filter.Filters.Keys];
+            }
             if (TargetEpubVer == 3 && !filters.Contains("epub3"))
             {
                 filters.Add("epub3"); // Add epub3 filter if not specified
@@ -152,7 +156,7 @@ namespace EpubSanitizerCore
             Console.WriteLine("e.g. EpubSanitizerCLI --filter=default,vitalsource extract.epub sanitized.epub");
             Console.WriteLine();
             Console.WriteLine("Universal options:");
-            Console.WriteLine("    --filter=xxx              The filter used for xhtml processing, default value is 'default,privacy' which only enables general and privacy filter, and 'epub3' for Epub 3 target.");
+            Console.WriteLine("    --filter=xxx              The filter used for xhtml processing, default value is 'default,privacy' which only enables general and privacy filter, and 'epub3' for Epub 3 target. Pass 'all' to enable all available filters.");
             Console.WriteLine("    --compress=0              Compression level used for compressible file, value in number as CompressionLevel Enum of .NET, default value is 0. Not applicable to non-compressible files.");
             Console.WriteLine("    --cache=ram|disk          Where to store cache during sanitization, ram mode privides faster speed but may consume enormous memory, default value is 'ram'.");
             Console.WriteLine("    --threads=single|multi    Enable multithread processing or not, multithread provides faster speed on multi core devices, but may affect system responsibility on low end devices, default value is 'multi'.");

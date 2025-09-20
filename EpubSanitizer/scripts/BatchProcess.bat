@@ -14,7 +14,7 @@ if not exist "%~1" (
 mkdir "%~1\out"
 for %%f in ("%~1\*.epub") do (
     echo Processing %%~nxf
-    %EpubSanitizer% --filter=general,epub3,privacy,css --epubVer=3 --cache=ram --compress=3 --enablePlugins "%%f" "%~1\out\%%~nxf"
+    %EpubSanitizer% --filter=all --epubVer=3 --cache=ram --compress=3 --enablePlugins "%%f" "%~1\out\%%~nxf"
 )
 for %%f in ("%~1\out\*.epub") do (
     echo Validating %%f
