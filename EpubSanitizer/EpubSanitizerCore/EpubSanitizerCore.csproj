@@ -63,6 +63,7 @@
   </ItemGroup>
 
   <ItemGroup>
+		<InternalsVisibleTo Include="EpubSanitizerWeb" />
     <InternalsVisibleTo Include="EpubSanitizerCore.Plugins.DemoPlugin" />
     <InternalsVisibleTo Include="EpubSanitizerCore.Plugins.CssPlugin" />
   </ItemGroup>
