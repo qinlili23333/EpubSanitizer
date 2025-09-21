@@ -24,10 +24,32 @@ namespace EpubSanitizerCore.Filters
                 Instance.Logger($"Error loading XHTML file {file}, skipping...");
                 return;
             }
+            FixDuplicateContentType(xhtmlDoc);
             FixDuokanNoteID(xhtmlDoc);
             FixExternalLink(file, xhtmlDoc);
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Fix duplicate content type meta tag created by some editors, seems they just add new meta tag without checking existing oneF
+        /// </summary>
+        /// <param name="doc">xhtml XmlDocument object</param>
+        private void FixDuplicateContentType(XmlDocument doc)
+        {
+            foreach (XmlElement element in (doc.GetElementsByTagName("head")[0] as XmlElement).GetElementsByTagName("meta").Cast<XmlElement>().ToArray())
+            {
+                if (element.GetAttribute("http-equiv").Equals("content-type", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    // only keep the first one
+                    element.ParentNode.RemoveChild(element);
+                }
+            }
+            // add a correct one
+            XmlElement meta = doc.CreateElement("meta");
+            meta.SetAttribute("http-equiv", "Content-Type");
+            meta.SetAttribute("content", "text/html; charset=utf-8");
+            (doc.GetElementsByTagName("head")[0] as XmlElement).AppendChild(meta);
         }
 
 
