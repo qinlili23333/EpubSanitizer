@@ -46,7 +46,7 @@ namespace EpubSanitizerCore.Filters
                 }
             }
             // add a correct one
-            XmlElement meta = doc.CreateElement("meta");
+            XmlElement meta = doc.CreateElement("meta", doc.DocumentElement.NamespaceURI);
             meta.SetAttribute("http-equiv", "Content-Type");
             meta.SetAttribute("content", "text/html; charset=utf-8");
             (doc.GetElementsByTagName("head")[0] as XmlElement).AppendChild(meta);
