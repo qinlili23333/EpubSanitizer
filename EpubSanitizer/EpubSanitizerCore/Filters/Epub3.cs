@@ -189,7 +189,7 @@ namespace EpubSanitizerCore.Filters
         private void CheckSvg(XmlDocument doc, string file)
         {
             OpfFile item = Utils.OpfUtil.GetItemFromManifest(Instance.Indexer.ManifestFiles, file);
-            if (doc.GetElementsByTagName("svg").Count > 0)
+            if (doc.GetElementsByTagName("svg").Count > 0 || doc.GetElementsByTagName("svg", "http://www.w3.org/2000/svg").Count > 0)
             {
                 if (item != null && !item.properties.Contains("svg"))
                 {
