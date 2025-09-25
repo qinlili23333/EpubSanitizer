@@ -151,6 +151,7 @@ namespace EpubSanitizerCore.Filters
             CheckScripted(xhtmlDoc, file);
             CheckSvg(xhtmlDoc, file);
             ProcessDeprecatedRoleAttributes(xhtmlDoc);
+            ProcessValignAttributes(xhtmlDoc);
             ProcessTableCellAttributes(xhtmlDoc);
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
@@ -343,6 +344,53 @@ namespace EpubSanitizerCore.Filters
                 {
                     XmlUtil.AddCssClass(table, $"cellspacing{spacing}");
                     table.RemoveAttribute("cellspacing");
+                }
+            }
+            if (cssStyles.Length == 0)
+            {
+                return;
+            }
+            // If there are any styles, add them to the head of the document
+            XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
+            XmlElement styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
+            styleElement.SetAttribute("type", "text/css");
+            styleElement.InnerText = cssStyles.ToString();
+            head.AppendChild(styleElement);
+        }
+
+        /// <summary>
+        /// Convert valign attributes to CSS styles to comply with Epub 3 standards.
+        /// </summary>
+        /// <param name="doc">XmlDocument object</param>
+        private static void ProcessValignAttributes(XmlDocument doc)
+        {
+            Dictionary<string, List<XmlElement>> Record = [];
+            foreach (XmlElement table in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            {
+                if (table.HasAttribute("valign"))
+                {
+                    if (Record.ContainsKey(table.GetAttribute("valign")))
+                    {
+                        Record[table.GetAttribute("valign")].Add(table);
+                    }
+                    else
+                    {
+                        Record[table.GetAttribute("valign")] = [table];
+                    }
+                }
+            }
+            // Generate CSS styles for each unique cellpadding and cellspacing value
+            StringBuilder cssStyles = new();
+            foreach (var type in Record.Keys)
+            {
+                string style = $@".valign-{type}{{
+    vertical-align: {((type == "center") ? "middle" : type)};
+}}";
+                cssStyles.AppendLine(style);
+                foreach (var table in Record[type])
+                {
+                    XmlUtil.AddCssClass(table, $"valign-{type}");
+                    table.RemoveAttribute("valign");
                 }
             }
             if (cssStyles.Length == 0)
