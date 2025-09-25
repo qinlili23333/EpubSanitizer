@@ -3,7 +3,9 @@ using AngleSharp.Css;
 using AngleSharp.Css.Dom;
 using AngleSharp.Css.Parser;
 using EpubSanitizerCore.Filters;
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace EpubSanitizerCore.Plugins.CssPlugin
 {
@@ -22,18 +24,44 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
             return GetAllCssFiles(Instance);
         }
 
+        ConcurrentDictionary<string, string> DirectionCache = [];
         internal override void Process(string file)
         {
             string cssString = Instance.FileStorage.ReadString(file);
             var cssParser = new CssParser();
             var stylesheet = cssParser.ParseStyleSheet(cssString);
             RemoveInvalidUrlInCss(stylesheet, file);
+            RemoveDirection(stylesheet);
             var stringWriter = new StringWriter();
             IStyleFormatter formatter = Instance.Config.GetBool("css.minify") ? new MinifyStyleFormatter() : new PrettyStyleFormatter(); // Or CssCompactFormatter for minified output
             stylesheet.ToCss(stringWriter, formatter);
             Instance.FileStorage.WriteString(file, stringWriter.ToString());
         }
 
+        /// <summary>
+        /// Remove direction in css which is invalid in Epub 3
+        /// </summary>
+        /// <param name="sheet">ICssStyleSheet object</param>
+        private void RemoveDirection(ICssStyleSheet sheet)
+        {
+            foreach (var rule in sheet.Rules.OfType<ICssStyleRule>())
+            {
+                foreach (var decl in rule.Style.ToArray())
+                {
+                    if (decl.Name == "direction")
+                    {
+                        DirectionCache[rule.SelectorText] = decl.Value;
+                        rule.Style.RemoveProperty(decl.Name);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove url properties in css which points to non-existing files
+        /// </summary>
+        /// <param name="sheet">ICssStyleSheet object</param>
+        /// <param name="file">file path</param>
         private void RemoveInvalidUrlInCss(ICssStyleSheet sheet, string file)
         {
             foreach (var rule in sheet.Rules.OfType<ICssStyleRule>())
@@ -107,6 +135,43 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
 
             // Return null or an empty string if the format is not matched.
             return string.Empty;
+        }
+
+        internal override void PostProcess()
+        {
+            if (!DirectionCache.IsEmpty)
+            {
+                Instance.Logger($"Updating dir property instead of direction css for {DirectionCache.Count()} selectors...");
+                // Add dir property back to xhtml files if cached
+                Parallel.ForEach(Utils.PathUtil.GetAllXHTMLFiles(Instance), file =>
+                {
+                    XmlDocument xhtmlDoc = Instance.FileStorage.ReadXml(file);
+                    if (xhtmlDoc == null)
+                    {
+                        Instance.Logger($"Error loading XHTML file {file}, skipping...");
+                        return;
+                    }
+                    bool modified = false;
+                    foreach (var kvp in DirectionCache)
+                    {
+                        var nodes = xhtmlDoc.SelectNodes(css2xpath.Converter.CSSToXPath(kvp.Key));
+                        if (nodes != null)
+                        {
+                            foreach (XmlElement element in nodes)
+                            {
+                                element.SetAttribute("dir", kvp.Value.ToString());
+                                modified = true;
+                            }
+                        }
+                    }
+                    if (!modified)
+                    {
+                        return;
+                    }
+                    // Write back the processed content
+                    Instance.FileStorage.WriteXml(file, xhtmlDoc);
+                });
+            }
         }
 
         public static new void PrintHelp()

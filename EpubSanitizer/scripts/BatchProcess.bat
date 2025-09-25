@@ -2,7 +2,7 @@
 title EpubSanitizer Batch Process
 rem Change path as your condition
 set EpubSanitizer=C:\DevEnv\EpubSanitizer\EpubSanitizer\EpubSanitizerCLI\bin\Debug\net10.0\EpubSanitizerCLI.exe
-set EpubCheck=C:\Users\QINLILI\Downloads\epubcheck-5.2.1\epubcheck.jar
+set EpubCheck=C:\Users\QINLILI\Downloads\epubcheck-5.3.0\epubcheck.jar
 if "%~1"=="" (
 	echo No path given, exit.
 	exit /b -1

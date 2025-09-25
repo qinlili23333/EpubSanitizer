@@ -104,3 +104,5 @@ Thanks to these projects for their inspiration and support:
 - [EpubCheck](https://github.com/w3c/epubcheck)
 - [MimeTypesMap](https://github.com/hey-red/MimeTypesMap)
 - [AngleSharp.Css](https://github.com/AngleSharp/AngleSharp.Css)
+- [libcaesium](https://github.com/Lymphatus/libcaesium)
+- [css2xpath-reloaded-core](https://github.com/qinlili23333/css2xpath-reloaded-core)
