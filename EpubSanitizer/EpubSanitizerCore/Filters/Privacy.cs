@@ -40,7 +40,7 @@ namespace EpubSanitizerCore.Filters
             {
                 if (node is XmlElement element)
                 {
-                    return element.Name == "meta" && element.GetAttribute("name") == "Adept.expected.resource";
+                    return element.Name == "meta" && element.HasAttribute("name") && (element.GetAttribute("name") is "Adept.expected.resource" or "Adept.resource");
                 }
                 return false;
             }).ToList().ForEach(node => node.ParentNode.RemoveChild(node));
