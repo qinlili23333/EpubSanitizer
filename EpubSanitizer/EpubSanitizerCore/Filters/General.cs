@@ -28,12 +28,35 @@ namespace EpubSanitizerCore.Filters
             FixDuplicateContentType(xhtmlDoc);
             FixDuokanNoteID(xhtmlDoc);
             FixExternalLink(file, xhtmlDoc);
+            FixInvalidWidthHeight(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+
+        /// <summary>
+        /// width and height only allows integer without any dimension, if it's invalid, use css to set width and height instead
+        /// </summary>
+        /// <param name="doc">xhtml XmlDocument object</param>
+        private static void FixInvalidWidthHeight(XmlDocument doc)
+        {
+            foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            {
+                if( element.HasAttribute("width") && !int.TryParse(element.GetAttribute("width"), out _))
+                {
+                    element.SetAttribute("style", (element.GetAttribute("style") + $";width:{element.GetAttribute("width")};").Replace(";;",";"));
+                    element.RemoveAttribute("width");
+                }
+                if (element.HasAttribute("height") && !int.TryParse(element.GetAttribute("height"), out _))
+                {
+                    element.SetAttribute("style", (element.GetAttribute("style") + $";height:{element.GetAttribute("height")};").Replace(";;", ";"));
+                    element.RemoveAttribute("height");
+                }
+            }
         }
 
         /// <summary>
