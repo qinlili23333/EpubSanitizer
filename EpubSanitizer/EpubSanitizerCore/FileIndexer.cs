@@ -316,6 +316,15 @@ namespace EpubSanitizerCore
                 }
                 manifest.AppendChild(newElement);
             }
+            // Remove empty guide element
+            if (OpfDoc.GetElementsByTagName("guide").Count != 0)
+            {
+                var guideNode = OpfDoc.GetElementsByTagName("guide")[0];
+                if (guideNode != null && guideNode.ChildNodes.Count == 0)
+                {
+                    guideNode.ParentNode.RemoveChild(guideNode);
+                }
+            }
             // Save the updated OPF document back to the file system
             Instance.FileStorage.WriteBytes(OpfPath, Utils.XmlUtil.ToXmlBytes(OpfDoc, false));
         }
