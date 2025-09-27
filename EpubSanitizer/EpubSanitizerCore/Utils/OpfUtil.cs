@@ -138,5 +138,53 @@ namespace EpubSanitizerCore.Utils
             }
             return null;
         }
+
+        /// <summary>
+        /// Correct spine order in OPF document based on NCX file.
+        /// Items not in NCX will be kept at the beginning, followed by NCX order.
+        /// </summary>
+        /// <param name="opfDoc">opf Document</param>
+        /// <param name="ncxDoc">ncx Document</param>
+        internal static void CorrectSpineOrderFromNcx(XmlDocument opfDoc, XmlDocument ncxDoc)
+        {
+            List<string> ncxOrder = [];
+            XmlNodeList navPoints = ncxDoc.GetElementsByTagName("navPoint");
+            foreach (XmlElement navPoint in navPoints)
+            {
+                XmlElement? content = navPoint.GetElementsByTagName("content").Cast<XmlElement?>().FirstOrDefault();
+                if (content != null)
+                {
+                    string src = content.GetAttribute("src").Split('#')[0];
+                    if (!string.IsNullOrEmpty(src) && !ncxOrder.Contains(src))
+                    {
+                        ncxOrder.Add(src);
+                    }
+                }
+            }
+            XmlNodeList itemrefs = opfDoc.GetElementsByTagName("spine")[0].ChildNodes;
+            List<XmlElement> itemrefElements = [.. itemrefs.Cast<XmlElement>()];
+            itemrefElements.Sort((a, b) =>
+            {
+                string aHref = (opfDoc.SelectSingleNode($"//*[@id='{a.GetAttribute("idref")}']") as XmlElement)?.GetAttribute("href") ?? "";
+                string bHref = (opfDoc.SelectSingleNode($"//*[@id='{b.GetAttribute("idref")}']") as XmlElement)?.GetAttribute("href") ?? "";
+                bool aInNcx = ncxOrder.Contains(aHref);
+                bool bInNcx = ncxOrder.Contains(bHref);
+
+                if (!aInNcx && !bInNcx) return 0; // both not in NCX, keep original order
+                if (!aInNcx) return -1; // a not in NCX, keep at front
+                if (!bInNcx) return 1;  // b not in NCX, keep at front
+
+                int aIndex = ncxOrder.IndexOf(aHref);
+                int bIndex = ncxOrder.IndexOf(bHref);
+                return aIndex.CompareTo(bIndex);
+            });
+            XmlElement spineElement = (XmlElement)opfDoc.GetElementsByTagName("spine")[0];
+            // Keep attributes but no childs
+            spineElement.ChildNodes.Cast<XmlNode>().ToList().ForEach(node => spineElement.RemoveChild(node));
+            foreach (XmlElement itemref in itemrefElements)
+            {
+                spineElement.AppendChild(itemref);
+            }
+        }
     }
 }

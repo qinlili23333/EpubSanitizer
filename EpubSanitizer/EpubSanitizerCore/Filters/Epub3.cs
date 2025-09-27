@@ -7,7 +7,8 @@ namespace EpubSanitizerCore.Filters
     internal class Epub3(EpubSanitizer CoreInstance) : MultiThreadFilter(CoreInstance)
     {
         static readonly Dictionary<string, object> ConfigList = new() {
-            {"epub3.guessToc", false}
+            {"epub3.guessToc", false},
+            { "epub3.correctSpine", true}
         };
         static Epub3()
         {
@@ -448,6 +449,11 @@ namespace EpubSanitizerCore.Filters
             XmlDocument nav = Utils.TocGenerator.Generate(Instance.Indexer.NcxDoc);
             string navPath = Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, "nav_epubsanitizer_generated.xhtml");
             Instance.FileStorage.WriteBytes(navPath, Utils.XmlUtil.ToXmlBytes(nav, false));
+            if (Instance.Config.GetBool("epub3.correctSpine"))
+            {
+                Instance.Logger("Correcting spine order based on NCX...");
+                Utils.OpfUtil.CorrectSpineOrderFromNcx(Instance.Indexer.OpfDoc, Instance.Indexer.NcxDoc);
+            }
             OpfFile NavFile = new()
             {
                 opfpath = "nav_epubsanitizer_generated.xhtml",
@@ -464,6 +470,7 @@ namespace EpubSanitizerCore.Filters
             Console.WriteLine("Filter applied to Epub 3 files.");
             Console.WriteLine("Options:");
             Console.WriteLine("    --epub3.guessToc=false    If true, will try to guess the toc file from OPF instead of creating new one if possible, default is false.");
+            Console.WriteLine("    --epub3.correctSpine=true   If true, will try to correct the spine order based on NCX if possible, default is true.");
         }
     }
 }
