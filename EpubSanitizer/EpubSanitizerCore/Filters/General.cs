@@ -1,4 +1,5 @@
 ﻿using EpubSanitizerCore.Utils;
+using HeyRed.Mime;
 using System.Xml;
 
 namespace EpubSanitizerCore.Filters
@@ -27,15 +28,31 @@ namespace EpubSanitizerCore.Filters
             FixDuplicateContentType(xhtmlDoc);
             FixDuokanNoteID(xhtmlDoc);
             FixExternalLink(file, xhtmlDoc);
+            if (Instance.Config.GetBool("correctMime"))
+            {
+                FixSourceMime(xhtmlDoc);
+            }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Update <source> tag mime type according to file extension
+        /// </summary>
+        /// <param name="doc">xhtml XmlDocument object</param>
+        private static void FixSourceMime(XmlDocument doc)
+        {
+            foreach (XmlElement element in doc.GetElementsByTagName("source").Cast<XmlElement>().ToArray())
+            {
+                element.SetAttribute("type", MimeTypesMap.GetMimeType(element.GetAttribute("src").Split('/').Last()));
+            }
         }
 
         /// <summary>
         /// Fix duplicate content type meta tag created by some editors, seems they just add new meta tag without checking existing oneF
         /// </summary>
         /// <param name="doc">xhtml XmlDocument object</param>
-        private void FixDuplicateContentType(XmlDocument doc)
+        private static void FixDuplicateContentType(XmlDocument doc)
         {
             foreach (XmlElement element in (doc.GetElementsByTagName("head")[0] as XmlElement).GetElementsByTagName("meta").Cast<XmlElement>().ToArray())
             {
