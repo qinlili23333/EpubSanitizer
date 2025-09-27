@@ -46,9 +46,9 @@ namespace EpubSanitizerCore.Filters
         {
             foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
             {
-                if( element.HasAttribute("width") && !int.TryParse(element.GetAttribute("width"), out _))
+                if (element.HasAttribute("width") && !int.TryParse(element.GetAttribute("width"), out _))
                 {
-                    element.SetAttribute("style", (element.GetAttribute("style") + $";width:{element.GetAttribute("width")};").Replace(";;",";"));
+                    element.SetAttribute("style", (element.GetAttribute("style") + $";width:{element.GetAttribute("width")};").Replace(";;", ";"));
                     element.RemoveAttribute("width");
                 }
                 if (element.HasAttribute("height") && !int.TryParse(element.GetAttribute("height"), out _))

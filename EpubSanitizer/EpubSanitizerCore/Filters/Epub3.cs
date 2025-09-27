@@ -293,6 +293,24 @@ namespace EpubSanitizerCore.Filters
             Dictionary<string, List<XmlElement>> SpacingRecord = [];
             foreach (XmlElement table in doc.GetElementsByTagName("table").Cast<XmlElement>().ToArray())
             {
+                if (table.HasAttribute("border"))
+                {
+                    if (int.TryParse(table.GetAttribute("border"), out int borderValue))
+                    {
+                        if (borderValue > 0)
+                        {
+                            table.SetAttribute("border", "1");
+                        }
+                        else if (borderValue == 0)
+                        {
+                            table.SetAttribute("border", "");
+                        }
+                    }
+                    else
+                    {
+                        table.RemoveAttribute("border");
+                    }
+                }
                 if (table.HasAttribute("cellpadding"))
                 {
                     if (PaddingRecord.ContainsKey(table.GetAttribute("cellpadding")))
