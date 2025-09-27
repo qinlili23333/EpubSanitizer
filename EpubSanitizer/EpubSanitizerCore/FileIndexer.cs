@@ -264,13 +264,16 @@ namespace EpubSanitizerCore
                     uid.SetAttribute("content", opfuid);
                 }
             }
-            // Sanitize id
+            // Sanitize id and playOrder
+            int order = 1;
             foreach (XmlElement navPoint in NcxDoc.GetElementsByTagName("navPoint"))
             {
                 if (int.TryParse(navPoint.GetAttribute("id").AsSpan(0, 1), out _))
                 {
                     navPoint.SetAttribute("id", "navPoint-" + navPoint.GetAttribute("id"));
                 }
+                navPoint.SetAttribute("playOrder", order.ToString());
+                order++;
             }
             //Write updated NCX file back to Epub.
             Instance.Logger("Updating NCX file...");
