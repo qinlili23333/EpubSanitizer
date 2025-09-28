@@ -204,5 +204,25 @@ namespace EpubSanitizerCore.Utils
             }
             return attributeName;
         }
+
+        /// <summary>
+        /// Provides a set of HTML tag names that are considered inline elements according to HTML specifications.
+        /// </summary>
+        private static readonly HashSet<string> InlineElements =
+        [
+            "a", "abbr", "b", "bdi", "bdo", "br", "button", "cite", "code", "data", "datalist", "dfn", "em", "i", "iframe",
+            "img", "input", "kbd", "label", "link", "map", "mark", "meter", "output", "progress", "q", "s", "samp", "script",
+            "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"
+        ];
+
+        /// <summary>
+        /// Determines whether the specified HTML tag name represents an inline element.
+        /// </summary>
+        /// <param name="tagName">The name of the HTML tag to evaluate. The comparison is case-insensitive.</param>
+        /// <returns>true if the tag name corresponds to a recognized inline HTML element; otherwise, false.</returns>
+        public static bool IsInline(string tagName)
+        {
+            return InlineElements.Contains(tagName.ToLower());
+        }
     }
 }

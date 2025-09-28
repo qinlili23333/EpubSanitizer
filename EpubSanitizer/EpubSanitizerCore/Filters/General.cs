@@ -6,6 +6,15 @@ namespace EpubSanitizerCore.Filters
 {
     internal class General(EpubSanitizer CoreInstance) : MultiThreadFilter(CoreInstance)
     {
+
+        static readonly Dictionary<string, object> ConfigList = new() {
+            {"general.raplaceInlineWithBlock", true}
+        };
+        static General()
+        {
+            ConfigManager.AddDefaultConfig(ConfigList);
+        }
+
         /// <summary>
         /// General filter only processes XHTML files.
         /// </summary>
@@ -33,8 +42,49 @@ namespace EpubSanitizerCore.Filters
             {
                 FixSourceMime(xhtmlDoc);
             }
+            if (Instance.Config.GetBool("general.raplaceInlineWithBlock"))
+            {
+                FixInlineWithBlock(xhtmlDoc);
+            }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Modifies the specified XHTML document to correct inline elements that are improperly nested within
+        /// block-level elements.
+        /// </summary>
+        /// <param name="doc">The XML document representing XHTML content to be analyzed and fixed. Cannot be null.</param>
+        private static void FixInlineWithBlock(XmlDocument doc)
+        {
+            foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            {
+                if (XmlUtil.IsInline(element.LocalName))
+                {
+                    bool containsBlock = false;
+                    foreach (XmlElement child in element.GetElementsByTagName("*"))
+                    {
+                        if (!XmlUtil.IsInline(child.LocalName))
+                        {
+                            containsBlock = true;
+                            break;
+                        }
+                    }
+                    if (containsBlock)
+                    {
+                        XmlElement div = doc.CreateElement("div", doc.DocumentElement.NamespaceURI);
+                        foreach (XmlAttribute attr in element.Attributes)
+                        {
+                            div.SetAttribute(attr.Name, attr.Value);
+                        }
+                        while (element.HasChildNodes)
+                        {
+                            div.AppendChild(element.FirstChild);
+                        }
+                        element.ParentNode.ReplaceChild(div, element);
+                    }
+                }
+            }
         }
 
 
@@ -139,6 +189,8 @@ namespace EpubSanitizerCore.Filters
         public static new void PrintHelp()
         {
             Console.WriteLine("General filter is a default filter that does basic processing for standard fixing.");
+            Console.WriteLine("Options:");
+            Console.WriteLine("  --general.raplaceInlineWithBlock=true  Whether to replace an inline element containing block element with div. Default is true, disable it may improve performance.");
         }
     }
 }
