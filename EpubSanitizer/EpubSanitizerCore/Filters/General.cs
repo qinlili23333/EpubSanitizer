@@ -228,6 +228,11 @@ namespace EpubSanitizerCore.Filters
                 {
                     continue;
                 }
+                if (link.StartsWith("kindle:embed"))
+                {
+                    element.RemoveAttribute("href");
+                    continue;
+                }
                 if (link != string.Empty && link[0] != '/' && link[0] != '.' && !Instance.FileStorage.FileExists(PathUtil.ComposeFromRelativePath(file, link).Split('#')[0]) && link.Split('/')[0].Split('.').Length >= 3)
                 {
                     element.SetAttribute("href", "http://" + link);
