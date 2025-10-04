@@ -1,6 +1,6 @@
 ﻿using EpubSanitizerCore.Utils;
 using HeyRed.Mime;
-using System.Data.Common;
+using System.Collections.Concurrent;
 using System.Xml;
 
 namespace EpubSanitizerCore.Filters
@@ -57,7 +57,7 @@ namespace EpubSanitizerCore.Filters
         }
 
 
-        private Dictionary<string, HashSet<string>> IDList = new();
+        private ConcurrentDictionary<string, ConcurrentBag<string>> IDList = [];
 
         /// <summary>
         /// Record all ID in the document for cleanup fragments later
@@ -68,9 +68,9 @@ namespace EpubSanitizerCore.Filters
         {
             foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
             {
-                if(element.HasAttribute("id") && element.GetAttribute("id") != string.Empty)
+                if (element.HasAttribute("id") && element.GetAttribute("id") != string.Empty)
                 {
-                    if (!IDList.TryGetValue(file, out HashSet<string>? value))
+                    if (!IDList.TryGetValue(file, out ConcurrentBag<string>? value))
                     {
                         value = [];
                         IDList[file] = value;
@@ -260,7 +260,7 @@ namespace EpubSanitizerCore.Filters
                         if (link.Contains('#'))
                         {
                             string[] parts = link.Split('#');
-                            if (parts.Length == 2 && parts[1] != string.Empty && (!IDList.TryGetValue(PathUtil.ComposeFromRelativePath(file, parts[0]), out HashSet<string>? value) || !value.Contains(parts[1])))
+                            if (parts.Length == 2 && parts[1] != string.Empty && (!IDList.TryGetValue(PathUtil.ComposeFromRelativePath(file, parts[0]), out ConcurrentBag<string>? value) || !value.Contains(parts[1])))
                             {
                                 element.SetAttribute("href", parts[0]);
                             }
@@ -269,6 +269,25 @@ namespace EpubSanitizerCore.Filters
                     // Write back the processed content
                     Instance.FileStorage.WriteXml(file, xhtmlDoc);
                 });
+                if (Instance.Indexer.NcxDoc != null)
+                {
+                    Instance.Logger("Cleaning up NCX file...");
+                    // Remove navPoint that point to non-exist fragment
+                    XmlNodeList navPoints = Instance.Indexer.NcxDoc.GetElementsByTagName("navPoint");
+                    foreach (XmlElement navPoint in navPoints.Cast<XmlElement>().ToArray())
+                    {
+                        XmlElement? content = navPoint.GetElementsByTagName("content").Cast<XmlElement?>().FirstOrDefault();
+                        if (content != null)
+                        {
+                            string src = content.GetAttribute("src").Split('#')[0];
+                            string id = content.GetAttribute("src").Contains('#') ? content.GetAttribute("src").Split('#')[1] : string.Empty;
+                            if (!Instance.FileStorage.FileExists(src) || (id != string.Empty && (!IDList.TryGetValue(src, out ConcurrentBag<string>? value) || !value.Contains(id))))
+                            {
+                                content.SetAttribute("src", src);
+                            }
+                        }
+                    }
+                }
             }
         }
 
