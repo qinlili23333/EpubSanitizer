@@ -340,5 +340,10 @@ namespace EpubSanitizerCore
                 Instance.FileStorage.WriteBytes(NcxPath, Utils.XmlUtil.ToXmlBytes(NcxDoc, false));
             }
         }
+
+        internal void DeleteFileRecord(string path)
+        {
+            ManifestFiles = [.. ManifestFiles.Where(f => f.path != path)];
+        }
     }
 }
