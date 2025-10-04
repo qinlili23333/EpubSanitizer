@@ -1,5 +1,6 @@
 ﻿using EpubSanitizerCore.Utils;
 using HeyRed.Mime;
+using System.Data.Common;
 using System.Xml;
 
 namespace EpubSanitizerCore.Filters
@@ -49,9 +50,34 @@ namespace EpubSanitizerCore.Filters
             if (!Instance.Config.GetBool("publisherMode"))
             {
                 RemoveInvalidImage(xhtmlDoc, file);
+                RecordID(xhtmlDoc, file);
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+
+        private Dictionary<string, HashSet<string>> IDList = new();
+
+        /// <summary>
+        /// Record all ID in the document for cleanup fragments later
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        /// <param name="file">file path in archive</param>
+        private void RecordID(XmlDocument doc, string file)
+        {
+            foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            {
+                if(element.HasAttribute("id") && element.GetAttribute("id") != string.Empty)
+                {
+                    if (!IDList.TryGetValue(file, out HashSet<string>? value))
+                    {
+                        value = [];
+                        IDList[file] = value;
+                    }
+                    value.Add(element.GetAttribute("id"));
+                }
+            }
         }
 
         /// <summary>
@@ -212,6 +238,37 @@ namespace EpubSanitizerCore.Filters
                         }
                     }
                 }
+            }
+        }
+
+        internal override void PostProcess()
+        {
+            if (!Instance.Config.GetBool("publisherMode"))
+            {
+                Parallel.ForEach(Utils.PathUtil.GetAllXHTMLFiles(Instance), file =>
+                {
+                    XmlDocument xhtmlDoc = Instance.FileStorage.ReadXml(file);
+                    if (xhtmlDoc == null)
+                    {
+                        Instance.Logger($"Error loading XHTML file {file}, skipping...");
+                        return;
+                    }
+                    // Remove fragment identifier if not exist
+                    foreach (XmlElement element in (xhtmlDoc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName("a"))
+                    {
+                        string link = element.GetAttribute("href");
+                        if (link.Contains('#'))
+                        {
+                            string[] parts = link.Split('#');
+                            if (parts.Length == 2 && parts[1] != string.Empty && (!IDList.TryGetValue(PathUtil.ComposeFromRelativePath(file, parts[0]), out HashSet<string>? value) || !value.Contains(parts[1])))
+                            {
+                                element.SetAttribute("href", parts[0]);
+                            }
+                        }
+                    }
+                    // Write back the processed content
+                    Instance.FileStorage.WriteXml(file, xhtmlDoc);
+                });
             }
         }
 
