@@ -79,7 +79,7 @@
             List<string> files = [];
             foreach (var file in instance.Indexer.ManifestFiles)
             {
-                if (file.mimetype == "application/xhtml+xml" || file.mimetype == "application/xml")
+                if (file.mimetype == "application/xhtml+xml")
                 {
                     files.Add(file.path);
                 }
