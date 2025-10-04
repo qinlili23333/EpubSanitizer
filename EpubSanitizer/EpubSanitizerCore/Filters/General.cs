@@ -379,6 +379,7 @@ namespace EpubSanitizerCore.Filters
                             }
                         }
                     }
+                    Utils.NcxUtil.ReorderNcx(Instance.Indexer.NcxDoc);
                 }
             }
         }

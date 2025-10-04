@@ -54,6 +54,30 @@ namespace EpubSanitizerCore.Utils
             return string.Empty;
         }
 
+        /// <summary>
+        /// Reorder playOrder in Ncx
+        /// </summary>
+        /// <param name="NcxDoc">NCX XmlDocument object</param>
+        internal static void ReorderNcx(XmlDocument NcxDoc)
+        {
+            // Sanitize id and playOrder
+            int order = 0;
+            string lastTarget = string.Empty;
+            foreach (XmlElement navPoint in NcxDoc.GetElementsByTagName("navPoint"))
+            {
+                if (int.TryParse(navPoint.GetAttribute("id").AsSpan(0, 1), out _))
+                {
+                    navPoint.SetAttribute("id", "navPoint-" + navPoint.GetAttribute("id"));
+                }
+                string target = (navPoint.GetElementsByTagName("content")[0] as XmlElement).GetAttribute("src");
+                if (target != lastTarget)
+                {
+                    lastTarget = target;
+                    order++;
+                }
+                navPoint.SetAttribute("playOrder", order.ToString());
+            }
+        }
 
     }
 }
