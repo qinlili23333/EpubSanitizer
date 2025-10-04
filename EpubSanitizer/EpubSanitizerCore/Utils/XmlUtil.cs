@@ -222,7 +222,7 @@ namespace EpubSanitizerCore.Utils
         /// <returns>true if the tag name corresponds to a recognized inline HTML element; otherwise, false.</returns>
         public static bool IsInline(string tagName)
         {
-            return InlineElements.Contains(tagName.ToLower());
+            return InlineElements.Contains(tagName.ToLowerInvariant());
         }
     }
 }
