@@ -235,11 +235,6 @@ namespace EpubSanitizerCore
                         string ncxContent = Instance.FileStorage.ReadString(NcxPath);
                         NcxDoc = new XmlDocument();
                         NcxDoc.LoadXml(ncxContent);
-                        if (Instance.Config.GetBool("sanitizeNcx"))
-                        {
-                            Instance.Logger("Sanitizing NCX file...");
-                            SanitizeNcx();
-                        }
                         return;
                     }
                 }
@@ -274,16 +269,13 @@ namespace EpubSanitizerCore
                     navPoint.SetAttribute("id", "navPoint-" + navPoint.GetAttribute("id"));
                 }
                 string target = (navPoint.GetElementsByTagName("content")[0] as XmlElement).GetAttribute("src");
-                if(target != lastTarget)
+                if (target != lastTarget)
                 {
                     lastTarget = target;
                     order++;
                 }
                 navPoint.SetAttribute("playOrder", order.ToString());
             }
-            //Write updated NCX file back to Epub.
-            Instance.Logger("Updating NCX file...");
-            Instance.FileStorage.WriteBytes(NcxPath, Utils.XmlUtil.ToXmlBytes(NcxDoc, false));
         }
 
         /// <summary>
@@ -336,6 +328,17 @@ namespace EpubSanitizerCore
             }
             // Save the updated OPF document back to the file system
             Instance.FileStorage.WriteBytes(OpfPath, Utils.XmlUtil.ToXmlBytes(OpfDoc, false));
+            if (NcxDoc != null)
+            {
+                if (Instance.Config.GetBool("sanitizeNcx"))
+                {
+                    Instance.Logger("Sanitizing NCX file...");
+                    SanitizeNcx();
+                }
+                //Write updated NCX file back to Epub.
+                Instance.Logger("Updating NCX file...");
+                Instance.FileStorage.WriteBytes(NcxPath, Utils.XmlUtil.ToXmlBytes(NcxDoc, false));
+            }
         }
     }
 }
