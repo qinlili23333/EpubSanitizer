@@ -28,6 +28,45 @@ namespace EpubSanitizerCore.Utils
         {
             emptyNavDoc.LoadXml(Res.TocXhtmlTemplate);
         }
+
+        /// <summary>
+        /// Converts the navigation XML document to a page list format and updates the specified OPF document
+        /// accordingly.
+        /// </summary>
+        /// <param name="nav">The navigation XML document to convert.</param>
+        /// <param name="Instance">The EpubSanitizer instance containing the OPF document to update.</param>
+        /// <param name="navPath">The path to the navigation document within the EPUB file.</param>
+        internal static void ConvertPageMapToPageList(XmlDocument nav, EpubSanitizer Instance, string navPath)
+        {
+            // Find page-map file
+            XmlElement spine = Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0] as XmlElement;
+            string id = spine.GetAttribute("page-map");
+            OpfFile mapFile = Instance.Indexer.ManifestFiles.FirstOrDefault(file => file.id == id);
+            XmlDocument pageMapDoc = Instance.FileStorage.ReadXml(mapFile.path);
+            nav.DocumentElement.SetAttribute("xmlns:epub", "http://www.idpf.org/2007/ops");
+            XmlElement pageList = nav.CreateElement("nav", nav.DocumentElement.NamespaceURI);
+            pageList.SetAttribute("type", "http://www.idpf.org/2007/ops","page-list");
+            pageList.SetAttribute("hidden", "hidden");
+            XmlElement olElement = nav.CreateElement("ol", nav.DocumentElement.NamespaceURI);
+            foreach (XmlElement pageTarget in pageMapDoc.GetElementsByTagName("page"))
+            {
+                XmlElement liElement = nav.CreateElement("li", nav.DocumentElement.NamespaceURI);
+                XmlElement aElement = nav.CreateElement("a", nav.DocumentElement.NamespaceURI);
+                aElement.SetAttribute("href", PathUtil.ComposeRelativePath(navPath, PathUtil.ComposeFromRelativePath(mapFile.path, pageTarget.GetAttribute("href"))));
+                aElement.InnerText = pageTarget.GetAttribute("name");
+                liElement.AppendChild(aElement);
+                olElement.AppendChild(liElement);
+            }
+            pageList.AppendChild(olElement);
+            nav.GetElementsByTagName("body")[0].AppendChild(pageList);
+            // Delete page-map file from manifest and file storage
+            Instance.Indexer.DeleteFileRecord(mapFile.path);
+            Instance.FileStorage.DeleteFile(mapFile.path);
+            spine.RemoveAttribute("page-map");
+            // Avoid pagemap still in file from cache
+            Instance.FileStorage.FlushXmlCache(mapFile.path);
+        }
+
         /// <summary>
         /// Generate a new nav.xhtml document based on the NCX file.
         /// </summary>

@@ -434,6 +434,11 @@ namespace EpubSanitizerCore.Filters
             {
                 if (file.mimetype == "application/xhtml+xml" && file.originElement.GetAttribute("properties").Split(' ').Contains("nav"))
                 {
+                    if (Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0]?.Attributes?["page-map"] != null)
+                    {
+                        Instance.Logger("Found Adobe style page number in spine, converting to page-list in nav...");
+                        Utils.TocGenerator.ConvertPageMapToPageList(Instance.FileStorage.ReadXml(file.path),Instance, file.path);
+                    }
                     return true;
                 }
             }
@@ -448,7 +453,12 @@ namespace EpubSanitizerCore.Filters
             Instance.Logger("No nav detected in OPF manifest, creating nav.xhtml based on toc.ncx...");
             XmlDocument nav = Utils.TocGenerator.Generate(Instance.Indexer.NcxDoc);
             string navPath = Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, "nav_epubsanitizer_generated.xhtml");
-            Instance.FileStorage.WriteBytes(navPath, Utils.XmlUtil.ToXmlBytes(nav, false));
+            if (Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0]?.Attributes?["page-map"] != null)
+            {
+                Instance.Logger("Found Adobe style page number in spine, converting to page-list in nav...");
+                Utils.TocGenerator.ConvertPageMapToPageList(nav, Instance, navPath);
+            }
+            Instance.FileStorage.WriteXml(navPath, nav);
             if (Instance.Config.GetBool("epub3.correctSpine"))
             {
                 Instance.Logger("Correcting spine order based on NCX...");
