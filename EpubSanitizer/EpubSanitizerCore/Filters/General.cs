@@ -41,6 +41,7 @@ namespace EpubSanitizerCore.Filters
             FixExternalLink(file, xhtmlDoc);
             FixInvalidWidthHeight(xhtmlDoc);
             FixColElement(xhtmlDoc);
+            RemoveShapeAttr(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -56,6 +57,21 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// The shape attr in a element is deprecated in HTML5, just remove it
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        private static void RemoveShapeAttr(XmlDocument doc)
+        {
+            foreach (XmlElement element in doc.GetElementsByTagName("a").Cast<XmlElement>().ToArray())
+            {
+                if (element.HasAttribute("shape"))
+                {
+                    element.RemoveAttribute("shape");
+                }
+            }
         }
 
         /// <summary>
