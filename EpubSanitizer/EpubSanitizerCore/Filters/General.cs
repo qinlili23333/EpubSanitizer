@@ -40,6 +40,7 @@ namespace EpubSanitizerCore.Filters
             RemoveAmazonAttr(xhtmlDoc);
             FixExternalLink(file, xhtmlDoc);
             FixInvalidWidthHeight(xhtmlDoc);
+            FixColElement(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -55,6 +56,37 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Ensure col element is in colgroup
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        private static void FixColElement(XmlDocument doc)
+        {
+            foreach (XmlElement element in doc.GetElementsByTagName("col").Cast<XmlElement>().ToArray())
+            {
+                var parentElement = element.ParentNode as XmlElement;
+                if (parentElement.LocalName == "colgroup")
+                {
+                    continue;
+                }
+                XmlElement? colgroup = null;
+                foreach (XmlNode node in parentElement.ChildNodes)
+                {
+                    if (node is XmlElement el && el.LocalName == "colgroup")
+                    {
+                        colgroup = el;
+                        break;
+                    }
+                }
+                if (colgroup == null)
+                {
+                    colgroup = doc.CreateElement("colgroup", doc.DocumentElement.NamespaceURI);
+                    parentElement.InsertBefore(colgroup, element);
+                }
+                colgroup.AppendChild(element);
+            }
         }
 
         /// <summary>
