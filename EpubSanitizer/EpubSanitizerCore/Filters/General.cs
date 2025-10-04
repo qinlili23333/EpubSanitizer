@@ -37,6 +37,7 @@ namespace EpubSanitizerCore.Filters
             }
             FixDuplicateContentType(xhtmlDoc);
             FixDuokanNoteID(xhtmlDoc);
+            RemoveAmazonAttr(xhtmlDoc);
             FixExternalLink(file, xhtmlDoc);
             FixInvalidWidthHeight(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
@@ -56,6 +57,21 @@ namespace EpubSanitizerCore.Filters
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
         }
 
+        /// <summary>
+        /// Amazon left attributes are useless, just remove them
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        private static void RemoveAmazonAttr(XmlDocument doc)
+        {
+            foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            {
+                List<string> removeAttrs = ["data-AmznRemoved-M8", "data-AmznRemoved"];
+                foreach (string attr in removeAttrs)
+                {
+                    element.RemoveAttribute(attr);
+                }
+            }
+        }
 
         private ConcurrentDictionary<string, ConcurrentBag<string>> IDList = [];
 
