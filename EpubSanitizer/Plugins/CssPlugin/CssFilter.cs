@@ -30,7 +30,10 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
             string cssString = Instance.FileStorage.ReadString(file);
             var cssParser = new CssParser();
             var stylesheet = cssParser.ParseStyleSheet(cssString);
-            RemoveInvalidUrlInCss(stylesheet, file);
+            if (!Instance.Config.GetBool("publisherMode"))
+            {
+                RemoveInvalidUrlInCss(stylesheet, file);
+            }
             RemoveDirection(stylesheet);
             var stringWriter = new StringWriter();
             IStyleFormatter formatter = Instance.Config.GetBool("css.minify") ? new MinifyStyleFormatter() : new PrettyStyleFormatter(); // Or CssCompactFormatter for minified output
