@@ -235,6 +235,11 @@ namespace EpubSanitizerCore
                         string ncxContent = Instance.FileStorage.ReadString(NcxPath);
                         NcxDoc = new XmlDocument();
                         NcxDoc.LoadXml(ncxContent);
+                        if (Instance.Config.GetBool("sanitizeNcx"))
+                        {
+                            Instance.Logger("Sanitizing NCX file...");
+                            SanitizeNcx();
+                        }
                         return;
                     }
                 }
@@ -330,11 +335,6 @@ namespace EpubSanitizerCore
             Instance.FileStorage.WriteBytes(OpfPath, Utils.XmlUtil.ToXmlBytes(OpfDoc, false));
             if (NcxDoc != null)
             {
-                if (Instance.Config.GetBool("sanitizeNcx"))
-                {
-                    Instance.Logger("Sanitizing NCX file...");
-                    SanitizeNcx();
-                }
                 //Write updated NCX file back to Epub.
                 Instance.Logger("Updating NCX file...");
                 Instance.FileStorage.WriteBytes(NcxPath, Utils.XmlUtil.ToXmlBytes(NcxDoc, false));
