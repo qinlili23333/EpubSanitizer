@@ -9,7 +9,7 @@ namespace EpubSanitizerCore.Filters
     {
 
         static readonly Dictionary<string, object> ConfigList = new() {
-            {"general.raplaceInlineWithBlock", true}
+            {"general.replaceInlineWithBlock", true}
         };
         static General()
         {
@@ -46,7 +46,7 @@ namespace EpubSanitizerCore.Filters
             {
                 FixSourceMime(xhtmlDoc);
             }
-            if (Instance.Config.GetBool("general.raplaceInlineWithBlock"))
+            if (Instance.Config.GetBool("general.replaceInlineWithBlock"))
             {
                 FixInlineWithBlock(xhtmlDoc);
             }
@@ -364,7 +364,7 @@ namespace EpubSanitizerCore.Filters
         {
             Console.WriteLine("General filter is a default filter that does basic processing for standard fixing.");
             Console.WriteLine("Options:");
-            Console.WriteLine("  --general.raplaceInlineWithBlock=true  Whether to replace an inline element containing block element with div. Default is true, disable it may improve performance.");
+            Console.WriteLine("  --general.replaceInlineWithBlock=true  Whether to replace an inline element containing block element with div. Default is true, disable it may improve performance.");
         }
     }
 }
