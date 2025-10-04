@@ -184,7 +184,7 @@ namespace EpubSanitizerCore.Filters
         {
             foreach (XmlElement element in (doc.GetElementsByTagName("head")[0] as XmlElement).GetElementsByTagName("meta").Cast<XmlElement>().ToArray())
             {
-                if (element.GetAttribute("http-equiv").Equals("content-type", StringComparison.InvariantCultureIgnoreCase) || element.HasAttribute("charset"))
+                if (element.GetAttribute("http-equiv").Equals("content-type", StringComparison.InvariantCultureIgnoreCase) || element.HasAttribute("charset") || element.GetAttribute("content").Contains("charset"))
                 {
                     // only keep the first one
                     element.ParentNode.RemoveChild(element);
