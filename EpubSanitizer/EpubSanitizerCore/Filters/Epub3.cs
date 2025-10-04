@@ -437,7 +437,7 @@ namespace EpubSanitizerCore.Filters
                     if (Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0]?.Attributes?["page-map"] != null)
                     {
                         Instance.Logger("Found Adobe style page number in spine, converting to page-list in nav...");
-                        Utils.TocGenerator.ConvertPageMapToPageList(Instance.FileStorage.ReadXml(file.path),Instance, file.path);
+                        Utils.TocGenerator.ConvertPageMapToPageList(Instance.FileStorage.ReadXml(file.path), Instance, file.path);
                     }
                     return true;
                 }

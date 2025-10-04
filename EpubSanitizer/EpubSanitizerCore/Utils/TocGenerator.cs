@@ -42,10 +42,19 @@ namespace EpubSanitizerCore.Utils
             XmlElement spine = Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0] as XmlElement;
             string id = spine.GetAttribute("page-map");
             OpfFile mapFile = Instance.Indexer.ManifestFiles.FirstOrDefault(file => file.id == id);
+            // Check whether page-list already exist
+            foreach (XmlElement navElem in nav.GetElementsByTagName("nav"))
+            {
+                if (navElem.GetAttribute("epub:type") == "page-list" ||
+                    navElem.GetAttribute("type", "http://www.idpf.org/2007/ops") == "page-list")
+                {
+                    goto delete;
+                }
+            }
             XmlDocument pageMapDoc = Instance.FileStorage.ReadXml(mapFile.path);
             nav.DocumentElement.SetAttribute("xmlns:epub", "http://www.idpf.org/2007/ops");
             XmlElement pageList = nav.CreateElement("nav", nav.DocumentElement.NamespaceURI);
-            pageList.SetAttribute("type", "http://www.idpf.org/2007/ops","page-list");
+            pageList.SetAttribute("type", "http://www.idpf.org/2007/ops", "page-list");
             pageList.SetAttribute("hidden", "hidden");
             XmlElement olElement = nav.CreateElement("ol", nav.DocumentElement.NamespaceURI);
             foreach (XmlElement pageTarget in pageMapDoc.GetElementsByTagName("page"))
@@ -59,6 +68,7 @@ namespace EpubSanitizerCore.Utils
             }
             pageList.AppendChild(olElement);
             nav.GetElementsByTagName("body")[0].AppendChild(pageList);
+        delete:
             // Delete page-map file from manifest and file storage
             Instance.Indexer.DeleteFileRecord(mapFile.path);
             Instance.FileStorage.DeleteFile(mapFile.path);
