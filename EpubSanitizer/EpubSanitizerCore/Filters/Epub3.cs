@@ -314,24 +314,26 @@ namespace EpubSanitizerCore.Filters
                 }
                 if (table.HasAttribute("cellpadding"))
                 {
-                    if (PaddingRecord.ContainsKey(table.GetAttribute("cellpadding")))
+                    string paddingValue = new([.. table.GetAttribute("cellpadding").Where(c => char.IsDigit(c) || c == '%')]);
+                    if (PaddingRecord.ContainsKey(paddingValue))
                     {
-                        PaddingRecord[table.GetAttribute("cellpadding")].Add(table);
+                        PaddingRecord[paddingValue].Add(table);
                     }
                     else
                     {
-                        PaddingRecord[table.GetAttribute("cellpadding")] = [table];
+                        PaddingRecord[paddingValue] = [table];
                     }
                 }
                 if (table.HasAttribute("cellspacing"))
                 {
-                    if (SpacingRecord.ContainsKey(table.GetAttribute("cellspacing")))
+                    string spacingValue = new([.. table.GetAttribute("cellpadding").Where(c => char.IsDigit(c) || c == '%')]);
+                    if (SpacingRecord.ContainsKey(spacingValue))
                     {
-                        SpacingRecord[table.GetAttribute("cellspacing")].Add(table);
+                        SpacingRecord[spacingValue].Add(table);
                     }
                     else
                     {
-                        SpacingRecord[table.GetAttribute("cellspacing")] = [table];
+                        SpacingRecord[spacingValue] = [table];
                     }
                 }
             }
