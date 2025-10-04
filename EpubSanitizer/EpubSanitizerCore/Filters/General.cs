@@ -46,8 +46,37 @@ namespace EpubSanitizerCore.Filters
             {
                 FixInlineWithBlock(xhtmlDoc);
             }
+            if (!Instance.Config.GetBool("publisherMode"))
+            {
+                RemoveInvalidImage(xhtmlDoc, file);
+            }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Remove invalid image that not exist in the archive
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        /// <param name="file">file path in archive</param>
+        private void RemoveInvalidImage(XmlDocument doc, string file)
+        {
+            foreach (XmlElement element in doc.GetElementsByTagName("img").Cast<XmlElement>().ToArray())
+            {
+                if (element.HasAttribute("src") && !Instance.FileStorage.FileExists(PathUtil.ComposeFromRelativePath(file, element.GetAttribute("src"))))
+                {
+                    Instance.Logger($"Removed invalid image {element.GetAttribute("src")} in {file}");
+                    if (element.HasAttribute("alt") && element.GetAttribute("alt") != string.Empty)
+                    {
+                        XmlText altText = doc.CreateTextNode(element.GetAttribute("alt"));
+                        element.ParentNode.ReplaceChild(altText, element);
+                    }
+                    else
+                    {
+                        element.ParentNode.RemoveChild(element);
+                    }
+                }
+            }
         }
 
         /// <summary>
