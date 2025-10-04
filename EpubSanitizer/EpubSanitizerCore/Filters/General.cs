@@ -42,6 +42,7 @@ namespace EpubSanitizerCore.Filters
             FixInvalidWidthHeight(xhtmlDoc);
             FixColElement(xhtmlDoc);
             RemoveShapeAttr(xhtmlDoc);
+            FixBigElement(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -57,6 +58,28 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Use span with css to replace big element, since HTML5 deprecated big element
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        private static void FixBigElement(XmlDocument doc)
+        {
+            foreach (XmlElement element in doc.GetElementsByTagName("big").Cast<XmlElement>().ToArray())
+            {
+                XmlElement span = doc.CreateElement("span", doc.DocumentElement.NamespaceURI);
+                span.SetAttribute("style", "font-size:larger;");
+                foreach (XmlAttribute attr in element.Attributes)
+                {
+                    span.SetAttribute(attr.Name, attr.Value);
+                }
+                while (element.HasChildNodes)
+                {
+                    span.AppendChild(element.FirstChild);
+                }
+                element.ParentNode.ReplaceChild(span, element);
+            }
         }
 
         /// <summary>
