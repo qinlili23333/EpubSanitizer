@@ -42,6 +42,7 @@ namespace EpubSanitizerCore.Filters
             FixInvalidWidthHeight(xhtmlDoc);
             FixColElement(xhtmlDoc);
             RemoveShapeAttr(xhtmlDoc);
+            RemoveEmptyList(xhtmlDoc);
             FixBigElement(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
@@ -58,6 +59,25 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// List elements should have at least one li element inside, otherwise remove the list element
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        private static void RemoveEmptyList(XmlDocument doc)
+        {
+            string[] tags = ["ul", "ol", "menu"];
+            foreach (string tag in tags)
+            {
+                foreach (XmlElement element in doc.GetElementsByTagName(tag).Cast<XmlElement>().ToArray())
+                {
+                    if (element.GetElementsByTagName("li").Count == 0)
+                    {
+                        element.ParentNode.RemoveChild(element);
+                    }
+                }
+            }
         }
 
         /// <summary>
