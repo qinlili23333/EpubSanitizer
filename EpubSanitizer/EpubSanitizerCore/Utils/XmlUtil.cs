@@ -82,18 +82,13 @@ namespace EpubSanitizerCore.Utils
         /// <param name="targetNamespaceUri">the namespace require normalize</param>
         public static void NormalizeXmlns(XmlDocument doc, string targetNamespaceUri)
         {
-            List<XmlElement> elementsToReplace = [];
             foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
             {
                 if (element.NamespaceURI == targetNamespaceUri)
                 {
-                    elementsToReplace.Add(element);
+                    element.Prefix = string.Empty;
                 }
 
-            }
-            foreach (XmlElement oldElement in elementsToReplace)
-            {
-                oldElement.Prefix = string.Empty;
             }
             XmlElement root = doc.DocumentElement;
             foreach (XmlAttribute attr in root.Attributes)
@@ -105,40 +100,47 @@ namespace EpubSanitizerCore.Utils
                 }
             }
             root.SetAttribute("xmlns", targetNamespaceUri);
-            foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            // Recursive mode
+            bool needAnotherPass = true;
+            while (needAnotherPass)
             {
-                if (element.NamespaceURI == string.Empty)
+                needAnotherPass = false;
+                foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
                 {
-                    // Recreate with proper namespace URI
-                    XmlElement newElement = doc.CreateElement(element.LocalName, targetNamespaceUri);
-                    // Copy attributes and children
-                    foreach (XmlAttribute attr in element.Attributes)
+                    if (element.NamespaceURI == string.Empty)
                     {
-                        newElement.SetAttribute(attr.Name, attr.Value);
+                        // Recreate with proper namespace URI
+                        XmlElement newElement = doc.CreateElement(element.LocalName, targetNamespaceUri);
+                        // Copy attributes and children
+                        foreach (XmlAttribute attr in element.Attributes)
+                        {
+                            newElement.SetAttribute(attr.Name, attr.Value);
+                        }
+                        foreach (XmlNode child in element.ChildNodes)
+                        {
+                            XmlNode importedChild = doc.ImportNode(child, true);
+                            newElement.AppendChild(importedChild);
+                        }
+                        // Replace the old element with the new one
+                        element.ParentNode.ReplaceChild(newElement, element);
+                        needAnotherPass = true;
                     }
-                    foreach (XmlNode child in element.ChildNodes)
+                    foreach (XmlAttribute attr in element.Attributes.Cast<XmlAttribute>().ToArray())
                     {
-                        XmlNode importedChild = doc.ImportNode(child, true);
-                        newElement.AppendChild(importedChild);
-                    }
-                    // Replace the old element with the new one
-                    element.ParentNode.ReplaceChild(newElement, element);
-                }
-                foreach (XmlAttribute attr in element.Attributes.Cast<XmlAttribute>().ToArray())
-                {
-                    if (attr.Prefix != string.Empty && attr.NamespaceURI == targetNamespaceUri)
-                    {
-                        // create a new attribute without prefix
-                        XmlAttribute newAttr = doc.CreateAttribute(attr.LocalName);
-                        newAttr.Value = attr.Value;
-                        element.Attributes.Append(newAttr);
-                        // Remove the prefix and namespace URI from the attribute
-                        element.Attributes.Remove(attr);
-                    }
-                    if (attr.Name == "xmlns" && attr.Value == targetNamespaceUri)
-                    {
-                        // Remove the xmlns attribute if it is not needed
-                        element.Attributes.Remove(attr);
+                        if (attr.Prefix != string.Empty && attr.NamespaceURI == targetNamespaceUri)
+                        {
+                            // create a new attribute without prefix
+                            XmlAttribute newAttr = doc.CreateAttribute(attr.LocalName);
+                            newAttr.Value = attr.Value;
+                            element.Attributes.Append(newAttr);
+                            // Remove the prefix and namespace URI from the attribute
+                            element.Attributes.Remove(attr);
+                        }
+                        if (attr.Name == "xmlns" && (attr.Value == targetNamespaceUri || attr.Value == string.Empty))
+                        {
+                            // Remove the xmlns attribute if it is not needed
+                            element.Attributes.Remove(attr);
+                        }
                     }
                 }
             }
