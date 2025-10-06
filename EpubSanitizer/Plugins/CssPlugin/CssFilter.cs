@@ -4,6 +4,8 @@ using AngleSharp.Css.Dom;
 using AngleSharp.Css.Parser;
 using EpubSanitizerCore.Filters;
 using System.Collections.Concurrent;
+using System.Data;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -67,8 +69,29 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
         /// <param name="file">file path</param>
         private void RemoveInvalidUrlInCss(ICssStyleSheet sheet, string file)
         {
+            foreach (var rule in sheet.Rules.OfType<ICssFontFaceRule>()) {
+
+                foreach (var decl in rule.ToArray())
+                {
+                    if (decl.Name == "src" && decl.Value.Contains("url"))
+                    {
+                        string path = ConvertUrlToPath(decl.Value);
+                        // Ignore data URLs and absolute URLs
+                        if (path.StartsWith("data") || path.StartsWith("http"))
+                        {
+                            continue;
+                        }
+                        if (!Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
+                        {
+                            rule.RemoveProperty(decl.Name);
+                            Instance.Logger($"Removed invalid URL in CSS property {decl.Name} targeting {path}");
+                        }
+                    }
+                }
+            }
             foreach (var rule in sheet.Rules.OfType<ICssStyleRule>())
             {
+ 
                 foreach (var decl in rule.Style.ToArray())
                 {
                     if (decl.Value.Contains("url"))
