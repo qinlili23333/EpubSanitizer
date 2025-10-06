@@ -82,6 +82,7 @@ namespace EpubSanitizerCore
             if (filters.Contains("all"))
             {
                 filters = [.. Filters.Filter.Filters.Keys];
+                filters.Remove("default"); // Avoid duplicate default filter
             }
             if (TargetEpubVer == 3 && !filters.Contains("epub3"))
             {
