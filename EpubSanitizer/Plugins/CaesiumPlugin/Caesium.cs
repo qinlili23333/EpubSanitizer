@@ -87,7 +87,6 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
             [
                 "image/jpeg",
                 "image/png",
-                "image/gif",
                 "image/webp",
                 "image/tiff"
             ];
