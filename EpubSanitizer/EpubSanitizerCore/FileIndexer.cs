@@ -306,13 +306,17 @@ namespace EpubSanitizerCore
                 }
                 manifest.AppendChild(newElement);
             }
-            // Remove empty guide element
-            if (OpfDoc.GetElementsByTagName("guide").Count != 0)
+            // Remove empty guide and tours element
+            string[] guideTags = ["tours", "guide"];
+            foreach (string tag in guideTags)
             {
-                var guideNode = OpfDoc.GetElementsByTagName("guide")[0];
-                if (guideNode != null && guideNode.ChildNodes.Count == 0)
+                if (OpfDoc.GetElementsByTagName(tag).Count != 0)
                 {
-                    guideNode.ParentNode.RemoveChild(guideNode);
+                    var guideNode = OpfDoc.GetElementsByTagName(tag)[0];
+                    if (guideNode != null && guideNode.ChildNodes.Count == 0)
+                    {
+                        guideNode.ParentNode.RemoveChild(guideNode);
+                    }
                 }
             }
             // Save the updated OPF document back to the file system
