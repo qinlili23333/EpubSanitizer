@@ -44,6 +44,7 @@ namespace EpubSanitizerCore.Filters
             RemoveShapeAttr(xhtmlDoc);
             RemoveEmptyList(xhtmlDoc);
             FixBigElement(xhtmlDoc);
+            FixBlockquote(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -59,6 +60,36 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Use q element insteam of blockquote for parents require phrasing content childs
+        /// Although this adds quote signs, it keeps same effect for accessibility
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        private static void FixBlockquote(XmlDocument doc)
+        {
+            string[] disallowParents = ["h1","h2","h3","h4","h5","h6"];
+            foreach (XmlElement element in doc.GetElementsByTagName("blockquote").Cast<XmlElement>().ToArray())
+            {
+                if (disallowParents.Contains((element.ParentNode as XmlElement).Name.ToLowerInvariant()))
+                {
+                    // replace with q element
+                    XmlElement q = doc.CreateElement("q", doc.DocumentElement.NamespaceURI);
+                    // Copy attributes
+                    foreach (XmlAttribute attr in element.Attributes)
+                    {
+                        q.SetAttribute(attr.Name, attr.Value);
+                    }
+                    // Move all children
+                    while (element.HasChildNodes)
+                    {
+                        q.AppendChild(element.FirstChild);
+                    }
+                    // Replace blockquote with q
+                    element.ParentNode.ReplaceChild(q, element);
+                }
+            }
         }
 
         /// <summary>
