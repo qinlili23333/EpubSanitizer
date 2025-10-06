@@ -35,6 +35,7 @@ namespace EpubSanitizerCore.Filters
                 Instance.Logger($"Error loading XHTML file {file}, skipping...");
                 return;
             }
+            CheckNonLinearContent(xhtmlDoc, file);
             FixDuplicateContentType(xhtmlDoc);
             FixDuokanNoteID(xhtmlDoc);
             RemoveAmazonAttr(xhtmlDoc);
@@ -62,6 +63,40 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        private void CheckNonLinearContent(XmlDocument doc, string file)
+        {
+            string docid = string.Empty;
+            foreach (OpfFile item in Instance.Indexer.ManifestFiles)
+            {
+                if (item.path == file)
+                {
+                    docid = item.id;
+                    break;
+                }
+            }
+            bool found = false;
+            if (Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0] is XmlElement spine)
+            {
+                foreach (XmlElement item in spine.GetElementsByTagName("itemref"))
+                {
+                    if (item.GetAttribute("idref") == docid && item.HasAttribute("linear") && item.GetAttribute("linear").ToLowerInvariant() == "no")
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (found)
+            {
+                XmlElement href = doc.CreateElement("a", doc.DocumentElement.NamespaceURI);
+                href.SetAttribute("href", file.Split('/').Last());
+                href.InnerText = "[This content is marked as non-linear and may be skipped in some readers]";
+                href.SetAttribute("style", "display:none;visibility:hidden;");
+                href.SetAttribute("hidden", "hidden");
+                (doc.GetElementsByTagName("body")[0] as XmlElement).InsertBefore(href, (doc.GetElementsByTagName("body")[0] as XmlElement).FirstChild);
+            }
         }
 
         /// <summary>
