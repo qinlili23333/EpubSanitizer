@@ -45,6 +45,7 @@ namespace EpubSanitizerCore.Filters
             RemoveEmptyList(xhtmlDoc);
             FixBigElement(xhtmlDoc);
             FixBlockquote(xhtmlDoc);
+            FixPagebreak(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -60,6 +61,34 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Ensure pagebreaks are correctly represented in Epub 3 type
+        /// Put this fix in General filter since the original implementation cannot even pass Epub 2 validation
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        private static void FixPagebreak(XmlDocument doc)
+        {
+            foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            {
+                if (element.HasAttribute("type") && element.GetAttribute("type") == "pagebreak")
+                {
+                    if(doc.DocumentElement.GetAttribute("xmlns:epub") == string.Empty)
+                    {
+                        doc.DocumentElement.SetAttribute("xmlns:epub", "http://www.idpf.org/2007/ops");
+                    }
+                    // Add epub:type attribute
+                    element.RemoveAttribute("type");
+                    element.SetAttribute("type", "http://www.idpf.org/2007/ops", "pagebreak");
+                    element.SetAttribute("role", "doc-pagebreak");
+                    string id = element.GetAttribute("id");
+                    if ((id.StartsWith("pg") && int.TryParse(id[2..], out int page))|| id.StartsWith('p') && int.TryParse(id[1..], out page) && page > 0 && element.InnerText == string.Empty)
+                    {
+                        element.InnerText = page.ToString();
+                    }
+                }
+            }
         }
 
         /// <summary>
