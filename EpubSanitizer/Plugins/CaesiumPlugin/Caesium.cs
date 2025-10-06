@@ -106,7 +106,7 @@ namespace EpubSanitizerCore.Plugins.CaesiumPlugin
             byte[] inputData = Instance.FileStorage.ReadBytes(file);
             CCSParameters parameters = new()
             {
-                keep_metadata = true,
+                keep_metadata = false,
                 jpeg_quality = (uint)Instance.Config.GetInt("caesium.quality"),
                 jpeg_chroma_subsampling = 0,
                 jpeg_progressive = false,
