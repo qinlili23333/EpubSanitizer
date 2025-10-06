@@ -46,6 +46,7 @@ namespace EpubSanitizerCore.Filters
             FixBigElement(xhtmlDoc);
             FixBlockquote(xhtmlDoc);
             FixPagebreak(xhtmlDoc);
+            FixType(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -64,6 +65,36 @@ namespace EpubSanitizerCore.Filters
         }
 
         /// <summary>
+        /// Upgrade element to have epub:type attribute
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        private static void FixType(XmlDocument doc)
+        {
+            foreach (XmlElement element in (doc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName("*").Cast<XmlElement>().ToArray().Append(doc.GetElementsByTagName("body")[0]))
+            {
+                HashSet<string> supportedTypes = ["backmatter", "bodymatter", "cover", "frontmatter", "chapter", "division", "part", "volume", "abstract", "afterword", "conclusion", "epigraph", "epilogue", "foreword", "introduction", "preamble", "preface", "prologue", "landmarks", "loa", "loi", "lot", "lov", "toc", "appendix", "colophon", "credits", "bibliography", "antonym-group", "condensed-entry", "def", "dictentry", "dictionary", "etymology", "example", "gram-info", "idiom", "part-of-speech", "part-of-speech-list", "part-of-speech-group", "phonetic-transcription", "phrase-list", "phrase-group", "sense-list", "sense-group", "synonym-group", "tran", "tran-info", "glossary", "glossdef", "glossterm", "index", "index-editor-note", "index-entry", "index-entry-list", "index-group", "index-headnotes", "index-legend", "index-locator", "index-locator-list", "index-locator-range", "index-term", "index-term-categories", "index-term-category", "index-xref-preferred", "index-xref-related", "acknowledgments", "contributors", "copyright-page", "dedication", "errata", "halftitlepage", "imprimatur", "imprint", "other-credits", "revision-history", "titlepage", "notice", "pullquote", "tip", "covertitle", "fulltitle", "halftitle", "subtitle", "title", "learning-objective", "learning-resource", "assessment", "qna", "balloon", "panel", "panel-group", "sound-area", "text-area", "endnotes", "footnote", "footnotes", "backlink", "biblioref", "glossref", "noteref", "concluding-sentence", "credit", "keyword", "topic-sentence", "page-list", "pagebreak", "table", "table-row", "table-cell", "list", "list-item", "figure", "aside"];
+                HashSet<string> allowTags = ["a", "ol", "ul", "button", "input", "li", "menu", "object", "param", "script", "source", "style", "link"];
+                if (element.HasAttribute("type") && (!allowTags.Contains(element.Name.ToLowerInvariant()) || (element.Name == "a" && !element.GetAttribute("type").Contains('/'))))
+                {
+                    string type = element.GetAttribute("type").ToLowerInvariant();
+                    if (supportedTypes.Contains(type))
+                    {
+                        if (doc.DocumentElement.GetAttribute("xmlns:epub") == string.Empty)
+                        {
+                            doc.DocumentElement.SetAttribute("xmlns:epub", "http://www.idpf.org/2007/ops");
+                        }
+                        element.RemoveAttribute("type");
+                        element.SetAttribute("type", "http://www.idpf.org/2007/ops", type);
+                    }
+                    else
+                    {
+                        element.RemoveAttribute("type");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Ensure pagebreaks are correctly represented in Epub 3 type
         /// Put this fix in General filter since the original implementation cannot even pass Epub 2 validation
         /// </summary>
@@ -74,7 +105,7 @@ namespace EpubSanitizerCore.Filters
             {
                 if (element.HasAttribute("type") && element.GetAttribute("type") == "pagebreak")
                 {
-                    if(doc.DocumentElement.GetAttribute("xmlns:epub") == string.Empty)
+                    if (doc.DocumentElement.GetAttribute("xmlns:epub") == string.Empty)
                     {
                         doc.DocumentElement.SetAttribute("xmlns:epub", "http://www.idpf.org/2007/ops");
                     }
@@ -83,7 +114,7 @@ namespace EpubSanitizerCore.Filters
                     element.SetAttribute("type", "http://www.idpf.org/2007/ops", "pagebreak");
                     element.SetAttribute("role", "doc-pagebreak");
                     string id = element.GetAttribute("id");
-                    if ((id.StartsWith("pg") && int.TryParse(id[2..], out int page))|| id.StartsWith('p') && int.TryParse(id[1..], out page) && page > 0 && element.InnerText == string.Empty)
+                    if ((id.StartsWith("pg") && int.TryParse(id[2..], out int page)) || (id.StartsWith('p') && int.TryParse(id[1..], out page) && page > 0 && element.InnerText == string.Empty))
                     {
                         element.InnerText = page.ToString();
                     }
@@ -98,7 +129,7 @@ namespace EpubSanitizerCore.Filters
         /// <param name="doc">XHTML document object</param>
         private static void FixBlockquote(XmlDocument doc)
         {
-            string[] disallowParents = ["h1","h2","h3","h4","h5","h6"];
+            string[] disallowParents = ["h1", "h2", "h3", "h4", "h5", "h6"];
             foreach (XmlElement element in doc.GetElementsByTagName("blockquote").Cast<XmlElement>().ToArray())
             {
                 if (disallowParents.Contains((element.ParentNode as XmlElement).Name.ToLowerInvariant()))
