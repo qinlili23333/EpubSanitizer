@@ -171,16 +171,7 @@ namespace EpubSanitizerCore.Filters
                 {
                     // replace with q element
                     XmlElement q = doc.CreateElement("q", doc.DocumentElement.NamespaceURI);
-                    // Copy attributes
-                    foreach (XmlAttribute attr in element.Attributes)
-                    {
-                        q.SetAttribute(attr.Name, attr.Value);
-                    }
-                    // Move all children
-                    while (element.HasChildNodes)
-                    {
-                        q.AppendChild(element.FirstChild);
-                    }
+                    Utils.XmlUtil.CopyTo(element, q);
                     // Replace blockquote with q
                     element.ParentNode.ReplaceChild(q, element);
                 }

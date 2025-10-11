@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace EpubSanitizerCore.Utils
 {
@@ -96,16 +97,7 @@ namespace EpubSanitizerCore.Utils
                     {
                         // Recreate with proper namespace URI
                         XmlElement newElement = doc.CreateElement(element.LocalName, targetNamespaceUri);
-                        // Copy attributes and children
-                        foreach (XmlAttribute attr in element.Attributes)
-                        {
-                            newElement.SetAttribute(attr.Name, attr.Value);
-                        }
-                        foreach (XmlNode child in element.ChildNodes)
-                        {
-                            XmlNode importedChild = doc.ImportNode(child, true);
-                            newElement.AppendChild(importedChild);
-                        }
+                        CopyTo(element, newElement);
                         // Replace the old element with the new one
                         element.ParentNode.ReplaceChild(newElement, element);
                         needAnotherPass = true;
@@ -210,6 +202,41 @@ namespace EpubSanitizerCore.Utils
         public static bool IsInline(string tagName)
         {
             return InlineElements.Contains(tagName.ToLowerInvariant());
+        }
+
+        /// <summary>
+        /// Copy all attributes and child nodes from source XmlElement to target XmlElement, two elements must belong to the same XmlDocument.
+        /// </summary>
+        /// <param name="source">source element</param>
+        /// <param name="target">target element</param>
+        internal static void CopyTo(XmlElement source, XmlElement target)
+        {
+            foreach (XmlAttribute attr in source.Attributes)
+            {
+                target.SetAttribute(attr.Name, attr.Value);
+            }
+            while (source.HasChildNodes)
+            {
+                target.AppendChild(source.FirstChild);
+            }
+        }
+
+        /// <summary>
+        /// Copy all attributes and child nodes from source XmlElement to target XmlElement, two elements can belong to different XmlDocument, but slower than CopyTo.
+        /// </summary>
+        /// <param name="source">source element</param>
+        /// <param name="target">target element</param>
+        internal static void CopyToAcross(XmlElement source, XmlElement target)
+        {
+            foreach (XmlAttribute attr in source.Attributes)
+            {
+                target.SetAttribute(attr.Name, attr.Value);
+            }
+            foreach (XmlNode child in source.ChildNodes)
+            {
+                XmlNode importedChild = target.OwnerDocument.ImportNode(child, true);
+                target.AppendChild(importedChild);
+            }
         }
     }
 }
