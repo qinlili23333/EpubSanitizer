@@ -264,6 +264,13 @@ namespace EpubSanitizerCore
                     uid.SetAttribute("content", opfuid);
                 }
             }
+            foreach (XmlElement xmlElement in NcxDoc.GetElementsByTagName("pageTarget"))
+            {
+                if (xmlElement.GetAttribute("type") == "body")
+                {
+                    xmlElement.SetAttribute("type", "normal");
+                }
+            }
             Utils.NcxUtil.ReorderNcx(NcxDoc);
         }
 
