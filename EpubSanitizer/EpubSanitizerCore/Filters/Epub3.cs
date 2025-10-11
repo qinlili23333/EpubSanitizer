@@ -26,8 +26,12 @@ namespace EpubSanitizerCore.Filters
         private void UpgradeDcMetaAttributes()
         {
             List<XmlNode> metadataNodes = [.. Instance.Indexer.OpfDoc.GetElementsByTagName("metadata")[0].ChildNodes.Cast<XmlNode>()];
-            foreach (XmlNode node in metadataNodes)
+            foreach (XmlElement node in metadataNodes.Cast<XmlElement>())
             {
+                if (node.LocalName == "meta" && node.GetAttribute("property") == "meta-auth")
+                {
+                    node.ParentNode.RemoveChild(node);
+                }
                 if (node is XmlElement element && element.Prefix == "dc")
                 {
                     if (element.LocalName == "date" && element.HasAttribute("event"))
