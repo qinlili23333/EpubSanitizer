@@ -49,6 +49,7 @@ namespace EpubSanitizerCore.Filters
             FixPagebreak(xhtmlDoc);
             FixType(xhtmlDoc);
             FixHgroup(xhtmlDoc);
+            EscapeUrl(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -67,9 +68,31 @@ namespace EpubSanitizerCore.Filters
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        private static void EscapeUrl(XmlDocument doc)
+        {
+            string[] hrefTags = ["a", "area", "base", "link"];
+            foreach (string tag in hrefTags)
+            {
+                foreach (XmlElement element in doc.GetElementsByTagName(tag).Cast<XmlElement>().ToArray())
+                {
+                    if (element.HasAttribute("href"))
+                    {
+                        if (element.GetAttribute("href").StartsWith("http"))
+                        {
+                            element.SetAttribute("href", new Uri(element.GetAttribute("href")).AbsoluteUri);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Ensure each hgroup only contains one h1-h6 element and optional p element
         /// </summary>
-        /// <param name="doc"></param>
+        /// <param name="doc">XHTML document object</param>
         private static void FixHgroup(XmlDocument doc)
         {
             foreach (XmlElement element in doc.GetElementsByTagName("hgroup").Cast<XmlElement>().ToArray())
@@ -97,6 +120,11 @@ namespace EpubSanitizerCore.Filters
             }
         }
 
+        /// <summary>
+        /// Add a hidden link to self for non-linear content to bypass check
+        /// </summary>
+        /// <param name="doc">XHTML document object</param>
+        /// <param name="file">file path</param>
         private void CheckNonLinearContent(XmlDocument doc, string file)
         {
             string docid = string.Empty;
