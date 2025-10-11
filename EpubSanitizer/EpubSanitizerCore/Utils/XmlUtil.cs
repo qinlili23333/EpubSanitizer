@@ -213,7 +213,7 @@ namespace EpubSanitizerCore.Utils
         {
             foreach (XmlAttribute attr in source.Attributes)
             {
-                target.SetAttribute(attr.Name, attr.Value);
+                target.SetAttribute(attr.LocalName, attr.NamespaceURI, attr.Value);
             }
             while (source.HasChildNodes)
             {
@@ -230,7 +230,7 @@ namespace EpubSanitizerCore.Utils
         {
             foreach (XmlAttribute attr in source.Attributes)
             {
-                target.SetAttribute(attr.Name, attr.Value);
+                target.SetAttribute(attr.LocalName, attr.NamespaceURI, attr.Value);
             }
             foreach (XmlNode child in source.ChildNodes)
             {
