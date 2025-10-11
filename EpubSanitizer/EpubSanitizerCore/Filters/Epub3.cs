@@ -156,6 +156,7 @@ namespace EpubSanitizerCore.Filters
             CheckScripted(xhtmlDoc, file);
             CheckSvg(xhtmlDoc, file);
             ProcessDeprecatedRoleAttributes(xhtmlDoc);
+            ProcessAlignAttributes(xhtmlDoc);
             ProcessValignAttributes(xhtmlDoc);
             ProcessTableCellAttributes(xhtmlDoc);
             // Write back the processed content
@@ -416,6 +417,59 @@ namespace EpubSanitizerCore.Filters
                 {
                     XmlUtil.AddCssClass(table, $"valign-{type}");
                     table.RemoveAttribute("valign");
+                }
+            }
+            if (cssStyles.Length == 0)
+            {
+                return;
+            }
+            // If there are any styles, add them to the head of the document
+            XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
+            XmlElement styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
+            styleElement.SetAttribute("type", "text/css");
+            styleElement.InnerText = cssStyles.ToString();
+            head.AppendChild(styleElement);
+        }
+
+        /// <summary>
+        /// Convert align attributes to CSS styles to comply with Epub 3 standards.
+        /// </summary>
+        /// <param name="doc">XmlDocument object</param>
+        private static void ProcessAlignAttributes(XmlDocument doc)
+        {
+            Dictionary<string, List<XmlElement>> Record = [];
+            foreach (XmlElement table in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            {
+                if (table.HasAttribute("align"))
+                {
+                    if (table.GetAttribute("align") == "char")
+                    {
+                        table.RemoveAttribute("align");
+                        table.RemoveAttribute("char");
+                        continue;
+                    }
+                    if (Record.ContainsKey(table.GetAttribute("align")))
+                    {
+                        Record[table.GetAttribute("align")].Add(table);
+                    }
+                    else
+                    {
+                        Record[table.GetAttribute("align")] = [table];
+                    }
+                }
+            }
+            // Generate CSS styles for each unique cellpadding and cellspacing value
+            StringBuilder cssStyles = new();
+            foreach (var type in Record.Keys)
+            {
+                string style = $@".align-{type}{{
+    text-align: {type};
+}}";
+                cssStyles.AppendLine(style);
+                foreach (var table in Record[type])
+                {
+                    XmlUtil.AddCssClass(table, $"align-{type}");
+                    table.RemoveAttribute("align");
                 }
             }
             if (cssStyles.Length == 0)
