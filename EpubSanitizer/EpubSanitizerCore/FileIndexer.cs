@@ -74,11 +74,6 @@ namespace EpubSanitizerCore
             XmlNodeList manifestNodes = OpfDoc.GetElementsByTagName("manifest")[0].ChildNodes;
             foreach (XmlNode file in manifestNodes)
             {
-                // Skip comment nodes
-                if (file.NodeType == XmlNodeType.Comment)
-                {
-                    continue;
-                }
                 AddManifestFile(file);
             }
             CheckMissingFile();
@@ -319,12 +314,12 @@ namespace EpubSanitizerCore
                 }
             }
             // Save the updated OPF document back to the file system
-            Instance.FileStorage.WriteBytes(OpfPath, Utils.XmlUtil.ToXmlBytes(OpfDoc, false));
+            Instance.FileStorage.WriteXml(OpfPath, OpfDoc);
             if (NcxDoc != null)
             {
                 //Write updated NCX file back to Epub.
                 Instance.Logger("Updating NCX file...");
-                Instance.FileStorage.WriteBytes(NcxPath, Utils.XmlUtil.ToXmlBytes(NcxDoc, false));
+                Instance.FileStorage.WriteXml(NcxPath, NcxDoc);
             }
         }
 
