@@ -40,7 +40,7 @@ namespace EpubSanitizerCore
         /// <summary>
         /// XML Document for container file
         /// </summary>
-        internal XmlDocument containerDoc = new();
+        internal XmlDocument containerDoc;
         /// <summary>
         /// Path of OPF file, relative to Epub root
         /// </summary>
@@ -48,7 +48,7 @@ namespace EpubSanitizerCore
         /// <summary>
         /// XML Document for OPF file
         /// </summary>
-        internal XmlDocument OpfDoc = new();
+        internal XmlDocument OpfDoc;
         /// <summary>
         /// NCX file path, relative to Epub root, if exists
         /// </summary>
@@ -91,32 +91,22 @@ namespace EpubSanitizerCore
         /// <exception cref="InvalidEpubException"></exception>
         private void LoadOpf()
         {
-            string container;
-            try
-            {
-                container = Instance.FileStorage.ReadString("META-INF/container.xml");
-            }
-            catch (FileNotFoundException)
+            containerDoc = Instance.FileStorage.ReadXml("META-INF/container.xml");
+            if(containerDoc == null)
             {
                 throw new InvalidEpubException("Container file not found in the Epub file.");
             }
-            containerDoc.LoadXml(container);
             XmlNodeList rootfiles = containerDoc.GetElementsByTagName("rootfile");
             if (rootfiles.Count > 1)
             {
                 Instance.Logger("Support to EPUB 3 Multiple-Rendition Publications is not finished. Currently only the first one will be processed.");
             }
             OpfPath = rootfiles[0].Attributes["full-path"].Value;
-            string opfcontent;
-            try
-            {
-                opfcontent = Instance.FileStorage.ReadString(OpfPath);
-            }
-            catch (FileNotFoundException)
+            OpfDoc = Instance.FileStorage.ReadXml(OpfPath);
+            if (OpfDoc == null)
             {
                 throw new InvalidEpubException("OPF file not found in the Epub file.");
             }
-            OpfDoc.LoadXml(opfcontent);
             Utils.XmlUtil.NormalizeXmlns(OpfDoc, "http://www.idpf.org/2007/opf");
             if (OpfDoc.GetElementsByTagName("package")[0] is XmlElement packageElement && packageElement.GetAttribute("version") != "3.0")
             {
@@ -232,9 +222,11 @@ namespace EpubSanitizerCore
                             Instance.Logger($"NCX mimetype mismatch, fixing...");
                             file.mimetype = "application/x-dtbncx+xml";
                         }
-                        string ncxContent = Instance.FileStorage.ReadString(NcxPath);
-                        NcxDoc = new XmlDocument();
-                        NcxDoc.LoadXml(ncxContent);
+                        NcxDoc = Instance.FileStorage.ReadXml(NcxPath);
+                        if (NcxDoc == null)
+                        {
+                            throw new InvalidEpubException("NCX file cannot be parsed.");
+                        }
                         if (Instance.Config.GetBool("sanitizeNcx"))
                         {
                             Instance.Logger("Sanitizing NCX file...");
