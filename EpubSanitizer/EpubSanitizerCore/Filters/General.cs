@@ -518,8 +518,9 @@ namespace EpubSanitizerCore.Filters
                         if (content != null)
                         {
                             string src = content.GetAttribute("src").Split('#')[0];
+                            string composedSrc = Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.NcxPath, src);
                             string id = content.GetAttribute("src").Contains('#') ? content.GetAttribute("src").Split('#')[1] : string.Empty;
-                            if (!Instance.FileStorage.FileExists(src) || (id != string.Empty && (!IDList.TryGetValue(src, out ConcurrentBag<string>? value) || !value.Contains(id))))
+                            if (!Instance.FileStorage.FileExists(composedSrc) || (id != string.Empty && (!IDList.TryGetValue(composedSrc, out ConcurrentBag<string>? value) || !value.Contains(id))))
                             {
                                 content.SetAttribute("src", src);
                             }
