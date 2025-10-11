@@ -48,6 +48,7 @@ namespace EpubSanitizerCore.Filters
             FixBlockquote(xhtmlDoc);
             FixPagebreak(xhtmlDoc);
             FixType(xhtmlDoc);
+            FixHgroup(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -63,6 +64,37 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Ensure each hgroup only contains one h1-h6 element and optional p element
+        /// </summary>
+        /// <param name="doc"></param>
+        private static void FixHgroup(XmlDocument doc)
+        {
+            foreach (XmlElement element in doc.GetElementsByTagName("hgroup").Cast<XmlElement>().ToArray())
+            {
+                bool hasH = false;
+                foreach (XmlElement node in element.ChildNodes.Cast<XmlElement>().ToArray())
+                {
+                    if (node is XmlElement el)
+                    {
+                        if (el.Name.StartsWith('h') && el.Name.Length == 2 && char.IsDigit(el.Name[1]) && el.Name[1] >= '1' && el.Name[1] <= '6')
+                        {
+                            if (!hasH)
+                            {
+                                hasH = true;
+                            }
+                            else
+                            {
+                                XmlElement div = doc.CreateElement("p", doc.DocumentElement.NamespaceURI);
+                                Utils.XmlUtil.CopyTo(el, div);
+                                el.ParentNode.ReplaceChild(div, el);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void CheckNonLinearContent(XmlDocument doc, string file)
