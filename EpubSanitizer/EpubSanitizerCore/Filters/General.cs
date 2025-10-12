@@ -35,6 +35,7 @@ namespace EpubSanitizerCore.Filters
                 Instance.Logger($"Error loading XHTML file {file}, skipping...");
                 return;
             }
+            RemoveInvalidNamespace(xhtmlDoc);
             CheckNonLinearContent(xhtmlDoc, file);
             FixDuplicateContentType(xhtmlDoc);
             FixDuokanNoteID(xhtmlDoc);
@@ -65,6 +66,55 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// idpf.org and w3.org namespace are not valid in epub, just remove them
+        /// </summary>
+        /// <param name="doc"></param>
+        private void RemoveInvalidNamespace(XmlDocument doc)
+        {
+            HashSet<string> validNamespaces = [
+                 "http://www.w3.org/1999/xhtml",
+                "http://www.w3.org/XML/1998/namespace",
+                "http://www.idpf.org/2007/ops",
+                "http://www.w3.org/2000/svg",
+                "http://www.w3.org/1998/Math/MathML",
+                "http://www.w3.org/2001/10/synthesis",
+                "http://www.w3.org/2001/xml-events",
+                "http://www.w3.org/1999/xlink"
+                ];
+            HashSet<string> blacklist = [];
+            foreach (XmlAttribute attr in doc.DocumentElement.Attributes.Cast<XmlAttribute>().ToArray())
+            {
+                if (attr.Prefix == "xmlns" && !validNamespaces.Contains(attr.Value) && (attr.Value.Contains("idpf.org") || attr.Value.Contains("w3.org")))
+                {
+                    blacklist.Add(attr.Value);
+                    Instance.Logger($"Removed invalid namespace {attr.Value}");
+                    doc.DocumentElement.RemoveAttributeNode(attr);
+                }
+            }
+            if (blacklist.Count > 0)
+            {
+                // Remove all elements and attributes in the blacklisted namespace
+                foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+                {
+                    if (blacklist.Contains(element.NamespaceURI))
+                    {
+                        element.ParentNode.RemoveChild(element);
+                    }
+                    else
+                    {
+                        foreach (XmlAttribute attr in element.Attributes.Cast<XmlAttribute>().ToArray())
+                        {
+                            if (blacklist.Contains(attr.NamespaceURI))
+                            {
+                                element.RemoveAttributeNode(attr);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>

@@ -87,7 +87,7 @@ namespace EpubSanitizerCore
         private void LoadOpf()
         {
             containerDoc = Instance.FileStorage.ReadXml("META-INF/container.xml");
-            if(containerDoc == null)
+            if (containerDoc == null)
             {
                 throw new InvalidEpubException("Container file not found in the Epub file.");
             }
@@ -167,7 +167,7 @@ namespace EpubSanitizerCore
                 properties = file.Attributes?["properties"]?.Value?.Split(' ') ?? [],
                 originElement = file as XmlElement
             };
-            if(int.TryParse(FileInfo.id.AsSpan(0, 1),out _))
+            if (int.TryParse(FileInfo.id.AsSpan(0, 1), out _))
             {
                 Instance.Logger($"File id '{FileInfo.id}' starts with number, which is invalid. Prepending 'id_'.");
                 FileInfo.id = "id_" + FileInfo.id;

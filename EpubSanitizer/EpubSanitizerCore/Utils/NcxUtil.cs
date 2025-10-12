@@ -71,7 +71,7 @@ namespace EpubSanitizerCore.Utils
                     navPoint.SetAttribute("id", "navPoint-" + navPoint.GetAttribute("id"));
                 }
                 string id = navPoint.GetAttribute("id");
-                if(ids.Contains(id))
+                if (ids.Contains(id))
                 {
                     // Generate new id if empty or duplicate
                     int i = 1;
