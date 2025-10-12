@@ -12,6 +12,6 @@
             Console.WriteLine("CssPlugin filter registered as 'css'");
         }
 
-        private string MinimumCoreVersion = "1.3.0";
+        private string MinimumCoreVersion = "1.5.0";
     }
 }

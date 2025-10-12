@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>EpubSanitizerCore.Plugins.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <AssemblyName>EpubSanitizerCore.Plugins.$(MSBuildProjectName)</AssemblyName>
+		<Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
