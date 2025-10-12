@@ -4,8 +4,6 @@ using AngleSharp.Css.Dom;
 using AngleSharp.Css.Parser;
 using EpubSanitizerCore.Filters;
 using System.Collections.Concurrent;
-using System.Data;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -69,7 +67,13 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
         /// <param name="file">file path</param>
         private void RemoveInvalidUrlInCss(ICssStyleSheet sheet, string file)
         {
-            foreach (var rule in sheet.Rules.OfType<ICssFontFaceRule>()) {
+            RecursiveRemoveUrlInCss(sheet.Rules, file);
+        }
+
+        private void RecursiveRemoveUrlInCss(ICssRuleList list, string file)
+        {
+            foreach (var rule in list.OfType<ICssFontFaceRule>())
+            {
 
                 foreach (var decl in rule.ToArray())
                 {
@@ -89,9 +93,12 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                     }
                 }
             }
-            foreach (var rule in sheet.Rules.OfType<ICssStyleRule>())
+            foreach (var rule in list.OfType<ICssMediaRule>())
             {
- 
+                RecursiveRemoveUrlInCss(rule.Rules, file);
+            }
+            foreach (var rule in list.OfType<ICssStyleRule>())
+            {
                 foreach (var decl in rule.Style.ToArray())
                 {
                     if (decl.Value.Contains("url"))
