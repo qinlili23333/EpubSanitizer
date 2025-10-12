@@ -172,6 +172,7 @@ namespace EpubSanitizerCore
                 Instance.Logger($"File id '{FileInfo.id}' starts with number, which is invalid. Prepending 'id_'.");
                 FileInfo.id = "id_" + FileInfo.id;
                 Utils.OpfUtil.ReplaceIdref(OpfDoc, FileInfo.id[3..], FileInfo.id);
+                file.Attributes["id"].Value = FileInfo.id;
             }
             if (FileInfo.path == string.Empty || !Instance.FileStorage.FileExists(FileInfo.path))
             {
