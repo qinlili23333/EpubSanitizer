@@ -60,6 +60,7 @@ namespace EpubSanitizerCore.Utils
         /// <param name="NcxDoc">NCX XmlDocument object</param>
         internal static void ReorderNcx(XmlDocument NcxDoc)
         {
+            HashSet<string> ids = [];
             // Sanitize id and playOrder
             int order = 0;
             string lastTarget = string.Empty;
@@ -69,6 +70,19 @@ namespace EpubSanitizerCore.Utils
                 {
                     navPoint.SetAttribute("id", "navPoint-" + navPoint.GetAttribute("id"));
                 }
+                string id = navPoint.GetAttribute("id");
+                if(ids.Contains(id))
+                {
+                    // Generate new id if empty or duplicate
+                    int i = 1;
+                    while (ids.Contains("navPoint-" + i.ToString() + "-" + id))
+                    {
+                        i++;
+                    }
+                    id = "navPoint-" + i.ToString() + "-" + id;
+                    navPoint.SetAttribute("id", id);
+                }
+                ids.Add(id);
                 string target = (navPoint.GetElementsByTagName("content")[0] as XmlElement).GetAttribute("src");
                 if (target != lastTarget)
                 {
