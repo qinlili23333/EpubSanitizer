@@ -24,11 +24,18 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
             return GetAllCssFiles(Instance);
         }
 
+        private static readonly CssParserOptions CssParserOptions = new()
+        {
+            IsIncludingUnknownDeclarations = true,
+            IsIncludingUnknownRules = true,
+            IsToleratingInvalidSelectors = true
+        };
+
         ConcurrentDictionary<string, string> DirectionCache = [];
         internal override void Process(string file)
         {
             string cssString = Instance.FileStorage.ReadString(file);
-            var cssParser = new CssParser();
+            var cssParser = new CssParser(CssParserOptions);
             var stylesheet = cssParser.ParseStyleSheet(cssString);
             if (!Instance.Config.GetBool("publisherMode"))
             {
