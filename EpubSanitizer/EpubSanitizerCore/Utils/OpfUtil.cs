@@ -48,6 +48,26 @@ namespace EpubSanitizerCore.Utils
         }
 
         /// <summary>
+        /// Change all idref in spine from oldid to newid
+        /// </summary>
+        /// <param name="OpfDoc">OPF XmlDocument object</param>
+        /// <param name="oldid">old id</param>
+        /// <param name="newid">new id</param>
+        internal static void ReplaceIdref(XmlDocument OpfDoc, string oldid, string newid)
+        {
+            XmlNodeList itemrefs = OpfDoc.GetElementsByTagName("spine")[0].ChildNodes;
+            foreach (XmlElement itemref in itemrefs)
+            {
+                string idref = itemref.GetAttribute("idref");
+                if (idref == oldid)
+                {
+                    itemref.SetAttribute("idref", newid);
+                }
+            }
+
+        }
+
+        /// <summary>
         /// Epub 3 requires dcterms:modified element to be present in OPF metadata, this function adds it if not present.
         /// </summary>
         /// <param name="OpfDoc">OPF XmlDocument object</param>

@@ -167,6 +167,12 @@ namespace EpubSanitizerCore
                 properties = file.Attributes?["properties"]?.Value?.Split(' ') ?? [],
                 originElement = file as XmlElement
             };
+            if(int.TryParse(FileInfo.id.AsSpan(0, 1),out _))
+            {
+                Instance.Logger($"File id '{FileInfo.id}' starts with number, which is invalid. Prepending 'id_'.");
+                FileInfo.id = "id_" + FileInfo.id;
+                Utils.OpfUtil.ReplaceIdref(OpfDoc, FileInfo.id[3..], FileInfo.id);
+            }
             if (FileInfo.path == string.Empty || !Instance.FileStorage.FileExists(FileInfo.path))
             {
                 Instance.Logger($"Invalid file entry in manifest: {file.OuterXml}, file will be excluded.");
