@@ -21,9 +21,10 @@ namespace EpubSanitizerCore.Plugins.XhtmlFixPlugin
             var htmlDoc = new HtmlDocument();
             htmlDoc.LoadHtml(input);
             htmlDoc.OptionOutputAsXml = true;
-            StringWriter sw = new();
-            XmlTextWriter xw = new(sw);
+            using var sw = new StringWriter();
+            using var xw = XmlWriter.Create(sw);
             htmlDoc.Save(xw);
+            xw.Flush();
             return sw.ToString();
         }
 
