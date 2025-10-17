@@ -197,9 +197,8 @@ namespace EpubSanitizerCore
                 Instance.Logger($"Lack file id: {file.OuterXml}, use hash as id.");
                 FileInfo.id = Instance.FileStorage.GetSHA256(FileInfo.path);
             }
-            if (FileInfo.mimetype == string.Empty)
+            if ((Instance.Config.GetBool("correctMime") && FileInfo.mimetype != "application/xhtml+xml") || FileInfo.mimetype == string.Empty)
             {
-                Instance.Logger($"Lack file mimetype: {file.OuterXml}, try getting by extension.");
                 FileInfo.mimetype = MimeTypesMap.GetMimeType(FileInfo.path);
             }
             ManifestFiles = [.. ManifestFiles, FileInfo];
@@ -289,7 +288,7 @@ namespace EpubSanitizerCore
                     // If the file already exists in the manifest, use the original element with updated attributes (id, href, and media-type).
                     file.originElement.SetAttribute("id", file.id);
                     file.originElement.SetAttribute("href", file.opfpath);
-                    file.originElement.SetAttribute("media-type", (Instance.Config.GetBool("correctMime") && file.mimetype != "application/xhtml+xml") ? MimeTypesMap.GetMimeType(file.opfpath) : file.mimetype);
+                    file.originElement.SetAttribute("media-type", file.mimetype);
                     if (file.properties.Length != 0)
                     {
                         file.originElement.SetAttribute("properties", string.Join(' ', file.properties));
