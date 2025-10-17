@@ -4,7 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1.5.0</Version>
+    <Version>1.6.0</Version>
     <PackageId>Qinlili.EpubSanitizer</PackageId>
     <Title>Epub Sanitizer</Title>
     <Authors>Qinlili</Authors>
@@ -67,6 +67,7 @@
     <InternalsVisibleTo Include="EpubSanitizerCore.Plugins.DemoPlugin" />
     <InternalsVisibleTo Include="EpubSanitizerCore.Plugins.CssPlugin" />
 		<InternalsVisibleTo Include="EpubSanitizerCore.Plugins.CaesiumPlugin" />
+		<InternalsVisibleTo Include="EpubSanitizerCore.Plugins.XhtmlFixPlugin" />
   </ItemGroup>
 
 </Project>

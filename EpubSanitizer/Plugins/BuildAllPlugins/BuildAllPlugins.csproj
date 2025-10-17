@@ -23,6 +23,7 @@
     <ProjectReference Include="..\CaesiumPlugin\CaesiumPlugin.csproj" />
     <ProjectReference Include="..\CssPlugin\CssPlugin.csproj" />
     <ProjectReference Include="..\DemoPlugin\DemoPlugin.csproj" />
+    <ProjectReference Include="..\XhtmlFixPlugin\XhtmlFixPlugin.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
