@@ -62,10 +62,6 @@ namespace EpubSanitizerCore.FS
                 try
                 {
                     doc.LoadXml(ReadString(path).Replace("&nbsp;", "\u00A0"));
-                    foreach (XmlNode node in doc.SelectNodes("//comment()").Cast<XmlNode>().ToArray())
-                    {
-                        node.ParentNode.RemoveChild(node);
-                    }
                 }
                 catch (XmlException ex)
                 {
@@ -92,6 +88,10 @@ namespace EpubSanitizerCore.FS
                 {
                     Instance.Logger($"XHTML file {path} not exist.");
                     return null;
+                }
+                foreach (XmlNode node in doc.SelectNodes("//comment()").Cast<XmlNode>().ToArray())
+                {
+                    node.ParentNode.RemoveChild(node);
                 }
                 if (Instance.Config.GetBool("xmlCache"))
                 {
