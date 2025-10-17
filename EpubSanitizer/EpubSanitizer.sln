@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuildAllPlugins", "Plugins\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CaesiumPlugin", "Plugins\CaesiumPlugin\CaesiumPlugin.csproj", "{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XhtmlFixPlugin", "Plugins\XhtmlFixPlugin\XhtmlFixPlugin.csproj", "{30EAA5E9-0750-43FC-A6CD-415210554AE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,12 @@ Global
 		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
 		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
 		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
+		{30EAA5E9-0750-43FC-A6CD-415210554AE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30EAA5E9-0750-43FC-A6CD-415210554AE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30EAA5E9-0750-43FC-A6CD-415210554AE4}.ReleaseFree|Any CPU.ActiveCfg = Release|Any CPU
+		{30EAA5E9-0750-43FC-A6CD-415210554AE4}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
+		{30EAA5E9-0750-43FC-A6CD-415210554AE4}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
+		{30EAA5E9-0750-43FC-A6CD-415210554AE4}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +88,7 @@ Global
 		{9CC635FE-77F8-4C1B-B356-442195F5CEC0} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{D18FD634-4FD3-4927-81EF-F0B69E15AA67} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{30EAA5E9-0750-43FC-A6CD-415210554AE4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E975EFF4-6CC5-4B9F-B2BF-884364C54CBA}

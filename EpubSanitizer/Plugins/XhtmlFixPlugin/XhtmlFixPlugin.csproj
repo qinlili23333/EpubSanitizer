@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>EpubSanitizerCore.Plugins.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<AssemblyName>EpubSanitizerCore.Plugins.$(MSBuildProjectName)</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\EpubSanitizerCore\EpubSanitizerCore.csproj" >
+			<Private>False</Private>
+		</ProjectReference>
+	</ItemGroup>
+
+</Project>
