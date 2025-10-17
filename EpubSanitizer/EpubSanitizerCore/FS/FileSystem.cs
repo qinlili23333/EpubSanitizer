@@ -30,6 +30,10 @@ namespace EpubSanitizerCore.FS
         /// Controls whether the XHTML fix plugin is loaded
         /// </summary>
         internal static bool XhtmlFixPluginLoaded = false;
+        /// <summary>
+        /// The function to fix xhtml, set by XhtmlFixPlugin if loaded
+        /// </summary>
+        internal static Func<string, string>? FixXhtml = null;
 
         internal FileSystem(EpubSanitizer CoreInstance)
         {
@@ -65,8 +69,24 @@ namespace EpubSanitizerCore.FS
                 }
                 catch (XmlException ex)
                 {
-                    Instance.Logger($"Error loading XHTML file {path}: {ex.Message}");
-                    return null;
+                    if (XhtmlFixPluginLoaded && FixXhtml != null)
+                    {
+                        Instance.Logger($"XHTML file {path} is malformed, trying to fix it...");
+                        try
+                        {
+                            doc.LoadXml(FixXhtml(ReadString(path).Replace("&nbsp;", "\u00A0")));
+                        }
+                        catch (Exception fixEx)
+                        {
+                            Instance.Logger($"Error loading XHTML file {path} after fix attempt: {fixEx.Message}");
+                            return null;
+                        }
+                    }
+                    else
+                    {
+                        Instance.Logger($"Error loading XHTML file {path}: {ex.Message}");
+                        return null;
+                    }
                 }
                 catch (FileNotFoundException)
                 {
