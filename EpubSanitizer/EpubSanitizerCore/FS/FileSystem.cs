@@ -26,6 +26,11 @@ namespace EpubSanitizerCore.FS
         /// </summary>
         internal readonly EpubSanitizer Instance;
 
+        /// <summary>
+        /// Controls whether the XHTML fix plugin is loaded
+        /// </summary>
+        internal static bool XhtmlFixPluginLoaded = false;
+
         internal FileSystem(EpubSanitizer CoreInstance)
         {
             Instance = CoreInstance;

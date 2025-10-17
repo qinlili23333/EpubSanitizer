@@ -9,7 +9,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\EpubSanitizerCore\EpubSanitizerCore.csproj" >
+	  <PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\EpubSanitizerCore\EpubSanitizerCore.csproj">
 			<Private>False</Private>
 		</ProjectReference>
 	</ItemGroup>

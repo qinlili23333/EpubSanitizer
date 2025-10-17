@@ -23,6 +23,7 @@ namespace EpubSanitizerCore
             "EpubSanitizerCore.Plugins.DemoPlugin",
             "EpubSanitizerCore.Plugins.CssPlugin",
             "EpubSanitizerCore.Plugins.CaesiumPlugin",
+            "EpubSanitizerCore.Plugins.XhtmlFixPlugin",
         ];
 
         /// <summary>
