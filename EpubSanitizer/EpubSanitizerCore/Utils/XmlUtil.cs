@@ -237,5 +237,39 @@ namespace EpubSanitizerCore.Utils
                 target.AppendChild(importedChild);
             }
         }
+
+        /// <summary>
+        /// Copy all attributes and child nodes from source XmlElement to target XmlElement with override empty namespace, two elements can belong to different XmlDocument, but slower than CopyTo.
+        /// </summary>
+        /// <param name="source">source element</param>
+        /// <param name="target">target element</param>
+        /// <param name="namespaceUri">target namespace</param>
+        internal static void CopyToAcrossOverrideEmptyNamespace(XmlElement source, XmlElement target, string namespaceUri)
+        {
+            foreach (XmlAttribute attr in source.Attributes)
+            {
+                if (target.NamespaceURI == namespaceUri && attr.NamespaceURI == string.Empty)
+                {
+                    target.SetAttribute(attr.LocalName, attr.Value);
+                } else
+                {
+                    target.SetAttribute(attr.LocalName, attr.NamespaceURI == string.Empty ? namespaceUri : attr.NamespaceURI, attr.Value);
+                }
+            }
+            foreach (XmlNode child in source.ChildNodes)
+            {
+                if (child is XmlElement childElement && childElement.NamespaceURI == string.Empty)
+                {
+                    XmlElement newChildElement = target.OwnerDocument.CreateElement(childElement.LocalName, namespaceUri);
+                    CopyToAcrossOverrideEmptyNamespace(childElement, newChildElement, namespaceUri);
+                    target.AppendChild(newChildElement);
+                }
+                else
+                {
+                    XmlNode importedChild = target.OwnerDocument.ImportNode(child, true);
+                    target.AppendChild(importedChild);
+                }
+            }
+        }
     }
 }
