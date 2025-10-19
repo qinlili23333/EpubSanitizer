@@ -458,12 +458,12 @@ namespace EpubSanitizerCore.Filters
         {
             foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
             {
-                if (XmlUtil.IsInline(element.LocalName))
+                if (element.Prefix == string.Empty && XmlUtil.IsInline(element.LocalName))
                 {
                     bool containsBlock = false;
                     foreach (XmlElement child in element.GetElementsByTagName("*"))
                     {
-                        if (!XmlUtil.IsInline(child.LocalName))
+                        if (child.Prefix == string.Empty && !XmlUtil.IsInline(child.LocalName))
                         {
                             containsBlock = true;
                             break;
