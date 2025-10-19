@@ -552,7 +552,7 @@ namespace EpubSanitizerCore.Filters
             foreach (XmlElement element in (doc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName("a"))
             {
                 string link = element.GetAttribute("href");
-                if (link.StartsWith("http"))
+                if (link.StartsWith("http") || link.StartsWith("mailto:"))
                 {
                     continue;
                 }
