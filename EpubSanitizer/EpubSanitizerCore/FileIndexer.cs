@@ -23,6 +23,14 @@ namespace EpubSanitizerCore
         /// </summary>
         internal required string mimetype;
         /// <summary>
+        /// optional media-overlay attribute
+        /// </summary>
+        internal string mediaOverlay = string.Empty;
+        /// <summary>
+        /// conditional fallback attribute
+        /// </summary>
+        internal string fallback = string.Empty;
+        /// <summary>
         /// properties of the file, used for OPF 3.0
         /// </summary>
         internal string[] properties = [];
@@ -164,6 +172,8 @@ namespace EpubSanitizerCore
                 opfpath = file.Attributes["href"]?.Value ?? string.Empty,
                 path = Utils.PathUtil.ComposeFromRelativePath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
                 mimetype = file.Attributes["media-type"]?.Value ?? string.Empty,
+                mediaOverlay = file.Attributes?["media-overlay"]?.Value ?? string.Empty,
+                fallback = file.Attributes?["fallback"]?.Value ?? string.Empty,
                 properties = file.Attributes?["properties"]?.Value?.Split(' ') ?? [],
                 originElement = file as XmlElement
             };
@@ -289,6 +299,22 @@ namespace EpubSanitizerCore
                     file.originElement.SetAttribute("id", file.id);
                     file.originElement.SetAttribute("href", file.opfpath);
                     file.originElement.SetAttribute("media-type", file.mimetype);
+                    if (file.fallback == string.Empty)
+                    {
+                        file.originElement.RemoveAttribute("fallback");
+                    }
+                    else
+                    {
+                        file.originElement.SetAttribute("fallback", file.fallback);
+                    }
+                    if (file.mediaOverlay == string.Empty)
+                    {
+                        file.originElement.RemoveAttribute("media-overlay");
+                    }
+                    else
+                    {
+                        file.originElement.SetAttribute("media-overlay", file.mediaOverlay);
+                    }
                     if (file.properties.Length != 0)
                     {
                         file.originElement.SetAttribute("properties", string.Join(' ', file.properties));
@@ -300,6 +326,22 @@ namespace EpubSanitizerCore
                 newElement.SetAttribute("id", file.id);
                 newElement.SetAttribute("href", file.opfpath);
                 newElement.SetAttribute("media-type", file.mimetype);
+                if (file.fallback == string.Empty)
+                {
+                    newElement.RemoveAttribute("fallback");
+                }
+                else
+                {
+                    newElement.SetAttribute("fallback", file.fallback);
+                }
+                if (file.mediaOverlay == string.Empty)
+                {
+                    newElement.RemoveAttribute("media-overlay");
+                }
+                else
+                {
+                    newElement.SetAttribute("media-overlay", file.mediaOverlay);
+                }
                 if (file.properties.Length != 0)
                 {
                     newElement.SetAttribute("properties", string.Join(' ', file.properties));
