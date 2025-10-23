@@ -131,7 +131,7 @@ namespace EpubSanitizerCore.Filters
         /// 
         /// </summary>
         /// <param name="doc">XHTML document object</param>
-        private static void EscapeUrl(XmlDocument doc)
+        private void EscapeUrl(XmlDocument doc)
         {
             string[] hrefTags = ["a", "area", "base", "link"];
             foreach (string tag in hrefTags)
@@ -142,7 +142,16 @@ namespace EpubSanitizerCore.Filters
                     {
                         if (element.GetAttribute("href").StartsWith("http"))
                         {
-                            element.SetAttribute("href", new Uri(element.GetAttribute("href")).AbsoluteUri);
+                            try
+                            {
+                                element.SetAttribute("href", new Uri(element.GetAttribute("href")).AbsoluteUri);
+                            }
+                            catch (UriFormatException)
+                            {
+                                // Handle invalid URI format
+                                Instance.Logger($"Invalid URI format in href attribute has been removed: {element.GetAttribute("href")}");
+                                element.RemoveAttribute("href");
+                            }
                         }
                     }
                 }
