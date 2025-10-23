@@ -1,7 +1,6 @@
 ﻿using EpubSanitizerCore.Utils;
 using HeyRed.Mime;
 using System.Collections.Concurrent;
-using System.Reflection.Metadata;
 using System.Xml;
 
 namespace EpubSanitizerCore.Filters
@@ -30,7 +29,7 @@ namespace EpubSanitizerCore.Filters
 
         internal override void Process(string file)
         {
-            XmlDocument xhtmlDoc = Instance.FileStorage.ReadXml(file); 
+            XmlDocument xhtmlDoc = Instance.FileStorage.ReadXml(file);
             if (xhtmlDoc.DocumentElement.GetAttribute("xmlns") != "http://www.w3.org/1999/xhtml")
             {
                 // Rebuild the document with correct namespace

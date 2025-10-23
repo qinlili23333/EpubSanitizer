@@ -170,7 +170,7 @@ namespace EpubSanitizerCore
             {
                 id = file.Attributes["id"]?.Value ?? string.Empty,
                 opfpath = file.Attributes["href"]?.Value ?? string.Empty,
-                path = Utils.PathUtil.ComposeFromRelativePath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
+                path = Utils.PathUtil.IsHttpOrHttpsUrl(file.Attributes["href"]?.Value) ? "remote" : Utils.PathUtil.ComposeFromRelativePath(OpfPath, file.Attributes["href"]?.Value) ?? string.Empty,
                 mimetype = file.Attributes["media-type"]?.Value ?? string.Empty,
                 mediaOverlay = file.Attributes?["media-overlay"]?.Value ?? string.Empty,
                 fallback = file.Attributes?["fallback"]?.Value ?? string.Empty,
@@ -184,7 +184,7 @@ namespace EpubSanitizerCore
                 Utils.OpfUtil.ReplaceIdref(OpfDoc, FileInfo.id[3..], FileInfo.id);
                 file.Attributes["id"].Value = FileInfo.id;
             }
-            if (FileInfo.path == string.Empty || !Instance.FileStorage.FileExists(FileInfo.path))
+            if (FileInfo.path == string.Empty || (FileInfo.path != "remote" && !Instance.FileStorage.FileExists(FileInfo.path)))
             {
                 Instance.Logger($"Invalid file entry in manifest: {file.OuterXml}, file will be excluded.");
                 return;

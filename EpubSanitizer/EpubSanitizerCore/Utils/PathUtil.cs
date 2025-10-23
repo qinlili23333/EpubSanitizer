@@ -86,5 +86,24 @@
             }
             return files.ToArray();
         }
+        /// <summary>
+        /// Test whether a given URL string is an HTTP or HTTPS URL.
+        /// </summary>
+        /// <param name="urlString">url</param>
+        /// <returns>whether it's an HTTP or HTTPS URL</returns>
+        internal static bool IsHttpOrHttpsUrl(string urlString)
+        {
+            if (string.IsNullOrWhiteSpace(urlString))
+            {
+                return false;
+            }
+
+            if (Uri.TryCreate(urlString, UriKind.Absolute, out Uri uriResult))
+            {
+                return uriResult.Scheme == Uri.UriSchemeHttp ||
+                       uriResult.Scheme == Uri.UriSchemeHttps;
+            }
+            return false;
+        }
     }
 }

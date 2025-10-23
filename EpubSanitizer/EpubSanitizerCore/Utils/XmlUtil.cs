@@ -251,7 +251,8 @@ namespace EpubSanitizerCore.Utils
                 if (target.NamespaceURI == namespaceUri && attr.NamespaceURI == string.Empty)
                 {
                     target.SetAttribute(attr.LocalName, attr.Value);
-                } else
+                }
+                else
                 {
                     target.SetAttribute(attr.LocalName, attr.NamespaceURI == string.Empty ? namespaceUri : attr.NamespaceURI, attr.Value);
                 }
