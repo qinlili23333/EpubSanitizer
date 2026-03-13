@@ -9,7 +9,8 @@ namespace EpubSanitizerCore.Filters
     {
 
         static readonly Dictionary<string, object> ConfigList = new() {
-            {"general.replaceInlineWithBlock", true}
+            {"general.replaceInlineWithBlock", true},
+            {"general.fullIdDedup", false}
         };
         static General()
         {
@@ -47,7 +48,7 @@ namespace EpubSanitizerCore.Filters
             RemoveInvalidNamespace(xhtmlDoc);
             CheckNonLinearContent(xhtmlDoc, file);
             FixDuplicateContentType(xhtmlDoc);
-            FixDuokanNoteID(xhtmlDoc);
+            DedupId(xhtmlDoc, Instance.Config.GetBool("general.fullIdDedup") ? "*" : "aside");
             RemoveAmazonAttr(xhtmlDoc);
             FixExternalLink(file, xhtmlDoc);
             FixInvalidWidthHeight(xhtmlDoc);
@@ -575,14 +576,13 @@ namespace EpubSanitizerCore.Filters
                 }
             }
         }
-
         /// <summary>
-        /// Fix duplicate note ID created by Duokan
+        /// Remove all id from child which is same as parent
         /// </summary>
         /// <param name="doc">xhtml XmlDocument object</param>
-        private static void FixDuokanNoteID(XmlDocument doc)
+        private static void DedupId(XmlDocument doc, string tag)
         {
-            foreach (XmlElement element in (doc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName("aside"))
+            foreach (XmlElement element in (doc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName(tag))
             {
                 string id = element.GetAttribute("id");
                 if (id != string.Empty)
@@ -597,6 +597,7 @@ namespace EpubSanitizerCore.Filters
                 }
             }
         }
+
 
         internal override void PostProcess()
         {
@@ -655,6 +656,7 @@ namespace EpubSanitizerCore.Filters
             Console.WriteLine("General filter is a default filter that does basic processing for standard fixing.");
             Console.WriteLine("Options:");
             Console.WriteLine("  --general.replaceInlineWithBlock=true  Whether to replace an inline element containing block element with div. Default is true, disable it may improve performance.");
+            Console.WriteLine("  --general.fullIdDedup=true  Whether to perform full ID deduplication, which will remove id tag on any element with same id as parents. Resource intensive action, default is false.");
         }
     }
 }
