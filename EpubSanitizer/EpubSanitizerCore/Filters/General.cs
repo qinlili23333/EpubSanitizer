@@ -61,6 +61,7 @@ namespace EpubSanitizerCore.Filters
             FixType(xhtmlDoc);
             FixHgroup(xhtmlDoc);
             EscapeUrl(xhtmlDoc);
+            FixU201D(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -79,9 +80,30 @@ namespace EpubSanitizerCore.Filters
         }
 
         /// <summary>
+        /// Fix incorrect usage of U+201D mark sign in xhtml
+        /// </summary>
+        /// <param name="xhtmlDoc">XHTML document object</param>
+        private void FixU201D(XmlDocument xhtmlDoc)
+        {
+            if(xhtmlDoc.InnerXml.Contains("\"”") && xhtmlDoc.InnerXml.Contains("”\""))
+            {
+                foreach (XmlElement element in xhtmlDoc.GetElementsByTagName("*"))
+                {
+                    foreach (XmlAttribute attr in element.Attributes)
+                    {
+                        if(attr.Value.StartsWith("”") && attr.Value.EndsWith("”"))
+                        {
+                            attr.Value = attr.Value.Replace("”", null);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// idpf.org and w3.org namespace are not valid in epub, just remove them
         /// </summary>
-        /// <param name="doc"></param>
+        /// <param name="doc">XHTML document object</param>
         private void RemoveInvalidNamespace(XmlDocument doc)
         {
             HashSet<string> validNamespaces = [
@@ -128,7 +150,7 @@ namespace EpubSanitizerCore.Filters
         }
 
         /// <summary>
-        /// 
+        /// Make sure urls are proper escaped
         /// </summary>
         /// <param name="doc">XHTML document object</param>
         private void EscapeUrl(XmlDocument doc)
