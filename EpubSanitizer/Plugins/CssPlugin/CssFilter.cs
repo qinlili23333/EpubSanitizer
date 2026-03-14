@@ -88,8 +88,13 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                     {
                         string path = ConvertUrlToPath(decl.Value);
                         // Ignore data URLs and absolute URLs
-                        if (path.StartsWith("data") || path.StartsWith("http"))
+                        if (path.StartsWith("data"))
                         {
+                            continue;
+                        }
+                        if(path.StartsWith("http"))
+                        {
+                            // Process remote resource if needed
                             continue;
                         }
                         if (!Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
@@ -113,8 +118,13 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                         // Simple check for invalid URL, can be improved
                         string path = ConvertUrlToPath(decl.Value);
                         // Ignore data URLs and absolute URLs
-                        if (path.StartsWith("data") || path.StartsWith("http"))
+                        if (path.StartsWith("data"))
                         {
+                            continue;
+                        }
+                        if (path.StartsWith("http"))
+                        {
+                            // Process remote resource if needed
                             continue;
                         }
                         if (!Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
