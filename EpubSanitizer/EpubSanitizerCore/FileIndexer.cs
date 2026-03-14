@@ -69,9 +69,14 @@ namespace EpubSanitizerCore
         /// List of files in the manifest
         /// </summary>
         internal OpfFile[] ManifestFiles = [];
+        /// <summary>
+        /// Remote resource manager
+        /// </summary>
+        internal RemoteResourceManager RemoteManager;
         internal FileIndexer(EpubSanitizer CoreInstance)
         {
             Instance = CoreInstance;
+            RemoteManager = new(Instance);
         }
         /// <summary>
         /// Parse package manifest and index files
