@@ -170,7 +170,7 @@ namespace EpubSanitizerCore.Filters
         /// <param name="file">file path</param>
         private void CheckScripted(XmlDocument doc, string file)
         {
-            OpfFile item = Utils.OpfUtil.GetItemFromManifest(Instance.Indexer.ManifestFiles, file);
+            OpfFile item = Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, file);
             if (doc.GetElementsByTagName("script").Count > 0)
             {
                 if (item != null && !item.properties.Contains("scripted"))
@@ -194,7 +194,7 @@ namespace EpubSanitizerCore.Filters
         /// <param name="file">file path</param>
         private void CheckSvg(XmlDocument doc, string file)
         {
-            OpfFile item = Utils.OpfUtil.GetItemFromManifest(Instance.Indexer.ManifestFiles, file);
+            OpfFile item = Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, file);
             if (doc.GetElementsByTagName("svg").Count > 0 || doc.GetElementsByTagName("svg", "http://www.w3.org/2000/svg").Count > 0)
             {
                 if (item != null && !item.properties.Contains("svg"))

@@ -3,7 +3,10 @@ using AngleSharp.Css;
 using AngleSharp.Css.Dom;
 using AngleSharp.Css.Parser;
 using EpubSanitizerCore.Filters;
+using HeyRed.Mime;
 using System.Collections.Concurrent;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -95,6 +98,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                         if(path.StartsWith("http"))
                         {
                             // Process remote resource if needed
+                            decl.Value = $"url(\"{CheckRemoteResource(path, file)}\")";
                             continue;
                         }
                         if (!Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
@@ -125,6 +129,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                         if (path.StartsWith("http"))
                         {
                             // Process remote resource if needed
+                            decl.Value = $"url({CheckRemoteResource(path, file)})";
                             continue;
                         }
                         if (!Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
@@ -134,6 +139,44 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                         }
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Check remote resource with user selected mode and return the sanitized url
+        /// </summary>
+        /// <param name="path">origin url</param>
+        /// <param name="file">file path in Epub</param>
+        /// <returns>sanitized url in selected mode from config</returns>
+        private string CheckRemoteResource(string path, string file)
+        {
+            OpfFile item = Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, file);
+            if (item != null && !item.properties.Contains("remote-resources"))
+            {
+                item.properties = [.. item.properties, "remote-resources"];
+            }
+            if (Instance.Config.GetEnum<RemoteResourceMode>("remoteResourceMode") == RemoteResourceMode.SanitizeOnly)
+            {
+                // Only need to check manifest and return origin path
+                if(Utils.OpfUtil.GetItemFromManifestRelative(Instance.Indexer.ManifestFiles, path) == null)
+                {
+                    byte[] bytes = Encoding.UTF8.GetBytes(path);
+                    byte[] hashBytes = SHA256.HashData(bytes);
+                    OpfFile FileInfo = new()
+                    {
+                        id = "remote-file-"+Convert.ToHexString(hashBytes),
+                        opfpath = path,
+                        path = "remote",
+                        mimetype = MimeTypesMap.GetMimeType(path)
+                    };
+                    Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, FileInfo];
+                }
+                return path;
+            }
+            else
+            {
+                // Convert to target embed url
+                return string.Empty;
             }
         }
 
