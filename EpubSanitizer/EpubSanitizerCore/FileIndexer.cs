@@ -11,11 +11,11 @@ namespace EpubSanitizerCore
         /// </summary>
         internal required string id;
         /// <summary>
-        /// Relative path to OPF file
+        /// Relative path to OPF file, for remote file it should be remote url
         /// </summary>
         internal required string opfpath;
         /// <summary>
-        /// Path inside Epub file
+        /// Path inside Epub file, for remote file it should be constant "remote"
         /// </summary>
         internal required string path;
         /// <summary>
@@ -38,6 +38,10 @@ namespace EpubSanitizerCore
         /// Original XML element in the OPF manifest
         /// </summary>
         internal XmlElement? originElement;
+        /// <summary>
+        /// RemoteFile object, only when remote resource need to embed into Epub, otherwise it will be null.
+        /// </summary>
+        internal RemoteFile? remoteFileInfo;
     }
     internal class FileIndexer
     {
