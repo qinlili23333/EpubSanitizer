@@ -152,7 +152,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
         {
             if (Instance.Config.GetEnum<RemoteResourceMode>("remoteResourceMode") == RemoteResourceMode.SanitizeOnly)
             {
-                lock (Instance.Indexer.ManifestFiles)
+                lock (Instance.Indexer.ManifestFilesLock)
                 {
                     OpfFile item = Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, file);
                     if (item != null && !item.properties.Contains("remote-resources"))

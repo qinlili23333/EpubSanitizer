@@ -105,7 +105,7 @@ namespace EpubSanitizerCore
                     Instance.FileStorage.WriteBytes(fileName, file.BinaryData);
                 }
                 // Avoid race condition
-                lock (Instance.Indexer.ManifestFiles)
+                lock (Instance.Indexer.ManifestFilesLock)
                 {
                     if (Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, fileName) == null)
                     {

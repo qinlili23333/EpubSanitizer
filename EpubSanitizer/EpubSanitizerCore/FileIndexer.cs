@@ -74,6 +74,10 @@ namespace EpubSanitizerCore
         /// </summary>
         internal OpfFile[] ManifestFiles = [];
         /// <summary>
+        /// Lock for manifest file list
+        /// </summary>
+        internal object ManifestFilesLock;
+        /// <summary>
         /// Remote resource manager
         /// </summary>
         internal RemoteResourceManager RemoteManager;
