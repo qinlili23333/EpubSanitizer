@@ -98,7 +98,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                         if (Utils.PathUtil.IsHttpOrHttpsUrl(path))
                         {
                             // Process remote resource if needed
-                            decl.Value = $"url(\"{CheckRemoteResource(path, file)}\")";
+                            decl.Value = decl.Value.Replace(path, CheckRemoteResource(path, file));
                             continue;
                         }
                         if (!Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
@@ -129,7 +129,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                         if (Utils.PathUtil.IsHttpOrHttpsUrl(path))
                         {
                             // Process remote resource if needed
-                            decl.Value = $"url(\"{CheckRemoteResource(path, file)}\")";
+                            decl.Value = decl.Value.Replace(path, CheckRemoteResource(path, file));
                             continue;
                         }
                         if (!Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
