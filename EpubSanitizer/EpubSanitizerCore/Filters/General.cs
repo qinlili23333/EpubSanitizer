@@ -61,7 +61,7 @@ namespace EpubSanitizerCore.Filters
             FixPagebreak(xhtmlDoc);
             FixType(xhtmlDoc);
             FixHgroup(xhtmlDoc);
-            EscapeUrl(xhtmlDoc);
+            EscapeUrl(xhtmlDoc, file);
             FixU201D(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
@@ -172,7 +172,8 @@ namespace EpubSanitizerCore.Filters
         /// Make sure urls are proper escaped
         /// </summary>
         /// <param name="doc">XHTML document object</param>
-        private void EscapeUrl(XmlDocument doc)
+        /// <param name="file">file path in archive</param>
+        private void EscapeUrl(XmlDocument doc, string file)
         {
             string[] hrefTags = ["a", "area", "base", "link"];
             foreach (string tag in hrefTags)
@@ -193,6 +194,11 @@ namespace EpubSanitizerCore.Filters
                                 Instance.Logger($"Invalid URI format in href attribute has been removed: {element.GetAttribute("href")}");
                                 element.RemoveAttribute("href");
                             }
+                        }
+                        if (!element.GetAttribute("href").StartsWith("data") && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href"))))
+                        {
+                            Instance.Logger($"Remove URL not exist: {element.GetAttribute("href")}");
+                            element.RemoveAttribute("href");
                         }
                     }
                 }
