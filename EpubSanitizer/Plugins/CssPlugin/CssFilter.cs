@@ -12,7 +12,7 @@ using System.Xml;
 
 namespace EpubSanitizerCore.Plugins.CssPlugin
 {
-    internal class CssFilter(EpubSanitizer CoreInstance) : MultiThreadFilter(CoreInstance)
+    internal class CssFilter(EpubSanitizer CoreInstance) : SingleThreadFilter(CoreInstance)
     {
         static readonly Dictionary<string, object> ConfigList = new() {
             {"css.minify", true}
