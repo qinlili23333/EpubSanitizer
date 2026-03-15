@@ -12,7 +12,7 @@ using System.Xml;
 
 namespace EpubSanitizerCore.Plugins.CssPlugin
 {
-    internal class CssFilter(EpubSanitizer CoreInstance) : SingleThreadFilter(CoreInstance)
+    internal class CssFilter(EpubSanitizer CoreInstance) : MultiThreadFilter(CoreInstance)
     {
         static readonly Dictionary<string, object> ConfigList = new() {
             {"css.minify", true}
@@ -152,24 +152,27 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
         {
             if (Instance.Config.GetEnum<RemoteResourceMode>("remoteResourceMode") == RemoteResourceMode.SanitizeOnly)
             {
-                OpfFile item = Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, file);
-                if (item != null && !item.properties.Contains("remote-resources"))
+                lock (Instance.Indexer.ManifestFiles)
                 {
-                    item.properties = [.. item.properties, "remote-resources"];
-                }
-                // Only need to check manifest and return origin path
-                if (Utils.OpfUtil.GetItemFromManifestRelative(Instance.Indexer.ManifestFiles, path) == null)
-                {
-                    byte[] bytes = Encoding.UTF8.GetBytes(path);
-                    byte[] hashBytes = SHA256.HashData(bytes);
-                    OpfFile fileinfo = new()
+                    OpfFile item = Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, file);
+                    if (item != null && !item.properties.Contains("remote-resources"))
                     {
-                        id = "remote-file-" + Convert.ToHexString(hashBytes),
-                        opfpath = path,
-                        path = "remote",
-                        mimetype = MimeTypesMap.GetMimeType(path)
-                    };
-                    Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, fileinfo];
+                        item.properties = [.. item.properties, "remote-resources"];
+                    }
+                    // Only need to check manifest and return origin path
+                    if (Utils.OpfUtil.GetItemFromManifestRelative(Instance.Indexer.ManifestFiles, path) == null)
+                    {
+                        byte[] bytes = Encoding.UTF8.GetBytes(path);
+                        byte[] hashBytes = SHA256.HashData(bytes);
+                        OpfFile fileinfo = new()
+                        {
+                            id = "remote-file-" + Convert.ToHexString(hashBytes),
+                            opfpath = path,
+                            path = "remote",
+                            mimetype = MimeTypesMap.GetMimeType(path)
+                        };
+                        Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, fileinfo];
+                    }
                 }
                 return path;
             }

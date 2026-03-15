@@ -40,7 +40,7 @@ namespace EpubSanitizerCore
             else
             {
                 // If not exist, create a new one and download it
-                file = new RemoteFile() { Url = url };
+                file = new RemoteFile{ Url = url };
                 try
                 {
                     file.mimetype = Utils.NetworkUtil.GetRemoteMimeType(url);
@@ -104,19 +104,22 @@ namespace EpubSanitizerCore
                 {
                     Instance.FileStorage.WriteBytes(fileName, file.BinaryData);
                 }
-                if (Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, fileName) == null)
+                // Avoid race condition
+                lock (Instance.Indexer.ManifestFiles)
                 {
-                    OpfFile opffile = new()
+                    if (Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, fileName) == null)
                     {
-                        id = "remote_" + file.SHA256,
-                        opfpath = Utils.PathUtil.ComposeRelativePath(Instance.Indexer.OpfPath, fileName),
-                        path = fileName,
-                        mimetype = file.mimetype,
-                        remoteFileInfo = GetFulfilledFile(url)
-                    };
-                    Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, opffile];
+                        OpfFile opffile = new()
+                        {
+                            id = "remote_" + file.SHA256,
+                            opfpath = Utils.PathUtil.ComposeRelativePath(Instance.Indexer.OpfPath, fileName),
+                            path = fileName,
+                            mimetype = file.mimetype,
+                            remoteFileInfo = file
+                        };
+                        Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, opffile];
+                    }
                 }
-
                 return fileName;
             }
             else
