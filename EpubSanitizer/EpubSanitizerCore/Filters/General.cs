@@ -46,6 +46,7 @@ namespace EpubSanitizerCore.Filters
                 return;
             }
             RemoveInvalidNamespace(xhtmlDoc);
+            RemoveInvalidAttribute(xhtmlDoc);
             CheckNonLinearContent(xhtmlDoc, file);
             FixDuplicateContentType(xhtmlDoc);
             DedupId(xhtmlDoc, Instance.Config.GetBool("general.fullIdDedup") ? "*" : "aside");
@@ -77,6 +78,24 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Remove attr in any body element that has "-" but not start with "data-" or "aria-" and not include ":"
+        /// </summary>
+        /// <param name="xhtmlDoc"></param>
+        private void RemoveInvalidAttribute(XmlDocument xhtmlDoc)
+        {
+            foreach (XmlElement element in (xhtmlDoc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            {
+                foreach (XmlAttribute attr in element.Attributes.Cast<XmlAttribute>().ToArray())
+                {
+                    if (attr.Name.Contains('-') && !attr.Name.StartsWith("data-") && !attr.Name.StartsWith("aria-") && !attr.Name.Contains(':'))
+                    {
+                        element.RemoveAttributeNode(attr);
+                    }
+                }
+            }
         }
 
         /// <summary>
