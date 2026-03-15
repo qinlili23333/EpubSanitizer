@@ -135,7 +135,7 @@ namespace EpubSanitizerCore
         public void Dispose()
         {
             FileStorage.Dispose();
-            Indexer.RemoteManager.Dispose();
+            Indexer?.RemoteManager.Dispose();
         }
 
         /// <summary>
