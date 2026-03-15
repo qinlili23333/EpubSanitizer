@@ -95,7 +95,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                         {
                             continue;
                         }
-                        if(path.StartsWith("http"))
+                        if (path.StartsWith("http"))
                         {
                             // Process remote resource if needed
                             decl.Value = $"url(\"{CheckRemoteResource(path, file)}\")";
@@ -150,21 +150,21 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
         /// <returns>sanitized url in selected mode from config</returns>
         private string CheckRemoteResource(string path, string file)
         {
-            OpfFile item = Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, file);
-            if (item != null && !item.properties.Contains("remote-resources"))
-            {
-                item.properties = [.. item.properties, "remote-resources"];
-            }
             if (Instance.Config.GetEnum<RemoteResourceMode>("remoteResourceMode") == RemoteResourceMode.SanitizeOnly)
             {
+                OpfFile item = Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, file);
+                if (item != null && !item.properties.Contains("remote-resources"))
+                {
+                    item.properties = [.. item.properties, "remote-resources"];
+                }
                 // Only need to check manifest and return origin path
-                if(Utils.OpfUtil.GetItemFromManifestRelative(Instance.Indexer.ManifestFiles, path) == null)
+                if (Utils.OpfUtil.GetItemFromManifestRelative(Instance.Indexer.ManifestFiles, path) == null)
                 {
                     byte[] bytes = Encoding.UTF8.GetBytes(path);
                     byte[] hashBytes = SHA256.HashData(bytes);
                     OpfFile FileInfo = new()
                     {
-                        id = "remote-file-"+Convert.ToHexString(hashBytes),
+                        id = "remote-file-" + Convert.ToHexString(hashBytes),
                         opfpath = path,
                         path = "remote",
                         mimetype = MimeTypesMap.GetMimeType(path)
@@ -176,6 +176,24 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
             else
             {
                 // Convert to target embed url
+                if (Instance.Config.GetEnum<ResourceEmbedMode>("resourceEmbedMode") == ResourceEmbedMode.Base64)
+                {
+                    string base64url = Instance.Indexer.RemoteManager.GetDataUriFromUrl(path);
+                    if (base64url != string.Empty)
+                    {
+                        return base64url;
+                    }
+                    else
+                    {
+                        // Embed fail
+                        Instance.Logger($"Fail to embed {path}, keep url unchanged.");
+                        return path;
+                    }
+                }
+                else
+                {
+
+                }
                 return string.Empty;
             }
         }

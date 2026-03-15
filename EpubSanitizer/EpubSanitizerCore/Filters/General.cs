@@ -85,13 +85,13 @@ namespace EpubSanitizerCore.Filters
         /// <param name="xhtmlDoc">XHTML document object</param>
         private void FixU201D(XmlDocument xhtmlDoc)
         {
-            if(xhtmlDoc.InnerXml.Contains("\"”") && xhtmlDoc.InnerXml.Contains("”\""))
+            if (xhtmlDoc.InnerXml.Contains("\"”") && xhtmlDoc.InnerXml.Contains("”\""))
             {
                 foreach (XmlElement element in xhtmlDoc.GetElementsByTagName("*"))
                 {
                     foreach (XmlAttribute attr in element.Attributes)
                     {
-                        if(attr.Value.StartsWith("”") && attr.Value.EndsWith("”"))
+                        if (attr.Value.StartsWith("”") && attr.Value.EndsWith("”"))
                         {
                             attr.Value = attr.Value.Replace("”", null);
                         }
