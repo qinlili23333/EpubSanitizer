@@ -2,6 +2,17 @@
 
 namespace EpubSanitizerCore
 {
+    public enum RemoteResourceMode
+    {
+        SanitizeOnly,
+        Embed
+    }
+
+    public enum ResourceEmbedMode
+    {
+        Base64,
+        File
+    }
     public class EpubSanitizer
     {
         static readonly Dictionary<string, object> ConfigList = new() {
@@ -14,7 +25,9 @@ namespace EpubSanitizerCore
             {"overwrite", false },
             {"correctMime", true },
             {"xmlCache", true },
-            {"publisherMode", false }
+            {"publisherMode", false },
+            {"remoteResourceMode", RemoteResourceMode.SanitizeOnly },
+            {"resourceEmbedMode", ResourceEmbedMode.Base64 }
         };
         static EpubSanitizer()
         {
@@ -122,6 +135,7 @@ namespace EpubSanitizerCore
         public void Dispose()
         {
             FileStorage.Dispose();
+            Indexer?.RemoteManager.Dispose();
         }
 
         /// <summary>
@@ -169,6 +183,8 @@ namespace EpubSanitizerCore
             Console.WriteLine("    --xmlCache=true           Cache XML parsing result, enabled by default, improve performance for multiple filter processing, but use more memory.");
             Console.WriteLine("    --enablePlugins           Enable plugin support, disabled by default. WARNING: Plugins may contain malicious code, only enable plugins from trusted source.");
             Console.WriteLine("    --publisherMode           Disable all processing on missing resources, helpful for publisher. Disabled by default.");
+            Console.WriteLine("    --remoteResourceMode=sanitizeonly|embed    How to handle remote resource. Default is sanitize only which only fix with Epub standard requirement. Set to embed will try to download all remote resource and bundled into Epub to make it fully available offline.");
+            Console.WriteLine("    --resourceEmbedMode=base64|file    When embed remote resource, use base64 string or save as file and reference in content.opf. Default is base64, file mode may produce better performance and smaller file size when resource is large, but may cause compatibility issue with some Epub reader.");
             Console.WriteLine("Special arguments:");
             Console.WriteLine("    -v                        Print version information.");
             Console.WriteLine("    -h                        Print this general help.");

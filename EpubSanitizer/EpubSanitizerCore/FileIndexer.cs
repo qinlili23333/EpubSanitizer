@@ -11,11 +11,11 @@ namespace EpubSanitizerCore
         /// </summary>
         internal required string id;
         /// <summary>
-        /// Relative path to OPF file
+        /// Relative path to OPF file, for remote file it should be remote url
         /// </summary>
         internal required string opfpath;
         /// <summary>
-        /// Path inside Epub file
+        /// Path inside Epub file, for remote file it should be constant "remote"
         /// </summary>
         internal required string path;
         /// <summary>
@@ -38,6 +38,10 @@ namespace EpubSanitizerCore
         /// Original XML element in the OPF manifest
         /// </summary>
         internal XmlElement? originElement;
+        /// <summary>
+        /// RemoteFile object, only when remote resource need to embed into Epub, otherwise it will be null.
+        /// </summary>
+        internal RemoteFile? remoteFileInfo;
     }
     internal class FileIndexer
     {
@@ -69,9 +73,19 @@ namespace EpubSanitizerCore
         /// List of files in the manifest
         /// </summary>
         internal OpfFile[] ManifestFiles = [];
+        /// <summary>
+        /// Lock for manifest file list
+        /// </summary>
+        internal object ManifestFilesLock;
+        /// <summary>
+        /// Remote resource manager
+        /// </summary>
+        internal RemoteResourceManager RemoteManager;
         internal FileIndexer(EpubSanitizer CoreInstance)
         {
             Instance = CoreInstance;
+            ManifestFilesLock = new object();
+            RemoteManager = new(Instance);
         }
         /// <summary>
         /// Parse package manifest and index files
@@ -148,14 +162,14 @@ namespace EpubSanitizerCore
                 if (!ManifestFiles.Any(f => f.path == file))
                 {
                     Instance.Logger($"File '{file}' not found in manifest, try adding to list.");
-                    OpfFile FileInfo = new()
+                    OpfFile fileinfo = new()
                     {
                         id = Instance.FileStorage.GetSHA256(file),
                         opfpath = Utils.PathUtil.ComposeRelativePath(OpfPath, file),
                         path = file,
                         mimetype = MimeTypesMap.GetMimeType(file)
                     };
-                    ManifestFiles = [.. ManifestFiles, FileInfo];
+                    ManifestFiles = [.. ManifestFiles, fileinfo];
                 }
             }
         }
@@ -166,7 +180,7 @@ namespace EpubSanitizerCore
         /// <param name="file">XmlNode element</param>
         private void AddManifestFile(XmlNode file)
         {
-            OpfFile FileInfo = new()
+            OpfFile fileinfo = new()
             {
                 id = file.Attributes["id"]?.Value ?? string.Empty,
                 opfpath = file.Attributes["href"]?.Value ?? string.Empty,
@@ -177,41 +191,38 @@ namespace EpubSanitizerCore
                 properties = file.Attributes?["properties"]?.Value?.Split(' ') ?? [],
                 originElement = file as XmlElement
             };
-            if (int.TryParse(FileInfo.id.AsSpan(0, 1), out _))
+            if (int.TryParse(fileinfo.id.AsSpan(0, 1), out _))
             {
-                Instance.Logger($"File id '{FileInfo.id}' starts with number, which is invalid. Prepending 'id_'.");
-                FileInfo.id = "id_" + FileInfo.id;
-                Utils.OpfUtil.ReplaceIdref(OpfDoc, FileInfo.id[3..], FileInfo.id);
-                file.Attributes["id"].Value = FileInfo.id;
+                Instance.Logger($"File id '{fileinfo.id}' starts with number, which is invalid. Prepending 'id_'.");
+                fileinfo.id = "id_" + fileinfo.id;
+                Utils.OpfUtil.ReplaceIdref(OpfDoc, fileinfo.id[3..], fileinfo.id);
+                file.Attributes["id"].Value = fileinfo.id;
             }
-            if (FileInfo.path == string.Empty || (FileInfo.path != "remote" && !Instance.FileStorage.FileExists(FileInfo.path)))
+            if (fileinfo.path == string.Empty || (fileinfo.path != "remote" && !Instance.FileStorage.FileExists(fileinfo.path)))
             {
                 Instance.Logger($"Invalid file entry in manifest: {file.OuterXml}, file will be excluded.");
                 return;
             }
-            if (FileInfo.opfpath == '/' + FileInfo.path)
+            if (fileinfo.opfpath == '/' + fileinfo.path)
             {
-                Instance.Logger($"File '{FileInfo.path}' is absolute path, try normalizing.");
-                try
+                Instance.Logger($"File '{fileinfo.path}' is absolute path, try normalizing.");
+                fileinfo.opfpath = Utils.PathUtil.ComposeRelativePath(OpfPath, fileinfo.path);
+                if (fileinfo.opfpath.StartsWith(".."))
                 {
-                    FileInfo.path = Utils.PathUtil.ComposeRelativePath(OpfPath, FileInfo.path);
-                }
-                catch (ArgumentException)
-                {
-                    Instance.Logger($"File '{FileInfo.path}' is outside of OPF path '{OpfPath}', will be moved.");
+                    Instance.Logger($"File '{fileinfo.path}' is outside of OPF path '{OpfPath}', will be moved.");
                     // TODO: move file directory to OPF path
                 }
             }
-            if (FileInfo.id == string.Empty)
+            if (fileinfo.id == string.Empty)
             {
                 Instance.Logger($"Lack file id: {file.OuterXml}, use hash as id.");
-                FileInfo.id = Instance.FileStorage.GetSHA256(FileInfo.path);
+                fileinfo.id = Instance.FileStorage.GetSHA256(fileinfo.path);
             }
-            if ((Instance.Config.GetBool("correctMime") && FileInfo.mimetype != "application/xhtml+xml") || FileInfo.mimetype == string.Empty)
+            if ((Instance.Config.GetBool("correctMime") && fileinfo.mimetype != "application/xhtml+xml") || fileinfo.mimetype == string.Empty)
             {
-                FileInfo.mimetype = MimeTypesMap.GetMimeType(FileInfo.path);
+                fileinfo.mimetype = MimeTypesMap.GetMimeType(fileinfo.path);
             }
-            ManifestFiles = [.. ManifestFiles, FileInfo];
+            ManifestFiles = [.. ManifestFiles, fileinfo];
         }
 
         /// <summary>

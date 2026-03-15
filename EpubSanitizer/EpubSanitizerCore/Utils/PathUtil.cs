@@ -58,15 +58,30 @@
         /// <returns></returns>
         internal static string ComposeRelativePath(string basePath, string filePath)
         {
-            string normalizedOpfPath = basePath[..(basePath.LastIndexOf('/') + 1)];
-            if (filePath.StartsWith(normalizedOpfPath))
+            string[] baseDirParts = basePath.Contains('/') ? basePath.Split('/')[..^1] : [];
+            string[] fileParts = filePath.Split('/');
+
+            int commonIndex = 0;
+            while (commonIndex < baseDirParts.Length &&
+                   commonIndex < fileParts.Length - 1 &&
+                   baseDirParts[commonIndex] == fileParts[commonIndex])
             {
-                return filePath[normalizedOpfPath.Length..];
+                commonIndex++;
             }
-            else
+
+            var relativeParts = new List<string>();
+
+            for (int i = commonIndex; i < baseDirParts.Length; i++)
             {
-                throw new ArgumentException($"File path '{filePath}' is not under base path '{basePath}'.");
+                relativeParts.Add("..");
             }
+
+            for (int i = commonIndex; i < fileParts.Length; i++)
+            {
+                relativeParts.Add(fileParts[i]);
+            }
+
+            return string.Join('/', relativeParts);
         }
 
         /// <summary>
@@ -104,6 +119,21 @@
                        uriResult.Scheme == Uri.UriSchemeHttps;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Get the base path of a file path, which is the path without the file name. For example, the base path of "OEBPS/Text/chapter1.xhtml" is "OEBPS/Text/".
+        /// </summary>
+        /// <param name="path">The file path</param>
+        /// <returns>The base path of the file</returns>
+        internal static string GetBasePath(string path)
+        {
+            int lastSlashIndex = path.LastIndexOf('/');
+            if (lastSlashIndex == -1)
+            {
+                return string.Empty;
+            }
+            return path[..(lastSlashIndex + 1)];
         }
     }
 }

@@ -13,8 +13,7 @@ namespace EpubSanitizerCore.FS
         {
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             byte[] timestampBytes = BitConverter.GetBytes(timestamp);
-            using SHA256 sha256 = System.Security.Cryptography.SHA256.Create();
-            byte[] hashBytes = sha256.ComputeHash(timestampBytes);
+            byte[] hashBytes = SHA256.HashData(timestampBytes);
             System.Text.StringBuilder stringBuilder = new();
             for (int i = 0; i < 4; i++)
             {
@@ -72,11 +71,13 @@ namespace EpubSanitizerCore.FS
         /// <inheritdoc/>
         public override void WriteString(string path, string content)
         {
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(Folder, path.Replace('\\', '/')))!);
             File.WriteAllText(Path.Combine(Folder, path.Replace('\\', '/')), content);
         }
         /// <inheritdoc/>
         public override void WriteBytes(string path, byte[] content)
         {
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(Folder, path.Replace('\\', '/')))!);
             File.WriteAllBytes(Path.Combine(Folder, path.Replace('\\', '/')), content);
         }
         /// <inheritdoc/>
@@ -103,12 +104,9 @@ namespace EpubSanitizerCore.FS
             {
                 throw new FileNotFoundException($"File '{path}' does not exist in the file system.");
             }
-            using SHA256 sha256 = System.Security.Cryptography.SHA256.Create();
             using FileStream fileStream = new(Path.Combine(Folder, path.Replace('\\', '/')), FileMode.Open, FileAccess.Read);
-            {
-                byte[] hashBytes = sha256.ComputeHash(fileStream);
-                return Convert.ToHexStringLower(hashBytes);
-            }
+            byte[] hashBytes = SHA256.HashData(fileStream);
+            return Convert.ToHexStringLower(hashBytes);
         }
 
         public override bool FileExists(string path)
