@@ -84,6 +84,7 @@ namespace EpubSanitizerCore
         internal FileIndexer(EpubSanitizer CoreInstance)
         {
             Instance = CoreInstance;
+            ManifestFilesLock = new object();
             RemoteManager = new(Instance);
         }
         /// <summary>
