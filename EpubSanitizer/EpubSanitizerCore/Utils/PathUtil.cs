@@ -99,7 +99,7 @@
                     files.Add(file.path);
                 }
             }
-            return files.ToArray();
+            return [.. files];
         }
         /// <summary>
         /// Test whether a given URL string is an HTTP or HTTPS URL.

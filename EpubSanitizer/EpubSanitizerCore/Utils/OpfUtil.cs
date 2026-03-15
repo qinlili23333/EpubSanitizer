@@ -138,7 +138,7 @@ namespace EpubSanitizerCore.Utils
                     spineArray.Add((OpfDoc.SelectSingleNode($"//*[@id='{idref}']") as XmlElement).GetAttribute("href"));
                 }
             }
-            return spineArray.ToArray();
+            return [.. spineArray];
         }
 
         /// <summary>

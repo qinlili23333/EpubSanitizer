@@ -108,22 +108,14 @@ namespace EpubSanitizerCore
         /// <exception cref="InvalidEpubException"></exception>
         private void LoadOpf()
         {
-            containerDoc = Instance.FileStorage.ReadXml("META-INF/container.xml");
-            if (containerDoc == null)
-            {
-                throw new InvalidEpubException("Container file not found in the Epub file.");
-            }
+            containerDoc = Instance.FileStorage.ReadXml("META-INF/container.xml") ?? throw new InvalidEpubException("Container file not found in the Epub file.");
             XmlNodeList rootfiles = containerDoc.GetElementsByTagName("rootfile");
             if (rootfiles.Count > 1)
             {
                 Instance.Logger("Support to EPUB 3 Multiple-Rendition Publications is not finished. Currently only the first one will be processed.");
             }
             OpfPath = rootfiles[0].Attributes["full-path"].Value;
-            OpfDoc = Instance.FileStorage.ReadXml(OpfPath);
-            if (OpfDoc == null)
-            {
-                throw new InvalidEpubException("OPF file not found in the Epub file.");
-            }
+            OpfDoc = Instance.FileStorage.ReadXml(OpfPath) ?? throw new InvalidEpubException("OPF file not found in the Epub file.");
             Utils.XmlUtil.NormalizeXmlns(OpfDoc, "http://www.idpf.org/2007/opf");
             if (OpfDoc.GetElementsByTagName("package")[0] is XmlElement packageElement && packageElement.GetAttribute("version") != "3.0")
             {
@@ -244,11 +236,7 @@ namespace EpubSanitizerCore
                             Instance.Logger($"NCX mimetype mismatch, fixing...");
                             file.mimetype = "application/x-dtbncx+xml";
                         }
-                        NcxDoc = Instance.FileStorage.ReadXml(NcxPath);
-                        if (NcxDoc == null)
-                        {
-                            throw new InvalidEpubException("NCX file cannot be parsed.");
-                        }
+                        NcxDoc = Instance.FileStorage.ReadXml(NcxPath) ?? throw new InvalidEpubException("NCX file cannot be parsed.");
                         if (Instance.Config.GetBool("sanitizeNcx"))
                         {
                             Instance.Logger("Sanitizing NCX file...");

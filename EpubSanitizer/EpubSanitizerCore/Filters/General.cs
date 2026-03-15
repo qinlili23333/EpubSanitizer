@@ -84,7 +84,7 @@ namespace EpubSanitizerCore.Filters
         /// Remove attr in any body element that has "-" but not start with "data-" or "aria-" and not include ":"
         /// </summary>
         /// <param name="xhtmlDoc"></param>
-        private void RemoveInvalidAttribute(XmlDocument xhtmlDoc)
+        private static void RemoveInvalidAttribute(XmlDocument xhtmlDoc)
         {
             foreach (XmlElement element in (xhtmlDoc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName("*").Cast<XmlElement>().ToArray())
             {
@@ -102,7 +102,7 @@ namespace EpubSanitizerCore.Filters
         /// Fix incorrect usage of U+201D mark sign in xhtml
         /// </summary>
         /// <param name="xhtmlDoc">XHTML document object</param>
-        private void FixU201D(XmlDocument xhtmlDoc)
+        private static void FixU201D(XmlDocument xhtmlDoc)
         {
             if (xhtmlDoc.InnerXml.Contains("\"”") && xhtmlDoc.InnerXml.Contains("”\""))
             {
@@ -110,7 +110,7 @@ namespace EpubSanitizerCore.Filters
                 {
                     foreach (XmlAttribute attr in element.Attributes)
                     {
-                        if (attr.Value.StartsWith("”") && attr.Value.EndsWith("”"))
+                        if (attr.Value.StartsWith('”') && attr.Value.EndsWith('”'))
                         {
                             attr.Value = attr.Value.Replace("”", null);
                         }
@@ -251,7 +251,7 @@ namespace EpubSanitizerCore.Filters
             {
                 foreach (XmlElement item in spine.GetElementsByTagName("itemref"))
                 {
-                    if (item.GetAttribute("idref") == docid && item.HasAttribute("linear") && item.GetAttribute("linear").ToLowerInvariant() == "no")
+                    if (item.GetAttribute("idref") == docid && item.HasAttribute("linear") && item.GetAttribute("linear").Equals("no", StringComparison.InvariantCultureIgnoreCase))
                     {
                         found = true;
                         break;

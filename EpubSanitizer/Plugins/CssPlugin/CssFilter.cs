@@ -225,7 +225,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                     files.Add(file.path);
                 }
             }
-            return files.ToArray();
+            return [.. files];
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
             string pattern = @"url\(['""]?(.*?)['""]?\)";
 
             // Create a Regex object.
-            Regex regex = new Regex(pattern);
+            Regex regex = new(pattern);
 
             // Perform the match.
             Match match = regex.Match(cssUrlString);
@@ -264,7 +264,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
         {
             if (!DirectionCache.IsEmpty)
             {
-                Instance.Logger($"Updating dir property instead of direction css for {DirectionCache.Count()} selectors...");
+                Instance.Logger($"Updating dir property instead of direction css for {DirectionCache.Count} selectors...");
                 // Add dir property back to xhtml files if cached
                 Parallel.ForEach(Utils.PathUtil.GetAllXHTMLFiles(Instance), file =>
                 {
