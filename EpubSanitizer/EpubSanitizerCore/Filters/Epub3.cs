@@ -438,23 +438,27 @@ namespace EpubSanitizerCore.Filters
         private static void ProcessAlignAttributes(XmlDocument doc)
         {
             Dictionary<string, List<XmlElement>> Record = [];
-            foreach (XmlElement table in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            foreach (XmlElement element in doc.GetElementsByTagName("table").Cast<XmlElement>().ToArray())
             {
-                if (table.HasAttribute("align"))
+                foreach (XmlElement table in element.GetElementsByTagName("*").Cast<XmlElement>().ToArray().Append(element))
                 {
-                    if (table.GetAttribute("align") == "char")
+                    table.RemoveAttribute("char");
+                    if (table.HasAttribute("align"))
                     {
-                        table.RemoveAttribute("align");
-                        table.RemoveAttribute("char");
-                        continue;
-                    }
-                    if (Record.ContainsKey(table.GetAttribute("align")))
-                    {
-                        Record[table.GetAttribute("align")].Add(table);
-                    }
-                    else
-                    {
-                        Record[table.GetAttribute("align")] = [table];
+                        if (table.GetAttribute("align") == "char")
+                        {
+                            table.RemoveAttribute("align");
+                            table.RemoveAttribute("char");
+                            continue;
+                        }
+                        if (Record.ContainsKey(table.GetAttribute("align")))
+                        {
+                            Record[table.GetAttribute("align")].Add(table);
+                        }
+                        else
+                        {
+                            Record[table.GetAttribute("align")] = [table];
+                        }
                     }
                 }
             }

@@ -40,7 +40,7 @@ namespace EpubSanitizerCore
             else
             {
                 // If not exist, create a new one and download it
-                file = new RemoteFile{ Url = url };
+                file = new RemoteFile { Url = url };
                 try
                 {
                     file.mimetype = Utils.NetworkUtil.GetRemoteMimeType(url);
