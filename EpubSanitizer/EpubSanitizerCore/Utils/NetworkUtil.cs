@@ -26,7 +26,7 @@ namespace EpubSanitizerCore.Utils
             // Only send HEAD request to get mime type, no need to download whole file
             using var client = new System.Net.Http.HttpClient();
             using var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Head, url);
-            var response = client.SendAsync(request).GetAwaiter().GetResult();
+            using var response = client.SendAsync(request).GetAwaiter().GetResult();
             if (response.Content.Headers.ContentType != null && response.Content.Headers.ContentType.MediaType != "application/octet-stream")
             {
                 return response.Content.Headers.ContentType.MediaType;
