@@ -464,7 +464,7 @@ namespace EpubSanitizerCore.Filters
         {
             foreach (XmlElement element in doc.GetElementsByTagName("img").Cast<XmlElement>().ToArray())
             {
-                if (element.HasAttribute("src") && !Instance.FileStorage.FileExists(PathUtil.ComposeFromRelativePath(file, element.GetAttribute("src"))))
+                if (element.HasAttribute("src") && !Instance.FileStorage.FileExists(PathUtil.ComposeFromRelativePath(file, element.GetAttribute("src"))) && !Utils.PathUtil.IsHttpOrHttpsUrl(element.GetAttribute("src")) && !element.GetAttribute("src").StartsWith("data"))
                 {
                     Instance.Logger($"Removed invalid image {element.GetAttribute("src")} in {file}");
                     if (element.HasAttribute("alt") && element.GetAttribute("alt") != string.Empty)
