@@ -205,8 +205,8 @@ namespace EpubSanitizerCore
             if (fileinfo.opfpath == '/' + fileinfo.path)
             {
                 Instance.Logger($"File '{fileinfo.path}' is absolute path, try normalizing.");
-                fileinfo.path = Utils.PathUtil.ComposeRelativePath(OpfPath, fileinfo.path);
-                if (fileinfo.path.StartsWith(".."))
+                fileinfo.opfpath = Utils.PathUtil.ComposeRelativePath(OpfPath, fileinfo.path);
+                if (fileinfo.opfpath.StartsWith(".."))
                 {
                     Instance.Logger($"File '{fileinfo.path}' is outside of OPF path '{OpfPath}', will be moved.");
                     // TODO: move file directory to OPF path
