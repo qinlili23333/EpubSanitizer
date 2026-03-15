@@ -179,7 +179,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                 if (Instance.Config.GetEnum<ResourceEmbedMode>("resourceEmbedMode") == ResourceEmbedMode.Base64)
                 {
                     string base64url = Instance.Indexer.RemoteManager.GetDataUriFromUrl(path);
-                    if (base64url != string.Empty)
+                    if (!string.IsNullOrEmpty(base64url))
                     {
                         return base64url;
                     }
@@ -192,9 +192,18 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                 }
                 else
                 {
-
+                    string absolutePath = Instance.Indexer.RemoteManager.AddToEpub(path);
+                    if (!string.IsNullOrEmpty(absolutePath))
+                    {
+                        return Utils.PathUtil.ComposeRelativePath(file, absolutePath);
+                    }
+                    else
+                    {
+                        // Embed fail
+                        Instance.Logger($"Fail to embed {path}, keep url unchanged.");
+                        return path;
+                    }
                 }
-                return string.Empty;
             }
         }
 

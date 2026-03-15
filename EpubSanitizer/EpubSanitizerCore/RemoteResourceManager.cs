@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using HeyRed.Mime;
+using System.Collections.Concurrent;
 
 namespace EpubSanitizerCore
 {
@@ -88,7 +89,41 @@ namespace EpubSanitizerCore
             }
         }
 
+        /// <summary>
+        /// Gets the remote file from the specified URL, saves it to the EPUB file storage with a unique name based on its SHA256 hash and MIME type, and returns the file name. If the file cannot be downloaded or is empty, returns an empty string.
+        /// </summary>
+        /// <param name="url">The URL of the remote file to add to the EPUB.</param>
+        /// <returns>The absolute path of the added remote file in the EPUB storage, or an empty string if the file could not be added.</returns>
+        internal string AddToEpub(string url)
+        {
+            RemoteFile file = GetFulfilledFile(url);
+            if (file.BinaryData.Length > 0)
+            {
+                string fileName = string.Concat(Utils.PathUtil.GetBasePath(Instance.Indexer.OpfPath), "RemoteResource/", file.SHA256, ".", MimeTypesMap.GetExtension(file.mimetype));
+                if (!Instance.FileStorage.FileExists(fileName))
+                {
+                    Instance.FileStorage.WriteBytes(fileName, file.BinaryData);
+                }
+                if (Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, fileName) == null)
+                {
+                    OpfFile opffile = new()
+                    {
+                        id = "remote_" + file.SHA256,
+                        opfpath = Utils.PathUtil.ComposeRelativePath(Instance.Indexer.OpfPath, fileName),
+                        path = fileName,
+                        mimetype = file.mimetype,
+                        remoteFileInfo = GetFulfilledFile(url)
+                    };
+                    Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, opffile];
+                }
 
+                return fileName;
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
 
 
         /// <summary>
