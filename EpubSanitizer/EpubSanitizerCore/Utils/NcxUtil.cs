@@ -89,7 +89,11 @@ namespace EpubSanitizerCore.Utils
                     lastTarget = target;
                     order++;
                 }
-                navPoint.SetAttribute("playOrder", order.ToString());
+                if (NcxDoc.GetElementsByTagName("pageList").Count == 0)
+                {
+                    // If pageList not exist, use the order of navPoint with different target as playOrder, otherwise keep original playOrder
+                    navPoint.SetAttribute("playOrder", order.ToString());
+                }
             }
         }
 
