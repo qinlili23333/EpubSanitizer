@@ -129,7 +129,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                         if (path.StartsWith("http"))
                         {
                             // Process remote resource if needed
-                            decl.Value = $"url({CheckRemoteResource(path, file)})";
+                            decl.Value = $"url(\"{CheckRemoteResource(path, file)}\")";
                             continue;
                         }
                         if (!Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
