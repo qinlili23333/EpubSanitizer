@@ -162,14 +162,14 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                 {
                     byte[] bytes = Encoding.UTF8.GetBytes(path);
                     byte[] hashBytes = SHA256.HashData(bytes);
-                    OpfFile FileInfo = new()
+                    OpfFile fileinfo = new()
                     {
                         id = "remote-file-" + Convert.ToHexString(hashBytes),
                         opfpath = path,
                         path = "remote",
                         mimetype = MimeTypesMap.GetMimeType(path)
                     };
-                    Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, FileInfo];
+                    Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, fileinfo];
                 }
                 return path;
             }
