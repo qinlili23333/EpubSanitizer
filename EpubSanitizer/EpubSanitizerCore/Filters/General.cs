@@ -63,6 +63,7 @@ namespace EpubSanitizerCore.Filters
             FixHgroup(xhtmlDoc);
             EscapeUrl(xhtmlDoc, file);
             FixU201D(xhtmlDoc);
+            FixUL(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -78,6 +79,36 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// ul element only allow specified child elements, if find any invalid ones, wrap them with the li before
+        /// </summary>
+        /// <param name="xhtmlDoc"></param>
+        private void FixUL(XmlDocument xhtmlDoc)
+        {
+            string[] ulTags = ["li", "script", "template"];
+            foreach (XmlElement ul in xhtmlDoc.GetElementsByTagName("ul").Cast<XmlElement>().ToArray())
+            {
+                foreach (XmlNode child in ul.ChildNodes.Cast<XmlNode>().ToArray())
+                {
+                    if (child is XmlElement el && !ulTags.Contains(el.Name.ToLowerInvariant()))
+                    {
+                        // Move to child of the existing li before
+                        if (child.PreviousSibling is XmlElement lastLi && lastLi.Name.Equals("li", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            lastLi.AppendChild(child);
+                        }
+                        else
+                        {
+                            // Create a new li to wrap the element
+                            XmlElement li = xhtmlDoc.CreateElement("li", xhtmlDoc.DocumentElement.NamespaceURI);
+                            ul.InsertBefore(li, child);
+                            li.AppendChild(child);
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
