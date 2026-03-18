@@ -101,7 +101,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                             decl.Value = decl.Value.Replace(path, CheckRemoteResource(path, file));
                             continue;
                         }
-                        if (!Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
+                        if (!Instance.Config.GetBool("publisherMode") && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
                         {
                             rule.RemoveProperty(decl.Name);
                             Instance.Logger($"Removed invalid URL in CSS property {decl.Name} targeting {path}");
@@ -132,7 +132,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                             decl.Value = decl.Value.Replace(path, CheckRemoteResource(path, file));
                             continue;
                         }
-                        if (!Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
+                        if (!Instance.Config.GetBool("publisherMode") && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, path)))
                         {
                             rule.Style.RemoveProperty(decl.Name);
                             Instance.Logger($"Removed invalid URL in CSS property {decl.Name} targeting {path}");
