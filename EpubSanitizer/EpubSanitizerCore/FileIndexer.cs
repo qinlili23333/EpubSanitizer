@@ -109,6 +109,7 @@ namespace EpubSanitizerCore
         private void LoadOpf()
         {
             containerDoc = Instance.FileStorage.ReadXml("META-INF/container.xml") ?? throw new InvalidEpubException("Container file not found in the Epub file.");
+            SanitizeContainer();
             XmlNodeList rootfiles = containerDoc.GetElementsByTagName("rootfile");
             if (rootfiles.Count > 1)
             {
@@ -137,6 +138,19 @@ namespace EpubSanitizerCore
                     Instance.TargetEpubVer = 2;
                 }
             }
+        }
+
+        /// <summary>
+        /// Ensure container document comply with standard
+        /// </summary>
+        private void SanitizeContainer()
+        {
+            // Remove old school xhtml doctype
+            if (containerDoc.DocumentType != null)
+            {
+                containerDoc.RemoveChild(containerDoc.DocumentType);
+            }
+            containerDoc.DocumentElement.SetAttribute("xmlns", "urn:oasis:names:tc:opendocument:xmlns:container");
         }
 
         /// <summary>
@@ -282,6 +296,8 @@ namespace EpubSanitizerCore
         /// </summary>
         internal void UpdateOpf()
         {
+            Instance.Logger("Writing container file...");
+            Instance.FileStorage.WriteXml("META-INF/container.xml", containerDoc);
             Instance.Logger("Updating OPF manifest...");
             // Remove all existing manifest entries
             XmlNode manifest = OpfDoc.GetElementsByTagName("manifest")[0];
