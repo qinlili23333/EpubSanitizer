@@ -63,6 +63,10 @@ namespace EpubSanitizerCore.Utils
                 XmlElement aElement = nav.CreateElement("a", nav.DocumentElement.NamespaceURI);
                 aElement.SetAttribute("href", PathUtil.ComposeRelativePath(navPath, PathUtil.ComposeFromRelativePath(mapFile.path, pageTarget.GetAttribute("href"))));
                 aElement.InnerText = pageTarget.GetAttribute("name");
+                if (aElement.InnerText == "")
+                {
+                    aElement.InnerText = pageTarget.GetAttribute("href").Remove(pageTarget.GetAttribute("href").LastIndexOf('.'));
+                }
                 liElement.AppendChild(aElement);
                 olElement.AppendChild(liElement);
             }
