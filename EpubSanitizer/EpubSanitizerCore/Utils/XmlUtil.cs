@@ -272,5 +272,33 @@ namespace EpubSanitizerCore.Utils
                 }
             }
         }
+
+        /// <summary>
+        /// Add CSS styles to the head of the document, if cssStyles is not empty.
+        /// </summary>
+        /// <param name="doc">xhtml document</param>
+        /// <param name="cssStyles">StringBuilder with css strings</param>
+        internal static void AddCssToHead(XmlDocument doc, StringBuilder cssStyles)
+        {
+            if(cssStyles.Length == 0)
+            {
+                return;
+            }
+            // If there are any styles, add them to the head of the document
+            XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
+            // Try to reuse existing style element if exist, otherwise create a new one
+            if (head.GetElementsByTagName("style").Count > 0)
+            {
+                XmlElement styleElement = head.GetElementsByTagName("style")[0] as XmlElement;
+                styleElement.InnerText += cssStyles.ToString();
+            }
+            else
+            {
+                XmlElement styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
+                styleElement.SetAttribute("type", "text/css");
+                styleElement.InnerText = cssStyles.ToString();
+                head.AppendChild(styleElement);
+            }
+        }
     }
 }

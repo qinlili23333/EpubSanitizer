@@ -164,6 +164,25 @@ namespace EpubSanitizerCore.Filters
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
         }
 
+
+        /// <summary>
+        /// A helper method to add element to dictionary with list value, if key already exist, add to the list, otherwise create a new list. This is used for processing attributes in batch to reduce the number of style elements created in head.
+        /// </summary>
+        /// <param name="dict">The dictionary to add the element to.</param>
+        /// <param name="key">The key to look for in the dictionary.</param>
+        /// <param name="element">The element to add to the list associated with the key.</param>
+        private static void AddToDictionary(Dictionary<string, List<XmlElement>> dict, string key, XmlElement element)
+        {
+            if (dict.TryGetValue(key, out List<XmlElement>? value))
+            {
+                value.Add(element);
+            }
+            else
+            {
+                dict[key] = [element];
+            }
+        }
+
         /// <summary>
         /// Remove vspace and hspace attributes from img elements and convert them to CSS styles to comply with Epub 3 standards.
         /// </summary>
@@ -176,25 +195,11 @@ namespace EpubSanitizerCore.Filters
             {
                 if (img.HasAttribute("vspace"))
                 {
-                    if (RecordV.ContainsKey(img.GetAttribute("vspace")))
-                    {
-                        RecordV[img.GetAttribute("vspace")].Add(img);
-                    }
-                    else
-                    {
-                        RecordV[img.GetAttribute("vspace")] = [img];
-                    }
+                    AddToDictionary(RecordV, img.GetAttribute("vspace"), img);
                 }
                 if (img.HasAttribute("hspace"))
                 {
-                    if (RecordH.ContainsKey(img.GetAttribute("hspace")))
-                    {
-                        RecordH[img.GetAttribute("hspace")].Add(img);
-                    }
-                    else
-                    {
-                        RecordH[img.GetAttribute("hspace")] = [img];
-                    }
+                    AddToDictionary(RecordH, img.GetAttribute("hspace"), img);
                 }
             }
             // Generate CSS styles for each unique vspace value
@@ -225,16 +230,7 @@ namespace EpubSanitizerCore.Filters
                     table.RemoveAttribute("hspace");
                 }
             }
-            if (cssStyles.Length == 0)
-            {
-                return;
-            }
-            // If there are any styles, add them to the head of the document
-            XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
-            XmlElement styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
-            styleElement.SetAttribute("type", "text/css");
-            styleElement.InnerText = cssStyles.ToString();
-            head.AppendChild(styleElement);
+            Utils.XmlUtil.AddCssToHead(doc, cssStyles);
         }
 
         /// <summary>
@@ -375,58 +371,36 @@ namespace EpubSanitizerCore.Filters
             {
                 if (table.HasAttribute("border"))
                 {
-                    if (int.TryParse(table.GetAttribute("border"), out int borderValue))
-                    {
-                        if (borderValue > 0)
-                        {
-                            table.SetAttribute("border", "1");
-                        }
-                        else if (borderValue == 0)
-                        {
-                            table.SetAttribute("border", "");
-                        }
-                    }
-                    else
+                    if (!int.TryParse(table.GetAttribute("border"), out int borderValue))
                     {
                         table.RemoveAttribute("border");
+                    }
+                    else if (borderValue >= 0)
+                    {
+                        table.SetAttribute("border", borderValue > 0 ? "1" : "");
                     }
                 }
                 foreach (XmlElement child in table.GetElementsByTagName("*").Cast<XmlElement>().ToArray().Append(table))
                 {
-                    if (child.HasAttribute("width"))
+                    string[] attrs = ["width", "height"];
+                    foreach (string attr in attrs)
                     {
-                        child.SetAttribute("style", $"width: {child.GetAttribute("width")}px;" + child.GetAttribute("style"));
-                        child.RemoveAttribute("width");
-                    }
-                    if (child.HasAttribute("height"))
-                    {
-                        child.SetAttribute("style", $"height: {child.GetAttribute("height")}px;" + child.GetAttribute("style"));
-                        child.RemoveAttribute("height");
+                        if (child.HasAttribute(attr))
+                        {
+                            child.SetAttribute("style", $"{attr}: {child.GetAttribute(attr)}{(child.GetAttribute(attr).EndsWith('%') ? "" : "px")};" + child.GetAttribute("style"));
+                            child.RemoveAttribute(attr);
+                        }
                     }
                 }
                 if (table.HasAttribute("cellpadding"))
                 {
                     string paddingValue = new([.. table.GetAttribute("cellpadding").Where(c => char.IsDigit(c) || c == '%')]);
-                    if (PaddingRecord.ContainsKey(paddingValue))
-                    {
-                        PaddingRecord[paddingValue].Add(table);
-                    }
-                    else
-                    {
-                        PaddingRecord[paddingValue] = [table];
-                    }
+                    AddToDictionary(PaddingRecord,paddingValue,table);
                 }
                 if (table.HasAttribute("cellspacing"))
                 {
-                    string spacingValue = new([.. table.GetAttribute("cellpadding").Where(c => char.IsDigit(c) || c == '%')]);
-                    if (SpacingRecord.ContainsKey(spacingValue))
-                    {
-                        SpacingRecord[spacingValue].Add(table);
-                    }
-                    else
-                    {
-                        SpacingRecord[spacingValue] = [table];
-                    }
+                    string spacingValue = new([.. table.GetAttribute("cellspacing").Where(c => char.IsDigit(c) || c == '%')]);
+                    AddToDictionary(SpacingRecord, spacingValue, table);
                 }
             }
             // Generate CSS styles for each unique cellpadding and cellspacing value
@@ -435,7 +409,7 @@ namespace EpubSanitizerCore.Filters
             {
                 string style = $@".cellpadding{padding} td,
 .cellpadding{padding} th {{
-    padding: {padding}px;
+    padding: {padding}{(padding.EndsWith('%') ? "" : "px")};
 }}";
                 cssStyles.AppendLine(style);
                 // Apply the class to all tables with this cellpadding
@@ -448,7 +422,7 @@ namespace EpubSanitizerCore.Filters
             foreach (var spacing in SpacingRecord.Keys)
             {
                 string style = $@".cellspacing{spacing} {{
-    border-spacing: {spacing}px;
+    border-spacing: {spacing}{(spacing.EndsWith('%') ? "" : "px")};
     border-collapse: separate;
 }}";
                 cssStyles.AppendLine(style);
@@ -459,16 +433,7 @@ namespace EpubSanitizerCore.Filters
                     table.RemoveAttribute("cellspacing");
                 }
             }
-            if (cssStyles.Length == 0)
-            {
-                return;
-            }
-            // If there are any styles, add them to the head of the document
-            XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
-            XmlElement styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
-            styleElement.SetAttribute("type", "text/css");
-            styleElement.InnerText = cssStyles.ToString();
-            head.AppendChild(styleElement);
+            Utils.XmlUtil.AddCssToHead(doc,cssStyles);
         }
 
         /// <summary>
@@ -482,14 +447,7 @@ namespace EpubSanitizerCore.Filters
             {
                 if (table.HasAttribute("valign"))
                 {
-                    if (Record.ContainsKey(table.GetAttribute("valign")))
-                    {
-                        Record[table.GetAttribute("valign")].Add(table);
-                    }
-                    else
-                    {
-                        Record[table.GetAttribute("valign")] = [table];
-                    }
+                    AddToDictionary(Record, table.GetAttribute("valign"), table);
                 }
             }
             // Generate CSS styles for each unique cellpadding and cellspacing value
@@ -506,16 +464,7 @@ namespace EpubSanitizerCore.Filters
                     table.RemoveAttribute("valign");
                 }
             }
-            if (cssStyles.Length == 0)
-            {
-                return;
-            }
-            // If there are any styles, add them to the head of the document
-            XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
-            XmlElement styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
-            styleElement.SetAttribute("type", "text/css");
-            styleElement.InnerText = cssStyles.ToString();
-            head.AppendChild(styleElement);
+            Utils.XmlUtil.AddCssToHead(doc, cssStyles);
         }
 
         /// <summary>
@@ -538,14 +487,7 @@ namespace EpubSanitizerCore.Filters
                             table.RemoveAttribute("char");
                             continue;
                         }
-                        if (Record.ContainsKey(table.GetAttribute("align")))
-                        {
-                            Record[table.GetAttribute("align")].Add(table);
-                        }
-                        else
-                        {
-                            Record[table.GetAttribute("align")] = [table];
-                        }
+                        AddToDictionary(Record, table.GetAttribute("align"), table);
                     }
                 }
             }
@@ -563,16 +505,7 @@ namespace EpubSanitizerCore.Filters
                     table.RemoveAttribute("align");
                 }
             }
-            if (cssStyles.Length == 0)
-            {
-                return;
-            }
-            // If there are any styles, add them to the head of the document
-            XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
-            XmlElement styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
-            styleElement.SetAttribute("type", "text/css");
-            styleElement.InnerText = cssStyles.ToString();
-            head.AppendChild(styleElement);
+            Utils.XmlUtil.AddCssToHead(doc, cssStyles);
         }
 
         /// <summary>
