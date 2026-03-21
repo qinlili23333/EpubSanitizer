@@ -65,7 +65,7 @@ namespace EpubSanitizerCore.Filters
             FixHgroup(xhtmlDoc);
             EscapeUrl(xhtmlDoc, file);
             FixU201D(xhtmlDoc);
-            FixUL(xhtmlDoc);
+            FixListChild(xhtmlDoc);
             FixColgroupSpan(xhtmlDoc);
             FixHeadWithChild(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
@@ -131,29 +131,33 @@ namespace EpubSanitizerCore.Filters
         }
 
         /// <summary>
-        /// ul element only allow specified child elements, if find any invalid ones, wrap them with the li before
+        /// ul/ol element only allow specified child elements, if find any invalid ones, wrap them with the li before
         /// </summary>
         /// <param name="xhtmlDoc">xhtml document</param>
-        private static void FixUL(XmlDocument xhtmlDoc)
+        private static void FixListChild(XmlDocument xhtmlDoc)
         {
+            string[] tags = ["ul", "ol", "menu"];
             string[] ulTags = ["li", "script", "template"];
-            foreach (XmlElement ul in xhtmlDoc.GetElementsByTagName("ul").Cast<XmlElement>().ToArray())
+            foreach (string tag in tags)
             {
-                foreach (XmlNode child in ul.ChildNodes.Cast<XmlNode>().ToArray())
+                foreach (XmlElement list in xhtmlDoc.GetElementsByTagName(tag).Cast<XmlElement>().ToArray())
                 {
-                    if (child is XmlElement el && !ulTags.Contains(el.Name.ToLowerInvariant()))
+                    foreach (XmlNode child in list.ChildNodes.Cast<XmlNode>().ToArray())
                     {
-                        // Move to child of the existing li before
-                        if (child.PreviousSibling is XmlElement lastLi && lastLi.Name.Equals("li", StringComparison.InvariantCultureIgnoreCase))
+                        if (child is XmlElement el && !ulTags.Contains(el.Name.ToLowerInvariant()))
                         {
-                            lastLi.AppendChild(child);
-                        }
-                        else
-                        {
-                            // Create a new li to wrap the element
-                            XmlElement li = xhtmlDoc.CreateElement("li", xhtmlDoc.DocumentElement.NamespaceURI);
-                            ul.InsertBefore(li, child);
-                            li.AppendChild(child);
+                            // Move to child of the existing li before
+                            if (child.PreviousSibling is XmlElement lastLi && lastLi.Name.Equals("li", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                lastLi.AppendChild(child);
+                            }
+                            else
+                            {
+                                // Create a new li to wrap the element
+                                XmlElement li = xhtmlDoc.CreateElement("li", xhtmlDoc.DocumentElement.NamespaceURI);
+                                list.InsertBefore(li, child);
+                                li.AppendChild(child);
+                            }
                         }
                     }
                 }
