@@ -307,6 +307,10 @@ namespace EpubSanitizerCore.Filters
                 {
                     if (element.HasAttribute("href"))
                     {
+                        if (element.GetAttribute("href").StartsWith("//"))
+                        {
+                            element.SetAttribute("href", "https:" + element.GetAttribute("href"));
+                        }
                         if (element.GetAttribute("href").StartsWith("http"))
                         {
                             try
