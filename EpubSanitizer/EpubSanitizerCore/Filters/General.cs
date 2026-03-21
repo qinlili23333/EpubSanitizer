@@ -64,6 +64,7 @@ namespace EpubSanitizerCore.Filters
             EscapeUrl(xhtmlDoc, file);
             FixU201D(xhtmlDoc);
             FixUL(xhtmlDoc);
+            FixColgroupSpan(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -82,10 +83,25 @@ namespace EpubSanitizerCore.Filters
         }
 
         /// <summary>
+        /// Remove span attr when colgroup has col children
+        /// </summary>
+        /// <param name="xhtmlDoc">xhtml document</param>
+        private static void FixColgroupSpan(XmlDocument xhtmlDoc)
+        {
+            foreach (XmlElement colgroup in xhtmlDoc.GetElementsByTagName("colgroup").Cast<XmlElement>().ToArray())
+            {
+                if (colgroup.GetElementsByTagName("col").Count > 0)
+                {
+                    colgroup.RemoveAttribute("span");
+                }
+            }
+        }
+
+        /// <summary>
         /// ul element only allow specified child elements, if find any invalid ones, wrap them with the li before
         /// </summary>
-        /// <param name="xhtmlDoc"></param>
-        private void FixUL(XmlDocument xhtmlDoc)
+        /// <param name="xhtmlDoc">xhtml document</param>
+        private static void FixUL(XmlDocument xhtmlDoc)
         {
             string[] ulTags = ["li", "script", "template"];
             foreach (XmlElement ul in xhtmlDoc.GetElementsByTagName("ul").Cast<XmlElement>().ToArray())
