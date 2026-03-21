@@ -68,6 +68,7 @@ namespace EpubSanitizerCore.Filters
             FixListChild(xhtmlDoc);
             FixColgroupSpan(xhtmlDoc);
             FixHeadWithChild(xhtmlDoc);
+            FixTheadLocation(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -83,6 +84,34 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// thead must be direct child of table, if not, move it to correct location, try parent of parent if parent is not table, to avoid breaking existing style as much as possible
+        /// </summary>
+        /// <param name="xhtmlDoc">xhtml document</param>
+        private static void FixTheadLocation(XmlDocument xhtmlDoc)
+        {
+            foreach (XmlElement ele in xhtmlDoc.GetElementsByTagName("thead").Cast<XmlElement>().ToArray())
+            {
+                if (ele.ParentNode.LocalName != "table")
+                {
+                    // Try parent of parent ...
+                    XmlElement parent = ele.ParentNode.ParentNode as XmlElement;
+                    while (parent != null)
+                    {
+                        if(parent.LocalName == "table")
+                        {
+                            parent.PrependChild(ele);
+                            break;
+                        }
+                        else
+                        {
+                            parent = parent.ParentNode as XmlElement;
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
