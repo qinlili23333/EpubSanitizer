@@ -43,7 +43,7 @@ namespace EpubSanitizerCore.FS
         /// <summary>
         /// Dictionary to store cached XmlDocument, key is the relative path in epub
         /// </summary>
-        private ConcurrentDictionary<string, XmlDocument> XmlCache = [];
+        protected ConcurrentDictionary<string, XmlDocument> XmlCache = [];
 
         /// <summary>
         /// Get XmlDocument from path, will use cache if enabled
@@ -125,7 +125,7 @@ namespace EpubSanitizerCore.FS
         /// <param name="path">relative path</param>
         internal void FlushXmlCache(string path)
         {
-            XmlCache.Remove(path, out _);
+            XmlCache.TryRemove(path, out _);
         }
 
 

@@ -79,6 +79,7 @@ namespace EpubSanitizerCore.FS
         public override void DeleteFile(string path)
         {
             Files.TryRemove(path, out _);
+            XmlCache.TryRemove(path, out _);
         }
 
         /// <inheritdoc/>
