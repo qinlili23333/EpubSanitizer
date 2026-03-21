@@ -296,6 +296,18 @@ namespace EpubSanitizerCore.Filters
                         {
                             Instance.Logger($"Remove URL not exist: {element.GetAttribute("href")}");
                             element.RemoveAttribute("href");
+                            if(element.Name == "a")
+                            {
+                                string[] toremove = ["download", "target", "rel", "type"];
+                                foreach (string attr in toremove)
+                                {
+                                    element.RemoveAttribute(attr);
+                                }
+                                // a element must have href, use span instead
+                                XmlElement span = doc.CreateElement("span", doc.DocumentElement.NamespaceURI);
+                                Utils.XmlUtil.CopyTo(element, span);
+                                element.ParentNode.ReplaceChild(span, element);
+                            }
                         }
                     }
                 }
