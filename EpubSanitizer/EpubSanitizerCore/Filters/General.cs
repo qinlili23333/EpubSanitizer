@@ -17,6 +17,8 @@ namespace EpubSanitizerCore.Filters
             ConfigManager.AddDefaultConfig(ConfigList);
         }
 
+        static readonly string[] HeadItems = ["h1", "h2", "h3", "h4", "h5", "h6"];
+
         /// <summary>
         /// General filter only processes XHTML files.
         /// </summary>
@@ -65,6 +67,7 @@ namespace EpubSanitizerCore.Filters
             FixU201D(xhtmlDoc);
             FixUL(xhtmlDoc);
             FixColgroupSpan(xhtmlDoc);
+            FixHeadWithChild(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -80,6 +83,36 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Move block element in title to after title
+        /// </summary>
+        /// <param name="xhtmlDoc">xhtml document</param>
+        private static void FixHeadWithChild(XmlDocument xhtmlDoc)
+        {
+            foreach (string type in HeadItems)
+            {
+                foreach (XmlElement ele in xhtmlDoc.GetElementsByTagName(type).Cast<XmlElement>().ToArray())
+                {
+                    foreach (XmlNode child in ele.ChildNodes.Cast<XmlNode>().ToArray())
+                    {
+                        if (child is XmlElement childEle)
+                        {
+                            bool hasBlock = Utils.XmlUtil.IsInline(childEle.LocalName);
+                            foreach (XmlElement subChild in childEle.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+                            {
+                                hasBlock = hasBlock || !Utils.XmlUtil.IsInline(subChild.LocalName);
+                                if (hasBlock)
+                                {
+                                    ele.ParentNode.InsertAfter(childEle, ele);
+                                    break;
+                                }
+                             }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -388,10 +421,9 @@ namespace EpubSanitizerCore.Filters
         /// <param name="doc">XHTML document object</param>
         private static void FixBlockquote(XmlDocument doc)
         {
-            string[] disallowParents = ["h1", "h2", "h3", "h4", "h5", "h6"];
             foreach (XmlElement element in doc.GetElementsByTagName("blockquote").Cast<XmlElement>().ToArray())
             {
-                if (disallowParents.Contains((element.ParentNode as XmlElement).Name.ToLowerInvariant()))
+                if (HeadItems.Contains((element.ParentNode as XmlElement).Name.ToLowerInvariant()))
                 {
                     // replace with q element
                     XmlElement q = doc.CreateElement("q", doc.DocumentElement.NamespaceURI);

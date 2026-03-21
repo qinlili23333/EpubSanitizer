@@ -190,7 +190,7 @@ namespace EpubSanitizerCore.Utils
         [
             "a", "abbr", "b", "bdi", "bdo", "br", "button", "cite", "code", "data", "datalist", "dfn", "em", "i", "iframe",
             "img", "input", "kbd", "label", "link", "map", "mark", "meter", "output", "progress", "q", "s", "samp", "script",
-            "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr"
+            "select", "slot", "small", "span", "strong", "sub", "sup", "template", "textarea", "time", "u", "var", "video", "wbr", "pre"
         ];
 
         /// <summary>
