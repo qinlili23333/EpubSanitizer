@@ -174,6 +174,14 @@ namespace EpubSanitizerCore.Filters
                     {
                         element.RemoveAttributeNode(attr);
                     }
+                    if (attr.Name == "start" && element.LocalName != "ol")
+                    {
+                        element.RemoveAttributeNode(attr);
+                    }
+                    if (attr.Name == "colspan" && ((element.LocalName != "td" && element.LocalName != "th") || !int.TryParse(attr.Value, out _)))
+                    {
+                        element.RemoveAttributeNode(attr);
+                    }
                 }
             }
         }
