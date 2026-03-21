@@ -160,8 +160,24 @@ namespace EpubSanitizerCore.Filters
             ProcessValignAttributes(xhtmlDoc);
             ProcessImgSpaceAttributes(xhtmlDoc);
             ProcessTableCellAttributes(xhtmlDoc);
+            ConvertTt(xhtmlDoc);
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Use code element to replace deprecated tt element
+        /// </summary>
+        /// <param name="xhtmlDoc">xhtml document</param>
+        private static void ConvertTt(XmlDocument xhtmlDoc)
+        {
+            foreach (XmlElement tt in xhtmlDoc.GetElementsByTagName("tt").Cast<XmlElement>().ToArray())
+            {
+                // Convert to code element
+                XmlElement code = xhtmlDoc.CreateElement("code", xhtmlDoc.DocumentElement.NamespaceURI);
+                Utils.XmlUtil.CopyTo(tt, code);
+                tt.ParentNode.ReplaceChild(code, tt);
+            }
         }
 
 
