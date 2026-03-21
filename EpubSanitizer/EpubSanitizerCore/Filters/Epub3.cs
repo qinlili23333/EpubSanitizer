@@ -155,6 +155,7 @@ namespace EpubSanitizerCore.Filters
             CheckTitle(xhtmlDoc, file);
             CheckScripted(xhtmlDoc, file);
             CheckSvg(xhtmlDoc, file);
+            CheckMathml(xhtmlDoc, file);
             ProcessDeprecatedRoleAttributes(xhtmlDoc);
             ProcessAlignAttributes(xhtmlDoc);
             ProcessValignAttributes(xhtmlDoc);
@@ -297,6 +298,29 @@ namespace EpubSanitizerCore.Filters
             }
         }
 
+        /// <summary>
+        /// Check if there is any mathml element in xhtml file, if yes, ensure mathml in properties in OPF manifest
+        /// </summary>
+        /// <param name="doc">XmlDocument object</param>
+        /// <param name="file">file path</param>
+        private void CheckMathml(XmlDocument doc, string file)
+        {
+            OpfFile item = Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, file);
+            if (doc.GetElementsByTagName("math").Count > 0 || doc.GetElementsByTagName("math", "http://www.w3.org/1998/Math/MathML").Count > 0)
+            {
+                if (item != null && !item.properties.Contains("mathml"))
+                {
+                    item.properties = [.. item.properties, "mathml"];
+                }
+            }
+            else
+            {
+                if (item != null && item.properties.Contains("mathml"))
+                {
+                    item.properties = [.. item.properties.Where(p => p != "mathml")];
+                }
+            }
+        }
         /// <summary>
         /// Check title element in xhtml file, if not present, add one based on ncx or first text node
         /// </summary>
