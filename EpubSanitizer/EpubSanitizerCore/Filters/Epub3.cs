@@ -158,9 +158,83 @@ namespace EpubSanitizerCore.Filters
             ProcessDeprecatedRoleAttributes(xhtmlDoc);
             ProcessAlignAttributes(xhtmlDoc);
             ProcessValignAttributes(xhtmlDoc);
+            ProcessImgSpaceAttributes(xhtmlDoc);
             ProcessTableCellAttributes(xhtmlDoc);
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// Remove vspace and hspace attributes from img elements and convert them to CSS styles to comply with Epub 3 standards.
+        /// </summary>
+        /// <param name="doc">XmlDocument object</param>
+        private static void ProcessImgSpaceAttributes(XmlDocument doc)
+        {
+            Dictionary<string, List<XmlElement>> RecordV = [];
+            Dictionary<string, List<XmlElement>> RecordH = [];
+            foreach (XmlElement img in doc.GetElementsByTagName("img").Cast<XmlElement>().ToArray())
+            {
+                if (img.HasAttribute("vspace"))
+                {
+                    if (RecordV.ContainsKey(img.GetAttribute("vspace")))
+                    {
+                        RecordV[img.GetAttribute("vspace")].Add(img);
+                    }
+                    else
+                    {
+                        RecordV[img.GetAttribute("vspace")] = [img];
+                    }
+                }
+                if (img.HasAttribute("hspace"))
+                {
+                    if (RecordH.ContainsKey(img.GetAttribute("hspace")))
+                    {
+                        RecordH[img.GetAttribute("hspace")].Add(img);
+                    }
+                    else
+                    {
+                        RecordH[img.GetAttribute("hspace")] = [img];
+                    }
+                }
+            }
+            // Generate CSS styles for each unique vspace value
+            StringBuilder cssStyles = new();
+            foreach (var value in RecordV.Keys)
+            {
+                string style = $@".vspace-{value}{{
+    margin-top: {value}px;
+    margin-bottom: {value}px;
+}}";
+                cssStyles.AppendLine(style);
+                foreach (var table in RecordV[value])
+                {
+                    XmlUtil.AddCssClass(table, $"vspace-{value}");
+                    table.RemoveAttribute("vspace");
+                }
+            }
+            foreach (var value in RecordH.Keys)
+            {
+                string style = $@".hspace-{value}{{
+    margin-left: {value}px;
+    margin-right: {value}px;
+}}";
+                cssStyles.AppendLine(style);
+                foreach (var table in RecordH[value])
+                {
+                    XmlUtil.AddCssClass(table, $"hspace-{value}");
+                    table.RemoveAttribute("hspace");
+                }
+            }
+            if (cssStyles.Length == 0)
+            {
+                return;
+            }
+            // If there are any styles, add them to the head of the document
+            XmlElement head = doc.GetElementsByTagName("head")[0] as XmlElement;
+            XmlElement styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
+            styleElement.SetAttribute("type", "text/css");
+            styleElement.InnerText = cssStyles.ToString();
+            head.AppendChild(styleElement);
         }
 
         /// <summary>
