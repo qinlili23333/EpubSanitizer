@@ -225,8 +225,9 @@ namespace EpubSanitizerCore.Filters
                                 Instance.Logger($"Invalid URI format in href attribute has been removed: {element.GetAttribute("href")}");
                                 element.RemoveAttribute("href");
                             }
+                            continue;
                         }
-                        if (!element.GetAttribute("href").StartsWith("data") && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href"))))
+                        if (!element.GetAttribute("href").StartsWith("data") && !element.GetAttribute("href").StartsWith("mailto:") && !element.GetAttribute("href").StartsWith('#') && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href")).Split('#')[0]))
                         {
                             Instance.Logger($"Remove URL not exist: {element.GetAttribute("href")}");
                             element.RemoveAttribute("href");
