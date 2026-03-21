@@ -367,6 +367,7 @@ namespace EpubSanitizerCore.Filters
             // Find all table elements with cellpadding or cellspacing attributes and classify by their values
             Dictionary<string, List<XmlElement>> PaddingRecord = [];
             Dictionary<string, List<XmlElement>> SpacingRecord = [];
+            StringBuilder cssStyles = new();
             foreach (XmlElement table in doc.GetElementsByTagName("table").Cast<XmlElement>().ToArray())
             {
                 if (table.HasAttribute("border"))
@@ -379,6 +380,43 @@ namespace EpubSanitizerCore.Filters
                     {
                         table.SetAttribute("border", borderValue > 0 ? "1" : "");
                     }
+                }
+                if (table.HasAttribute("frame"))
+                {
+                    string frame = table.GetAttribute("frame").ToLower();
+                    table.RemoveAttribute("frame");
+                    string borderStyle = frame switch
+                    {
+                        "void" => "border: none;",
+                        "above" => "border-top: 1px solid black;",
+                        "below" => "border-bottom: 1px solid black;",
+                        "hsides" => "border-top: 1px solid black; border-bottom: 1px solid black;",
+                        "vsides" => "border-left: 1px solid black; border-right: 1px solid black;",
+                        "lhs" => "border-left: 1px solid black;",
+                        "rhs" => "border-right: 1px solid black;",
+                        "box" or "border" => "border: 1px solid black;",
+                        _ => ""
+                    };
+                    if (table.GetAttribute("border") != "0")
+                    {
+                        table.SetAttribute("style", $"{borderStyle}{table.GetAttribute("style")}");
+                    }
+                }
+                if (table.HasAttribute("rules"))
+                {
+                    string rules = table.GetAttribute("rules").ToLower();
+                    table.RemoveAttribute("rules");
+                    if (cssStyles.Length == 0)
+                    {
+                        cssStyles.AppendLine(@"[class*=""table-rules-""] {
+    border-collapse: collapse;
+}
+.table-rules-all th, .table-rules-all td { border: 1px solid black; }
+.table-rules-rows th, .table-rules-rows td { border-top: 1px solid black; border-bottom: 1px solid black; }
+.table-rules-cols th, .table-rules-cols td { border-left: 1px solid black; border-right: 1px solid black; }
+.table-rules-none th, .table-rules-none td { border: none; }");
+                    }
+                    XmlUtil.AddCssClass(table, $"table-rules-{rules}");
                 }
                 foreach (XmlElement child in table.GetElementsByTagName("*").Cast<XmlElement>().ToArray().Append(table))
                 {
@@ -404,7 +442,6 @@ namespace EpubSanitizerCore.Filters
                 }
             }
             // Generate CSS styles for each unique cellpadding and cellspacing value
-            StringBuilder cssStyles = new();
             foreach (var padding in PaddingRecord.Keys)
             {
                 string style = $@".cellpadding{padding} td,
