@@ -391,6 +391,19 @@ namespace EpubSanitizerCore.Filters
                         table.RemoveAttribute("border");
                     }
                 }
+                foreach (XmlElement child in table.GetElementsByTagName("*").Cast<XmlElement>().ToArray().Append(table))
+                {
+                    if (child.HasAttribute("width"))
+                    {
+                        child.SetAttribute("style", $"width: {child.GetAttribute("width")}px;" + child.GetAttribute("style"));
+                        child.RemoveAttribute("width");
+                    }
+                    if (child.HasAttribute("height"))
+                    {
+                        child.SetAttribute("style", $"height: {child.GetAttribute("height")}px;" + child.GetAttribute("style"));
+                        child.RemoveAttribute("height");
+                    }
+                }
                 if (table.HasAttribute("cellpadding"))
                 {
                     string paddingValue = new([.. table.GetAttribute("cellpadding").Where(c => char.IsDigit(c) || c == '%')]);
