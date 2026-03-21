@@ -99,6 +99,10 @@ namespace EpubSanitizerCore.Filters
                     {
                         if (child is XmlElement childEle)
                         {
+                            if (childEle.NamespaceURI != xhtmlDoc.DocumentElement.NamespaceURI)
+                            {
+                                continue;
+                            }
                             bool hasBlock = Utils.XmlUtil.IsInline(childEle.LocalName);
                             foreach (XmlElement subChild in childEle.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
                             {
@@ -606,12 +610,20 @@ namespace EpubSanitizerCore.Filters
         {
             foreach (XmlElement element in doc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
             {
+                if (element.NamespaceURI != doc.DocumentElement.NamespaceURI)
+                {
+                    continue;
+                }
                 // p is a special case of block element cannot allow block element inside
                 if (element.Prefix == string.Empty && (element.LocalName == "p" || XmlUtil.IsInline(element.LocalName)))
                 {
                     bool containsBlock = false;
                     foreach (XmlElement child in element.GetElementsByTagName("*"))
                     {
+                        if(child.NamespaceURI != doc.DocumentElement.NamespaceURI)
+                        {
+                            continue;
+                        }
                         if (child.Prefix == string.Empty && !XmlUtil.IsInline(child.LocalName))
                         {
                             containsBlock = true;
