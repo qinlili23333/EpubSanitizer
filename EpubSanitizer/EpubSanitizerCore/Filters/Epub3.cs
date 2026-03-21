@@ -397,10 +397,7 @@ namespace EpubSanitizerCore.Filters
                         "box" or "border" => "border: 1px solid black;",
                         _ => ""
                     };
-                    if (table.GetAttribute("border") != "0")
-                    {
-                        table.SetAttribute("style", $"{borderStyle}{table.GetAttribute("style")}");
-                    }
+                    table.SetAttribute("style", $"{borderStyle}{table.GetAttribute("style")}");
                 }
                 if (table.HasAttribute("rules"))
                 {
