@@ -17,6 +17,17 @@ namespace EpubSanitizerCore.Filters
                 Instance.FileStorage.DeleteFile("META-INF/calibre_bookmarks.txt");
             }
             RemoveThumbsDB();
+            RemoveProQuestWatermark();
+        }
+
+        private void RemoveProQuestWatermark()
+        {
+            if (Instance.FileStorage.FileExists("text.xhtml") && Instance.FileStorage.ReadString("text.xhtml").Contains("Watermark Page") && Instance.FileStorage.ReadString("text.xhtml").Contains("ProQuest Ebook Central"))
+            {
+                Instance.Logger("Found ProQuest watermark file, removing it.");
+                Instance.FileStorage.DeleteFile("text.xhtml");
+                Instance.Indexer.DeleteFileRecord("text.xhtml");
+            }
         }
 
         /// <summary>
