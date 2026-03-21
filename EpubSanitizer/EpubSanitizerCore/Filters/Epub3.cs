@@ -566,7 +566,7 @@ namespace EpubSanitizerCore.Filters
         {
             foreach (var file in Instance.Indexer.ManifestFiles)
             {
-                if (file.mimetype == "application/xhtml+xml" && file.originElement.GetAttribute("properties").Split(' ').Contains("nav"))
+                if (file.mimetype == "application/xhtml+xml" && file.originElement != null && file.originElement.GetAttribute("properties").Split(' ').Contains("nav"))
                 {
                     if (Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0]?.Attributes?["page-map"] != null)
                     {
