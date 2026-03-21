@@ -395,7 +395,7 @@ namespace EpubSanitizerCore.Filters
                 if (table.HasAttribute("cellpadding"))
                 {
                     string paddingValue = new([.. table.GetAttribute("cellpadding").Where(c => char.IsDigit(c) || c == '%')]);
-                    AddToDictionary(PaddingRecord,paddingValue,table);
+                    AddToDictionary(PaddingRecord, paddingValue, table);
                 }
                 if (table.HasAttribute("cellspacing"))
                 {
@@ -433,7 +433,7 @@ namespace EpubSanitizerCore.Filters
                     table.RemoveAttribute("cellspacing");
                 }
             }
-            Utils.XmlUtil.AddCssToHead(doc,cssStyles);
+            Utils.XmlUtil.AddCssToHead(doc, cssStyles);
         }
 
         /// <summary>

@@ -280,7 +280,7 @@ namespace EpubSanitizerCore.Utils
         /// <param name="cssStyles">StringBuilder with css strings</param>
         internal static void AddCssToHead(XmlDocument doc, StringBuilder cssStyles)
         {
-            if(cssStyles.Length == 0)
+            if (cssStyles.Length == 0)
             {
                 return;
             }
@@ -290,6 +290,15 @@ namespace EpubSanitizerCore.Utils
             if (head.GetElementsByTagName("style").Count > 0)
             {
                 XmlElement styleElement = head.GetElementsByTagName("style")[0] as XmlElement;
+                if (styleElement.HasAttribute("media"))
+                {
+                    // If the existing style element has media attribute, we should not reuse it, otherwise it may cause unexpected issue
+                    styleElement = doc.CreateElement("style", "http://www.w3.org/1999/xhtml");
+                    styleElement.SetAttribute("type", "text/css");
+                    styleElement.InnerText = cssStyles.ToString();
+                    head.AppendChild(styleElement);
+                    return;
+                }
                 styleElement.InnerText += cssStyles.ToString();
             }
             else
