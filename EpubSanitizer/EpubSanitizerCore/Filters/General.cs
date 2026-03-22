@@ -395,10 +395,9 @@ namespace EpubSanitizerCore.Filters
                             }
                             goto checkhref;
                         }
-                        if (element.HasAttribute("href") && !element.GetAttribute("href").StartsWith("data") && !element.GetAttribute("href").StartsWith("mailto:") && !element.GetAttribute("href").StartsWith('#') && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href")).Split('#')[0]))
+                        if (element.HasAttribute("href") && !element.GetAttribute("href").StartsWith("data") && !element.GetAttribute("href").StartsWith('#') && !element.GetAttribute("href").StartsWith("mailto:") && !element.GetAttribute("href").StartsWith('#') && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href")).Split('#')[0]))
                         {
                             Instance.Logger($"Remove URL not exist: {element.GetAttribute("href")}");
-                            Instance.Logger(element.OuterXml);
                             element.RemoveAttribute("href");
                         }
                     checkhref:
@@ -884,7 +883,7 @@ namespace EpubSanitizerCore.Filters
                     foreach (XmlElement element in (xhtmlDoc.GetElementsByTagName("body")[0] as XmlElement).GetElementsByTagName("a"))
                     {
                         string link = element.GetAttribute("href");
-                        if (link.Contains('#'))
+                        if (link.Contains('#') && !link.StartsWith('#'))
                         {
                             string[] parts = link.Split('#');
                             if (parts.Length == 2 && parts[1] != string.Empty && (!IDList.TryGetValue(PathUtil.ComposeFromRelativePath(file, parts[0]), out ConcurrentBag<string>? value) || !value.Contains(parts[1])))
