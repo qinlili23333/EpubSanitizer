@@ -100,7 +100,7 @@ namespace EpubSanitizerCore.Filters
                     XmlElement parent = ele.ParentNode.ParentNode as XmlElement;
                     while (parent != null)
                     {
-                        if(parent.LocalName == "table")
+                        if (parent.LocalName == "table")
                         {
                             parent.PrependChild(ele);
                             break;
@@ -141,7 +141,7 @@ namespace EpubSanitizerCore.Filters
                                     ele.ParentNode.InsertAfter(childEle, ele);
                                     break;
                                 }
-                             }
+                            }
                         }
                     }
                 }
@@ -305,6 +305,14 @@ namespace EpubSanitizerCore.Filters
             {
                 foreach (XmlElement element in doc.GetElementsByTagName(tag).Cast<XmlElement>().ToArray())
                 {
+                    if (element.HasAttribute("referrer"))
+                    {
+                        if (((string[])["no-referrer", "no-referrer-when-downgrade", "origin", "origin-when-cross-origin", "same-origin", "strict-origin", "strict-origin-when-cross-origin", "unsafe-url"]).Contains(element.GetAttribute("referrer")))
+                        {
+                            element.SetAttribute("referrerpolicy", element.GetAttribute("referrer"));
+                        }
+                        element.RemoveAttribute("referrer");
+                    }
                     if (element.HasAttribute("href"))
                     {
                         if (element.GetAttribute("href").StartsWith("//"))
@@ -329,7 +337,7 @@ namespace EpubSanitizerCore.Filters
                         {
                             Instance.Logger($"Remove URL not exist: {element.GetAttribute("href")}");
                             element.RemoveAttribute("href");
-                            if(element.Name == "a")
+                            if (element.Name == "a")
                             {
                                 string[] toremove = ["download", "target", "rel", "type"];
                                 foreach (string attr in toremove)
@@ -665,7 +673,7 @@ namespace EpubSanitizerCore.Filters
                     bool containsBlock = false;
                     foreach (XmlElement child in element.GetElementsByTagName("*"))
                     {
-                        if(child.NamespaceURI != doc.DocumentElement.NamespaceURI)
+                        if (child.NamespaceURI != doc.DocumentElement.NamespaceURI)
                         {
                             continue;
                         }

@@ -224,7 +224,7 @@ namespace EpubSanitizerCore
                 Instance.Logger($"Lack file id: {file.OuterXml}, use hash as id.");
                 fileinfo.id = Instance.FileStorage.GetSHA256(fileinfo.path);
             }
-            if ((Instance.Config.GetBool("correctMime") && fileinfo.mimetype != "application/xhtml+xml") && fileinfo.path.Split("/").Last().Contains('.') || fileinfo.mimetype == string.Empty)
+            if ((Instance.Config.GetBool("correctMime") && fileinfo.mimetype != "application/xhtml+xml" && fileinfo.path.Split("/").Last().Contains('.')) || fileinfo.mimetype == string.Empty)
             {
                 fileinfo.mimetype = MimeTypesMap.GetMimeType(fileinfo.path);
             }
