@@ -1,7 +1,6 @@
 ﻿using EpubSanitizerCore.Utils;
 using HeyRed.Mime;
 using System.Collections.Concurrent;
-using System.ComponentModel;
 using System.Xml;
 
 namespace EpubSanitizerCore.Filters
@@ -71,6 +70,7 @@ namespace EpubSanitizerCore.Filters
             FixColgroupSpan(xhtmlDoc);
             FixHeadWithChild(xhtmlDoc);
             FixTheadLocation(xhtmlDoc);
+            SplitTable(xhtmlDoc);
             if (Instance.Config.GetBool("correctMime"))
             {
                 FixSourceMime(xhtmlDoc);
@@ -88,6 +88,42 @@ namespace EpubSanitizerCore.Filters
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
         }
 
+        /// <summary>
+        /// One table only can have one thead element and must be first, split if required
+        /// </summary>
+        /// <param name="xhtmlDoc">xhtml document</param>
+        private static void SplitTable(XmlDocument xhtmlDoc)
+        {
+            int i = 1;
+            foreach (XmlElement table in xhtmlDoc.GetElementsByTagName("table").Cast<XmlElement>().ToArray())
+            {
+                while (table.GetElementsByTagName("thead").Count > 1)
+                {
+                    // split to multiple tables with one thead each
+                    XmlElement parent = table.ParentNode as XmlElement;
+                    XmlElement newTable = xhtmlDoc.CreateElement("table", "http://www.w3.org/1999/xhtml");
+                    foreach (XmlAttribute attr in table.Attributes)
+                    {
+                        if (attr.LocalName == "id")
+                        {
+                            // Generate new id for the new table
+                            newTable.SetAttribute("id", attr.Value + "-split-" + i.ToString());
+                            i++;
+                        }
+                        else
+                        {
+                            newTable.SetAttribute(attr.Name, attr.Value);
+                        }
+                    }
+                    do
+                    {
+                        newTable.PrependChild(table.LastChild);
+                    } while (table.HasChildNodes && newTable.FirstChild.LocalName != "thead");
+                    parent.InsertAfter(newTable, table);
+                }
+            }
+        }
+
 
         /// <summary>
         /// Remove empty ids
@@ -99,12 +135,12 @@ namespace EpubSanitizerCore.Filters
             {
                 if (ele.HasAttribute("id"))
                 {
-                    if(ele.GetAttribute("id") == string.Empty)
+                    if (ele.GetAttribute("id") == string.Empty)
                     {
                         ele.RemoveAttribute("id");
                         continue;
                     }
-                    if(ele.GetAttribute("id").Contains(' '))
+                    if (ele.GetAttribute("id").Contains(' '))
                     {
                         ele.SetAttribute("id", ele.GetAttribute("id").Replace(' ', '_'));
                     }
@@ -359,12 +395,13 @@ namespace EpubSanitizerCore.Filters
                             }
                             goto checkhref;
                         }
-                        if (!element.GetAttribute("href").StartsWith("data") && !element.GetAttribute("href").StartsWith("mailto:") && !element.GetAttribute("href").StartsWith('#') && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href")).Split('#')[0]))
+                        if (element.HasAttribute("href") && !element.GetAttribute("href").StartsWith("data") && !element.GetAttribute("href").StartsWith("mailto:") && !element.GetAttribute("href").StartsWith('#') && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href")).Split('#')[0]))
                         {
                             Instance.Logger($"Remove URL not exist: {element.GetAttribute("href")}");
+                            Instance.Logger(element.OuterXml);
                             element.RemoveAttribute("href");
                         }
-                        checkhref:
+                    checkhref:
                         if (element.Name == "a" && !element.HasAttribute("href"))
                         {
                             string[] toremove = ["download", "target", "rel", "type", "referrerpolicy"];
