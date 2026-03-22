@@ -374,6 +374,7 @@ namespace EpubSanitizerCore
                     {
                         guideNode.ParentNode.RemoveChild(guideNode);
                     }
+                    SanitizeGuide(guideNode as XmlElement);
                 }
             }
             // Save the updated OPF document back to the file system
@@ -383,6 +384,24 @@ namespace EpubSanitizerCore
                 //Write updated NCX file back to Epub.
                 Instance.Logger("Updating NCX file...");
                 Instance.FileStorage.WriteXml(NcxPath, NcxDoc);
+            }
+        }
+
+        /// <summary>
+        /// Remove unsupported items
+        /// </summary>
+        /// <param name="guideNode">XmlElement object of guide node</param>
+        private void SanitizeGuide(XmlElement guideNode)
+        {
+            foreach (XmlElement element in guideNode.ChildNodes.Cast<XmlElement>().ToArray())
+            {
+                string type = element.GetAttribute("type");
+                string[] allowedTypes = ["cover", "title-page", "toc", "index", "glossary", "acknowledgements", "bibliography", "colophon", "copyright-page", "dedication", "epigraph", "foreword", "loi", "lot", "notes", "preface", "text"];
+                if (!allowedTypes.Contains(type))
+                {
+                    Instance.Logger($"Unsupported guide type '{type}' found, removing it.");
+                    guideNode.RemoveChild(element);
+                }
             }
         }
 
