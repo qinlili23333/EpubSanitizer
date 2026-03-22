@@ -320,6 +320,15 @@ namespace EpubSanitizerCore.Filters
                     item.properties = [.. item.properties.Where(p => p != "mathml")];
                 }
             }
+            foreach (XmlElement math in doc.GetElementsByTagName("math").Cast<XmlElement>().ToArray())
+            {
+                if (math.GetAttribute("xmlns") != "http://www.w3.org/1998/Math/MathML" && math.NamespaceURI != "http://www.w3.org/1998/Math/MathML")
+                {
+                    XmlElement mathElement = doc.CreateElement(math.LocalName, "http://www.w3.org/1998/Math/MathML");
+                    Utils.XmlUtil.CopyToWithNewNamespace(math, mathElement, "m", "http://www.w3.org/1998/Math/MathML");
+                    math.ParentNode.ReplaceChild(mathElement, math);
+                }
+            }
         }
         /// <summary>
         /// Check title element in xhtml file, if not present, add one based on ncx or first text node

@@ -221,6 +221,35 @@ namespace EpubSanitizerCore.Utils
         }
 
         /// <summary>
+        /// Copy all attributes and child nodes from source XmlElement to target XmlElement, two elements must belong to the same XmlDocument.
+        /// </summary>
+        /// <param name="source">source element</param>
+        /// <param name="target">target element</param>
+        /// <param name="prefix">target prefix<
+        /// <param name="namespaceURI">target namespace URI</param>
+        internal static void CopyToWithNewNamespace(XmlElement source, XmlElement target, string prefix, string namespaceURI)
+        {
+            foreach (XmlAttribute attr in source.Attributes)
+            {
+                target.SetAttribute(attr.LocalName, attr.NamespaceURI, attr.Value);
+            }
+            foreach (XmlNode child in source.ChildNodes.Cast<XmlNode>().ToArray())
+            {
+                if (child is XmlElement childElement)
+                {
+                    XmlElement newChild = target.OwnerDocument.CreateElement(prefix, childElement.LocalName, namespaceURI);
+                    CopyToWithNewNamespace(childElement, newChild, prefix, namespaceURI);
+                    target.AppendChild(newChild);
+                }
+                else
+                {
+                    target.AppendChild(child);
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Copy all attributes and child nodes from source XmlElement to target XmlElement, two elements can belong to different XmlDocument, but slower than CopyTo.
         /// </summary>
         /// <param name="source">source element</param>
