@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\EpubSanitizerCore\EpubSanitizerCore.csproj" />
     <ProjectReference Include="..\Plugins\CssPlugin\CssPlugin.csproj" />
+    <ProjectReference Include="..\Plugins\XhtmlFixPlugin\XhtmlFixPlugin.csproj" />
   </ItemGroup>
 
   <ItemGroup>
