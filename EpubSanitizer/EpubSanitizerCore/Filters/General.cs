@@ -1,6 +1,7 @@
 ﻿using EpubSanitizerCore.Utils;
 using HeyRed.Mime;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.Xml;
 
 namespace EpubSanitizerCore.Filters
@@ -356,24 +357,25 @@ namespace EpubSanitizerCore.Filters
                                 Instance.Logger($"Invalid URI format in href attribute has been removed: {element.GetAttribute("href")}");
                                 element.RemoveAttribute("href");
                             }
-                            continue;
+                            goto checkhref;
                         }
                         if (!element.GetAttribute("href").StartsWith("data") && !element.GetAttribute("href").StartsWith("mailto:") && !element.GetAttribute("href").StartsWith('#') && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href")).Split('#')[0]))
                         {
                             Instance.Logger($"Remove URL not exist: {element.GetAttribute("href")}");
                             element.RemoveAttribute("href");
-                            if (element.Name == "a")
+                        }
+                        checkhref:
+                        if (element.Name == "a" && !element.HasAttribute("href"))
+                        {
+                            string[] toremove = ["download", "target", "rel", "type", "referrerpolicy"];
+                            foreach (string attr in toremove)
                             {
-                                string[] toremove = ["download", "target", "rel", "type"];
-                                foreach (string attr in toremove)
-                                {
-                                    element.RemoveAttribute(attr);
-                                }
-                                // a element must have href, use span instead
-                                XmlElement span = doc.CreateElement("span", doc.DocumentElement.NamespaceURI);
-                                Utils.XmlUtil.CopyTo(element, span);
-                                element.ParentNode.ReplaceChild(span, element);
+                                element.RemoveAttribute(attr);
                             }
+                            // a element must have href, use span instead
+                            XmlElement span = doc.CreateElement("span", doc.DocumentElement.NamespaceURI);
+                            Utils.XmlUtil.CopyTo(element, span);
+                            element.ParentNode.ReplaceChild(span, element);
                         }
                     }
                 }
