@@ -18,6 +18,19 @@ namespace EpubSanitizerCore.Filters
             }
             RemoveThumbsDB();
             RemoveProQuestWatermark();
+            RemoveHyreadWatermark();
+        }
+
+        private void RemoveHyreadWatermark()
+        {
+            foreach (XmlElement ele in Instance.Indexer.OpfDoc.GetElementsByTagName("meta").Cast<XmlElement>().ToArray())
+            {
+                if (ele.GetAttribute("property") == "hdf")
+                {
+                    Instance.Logger("Found Hyread watermark meta tag, removing it.");
+                    ele.ParentNode.RemoveChild(ele);
+                }
+            }
         }
 
         private void RemoveProQuestWatermark()
