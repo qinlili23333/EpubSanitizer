@@ -47,6 +47,7 @@ namespace EpubSanitizerCore.Filters
                 Instance.Logger($"Error loading XHTML file {file}, skipping...");
                 return;
             }
+            SanitizeID(xhtmlDoc);
             RemoveInvalidNamespace(xhtmlDoc);
             RemoveInvalidAttribute(xhtmlDoc);
             CheckNonLinearContent(xhtmlDoc, file);
@@ -84,6 +85,30 @@ namespace EpubSanitizerCore.Filters
             }
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+
+        /// <summary>
+        /// Remove empty ids
+        /// </summary>
+        /// <param name="xhtmlDoc">xhtml document</param>
+        private static void SanitizeID(XmlDocument xhtmlDoc)
+        {
+            foreach (XmlElement ele in xhtmlDoc.GetElementsByTagName("*").Cast<XmlElement>().ToArray())
+            {
+                if (ele.HasAttribute("id"))
+                {
+                    if(ele.GetAttribute("id") == string.Empty)
+                    {
+                        ele.RemoveAttribute("id");
+                        continue;
+                    }
+                    if(ele.GetAttribute("id").Contains(' '))
+                    {
+                        ele.SetAttribute("id", ele.GetAttribute("id").Replace(' ', '_'));
+                    }
+                }
+            }
         }
 
         /// <summary>
