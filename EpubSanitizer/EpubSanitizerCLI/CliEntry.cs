@@ -1,9 +1,29 @@
 ﻿using EpubSanitizerCore;
+using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Text;
 
 namespace EpubSanitizerCLI
 {
+    internal static class AsyncLogger
+    {
+        private static readonly BlockingCollection<(DateTime Time, string Msg, int Diff)> _queue = new();
+
+        static AsyncLogger()
+        {
+            // Background thread to handle the slow Console.WriteLine calls
+            Task.Run(() =>
+            {
+                foreach (var item in _queue.GetConsumingEnumerable())
+                {
+                    Console.WriteLine($"[{item.Time:hh.mm.ss.fff}]{item.Msg}[+{item.Diff}ms]");
+                }
+            });
+        }
+
+        internal static void Enqueue(DateTime time, string message, int diff)
+            => _queue.Add((time, message, diff));
+    }
     internal static class CliEntry
     {
         enum ExitCode
@@ -102,8 +122,9 @@ namespace EpubSanitizerCLI
         static void Log(string message)
         {
             DateTime dateTime = DateTime.Now;
-            Console.WriteLine($"[{dateTime:hh.mm.ss.fff}]{message}[+{(int)(dateTime - LastActionTime).TotalMilliseconds}ms]");
+            int diff = (int)(dateTime - LastActionTime).TotalMilliseconds;
             LastActionTime = dateTime;
+            AsyncLogger.Enqueue(dateTime, message, diff);
         }
 
         /// <summary>
