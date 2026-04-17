@@ -2,7 +2,7 @@
   "profiles": {
     "EpubSanitizerCLI": {
       "commandName": "Project",
-      "commandLineArgs": "--filter=all --epubVer=3 --cache=ram --compress=3 --enablePlugins --overwrite 1.epub 2.epub",
+      "commandLineArgs": "--filter=all --epubVer=3 --cache=ram --compress=3 --enablePlugins --overwrite --general.fullIdDedup=true --remoteResourceMode=embed --resourceEmbedMode=file \"Cybersecurity_Education_for_Awareness_and_Complian....epub\" 2.epub",
       "nativeDebugging": true,
       "jsWebView2Debugging": false
     }
