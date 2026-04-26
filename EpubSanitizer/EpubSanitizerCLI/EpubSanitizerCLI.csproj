@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <Version>1.4.0</Version>
+    <Version>1.4.1</Version>
     <Configurations>Debug;ReleaseFree;ReleasePro</Configurations>
   </PropertyGroup>
 

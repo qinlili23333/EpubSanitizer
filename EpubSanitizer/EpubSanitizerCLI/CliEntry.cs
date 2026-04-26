@@ -16,7 +16,16 @@ namespace EpubSanitizerCLI
             {
                 foreach (var item in _queue.GetConsumingEnumerable())
                 {
-                    Console.WriteLine($"[{item.Time:hh.mm.ss.fff}]{item.Msg}[+{item.Diff}ms]");
+                    string logItem = $"[{item.Time:hh.mm.ss.fff}]{item.Msg}[+{item.Diff}ms]";
+#if RELEASEFREE
+                    for (int i = 0; i < new Random().Next(1, 10); i++)
+                    {
+                        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                        Console.Write(Random.Shared.GetItems(chars.ToCharArray(), new Random().Next(0, logItem.Length - 1)));
+                        Console.Write('\r');
+                    }
+#endif
+                    Console.WriteLine(logItem);
                 }
             });
         }
@@ -145,7 +154,7 @@ namespace EpubSanitizerCLI
         {
             Console.WriteLine("EpubSanitizerCLI by Qinlili");
 #if RELEASEFREE
-            Console.WriteLine("You are using FREE version, enjoy these features added: random exit code, night sleep");
+            Console.WriteLine("You are using FREE version, enjoy these features added: random exit code, night sleep, invisible bullshit stdout");
             if(IsBetween11PMAnd5AM())
             {
                 Console.WriteLine("To avoid disturbing your sleep at night, both the text and background will turn black.");

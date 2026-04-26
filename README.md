@@ -58,6 +58,7 @@ There is some little difference for Free and Pro version on CLI.
 | ReadyToRun acceleration  | ✅ | ✅ |
 | Random exit code  | ✅ | ❌ |
 | Black both console text and background at night  | ✅ | ❌ |
+| Random string in stdout but invisible for console  | ✅ | ❌ |
 | Support HarmonyOS NEXT  | ❌ | ❌ |
 
 You can get Pro version CLI by any of these methods:  
