@@ -26,6 +26,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XhtmlFixPlugin", "Plugins\X
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpubSanitizerMAUI", "EpubSanitizerMAUI\EpubSanitizerMAUI.csproj", "{79007C95-9E18-4D50-A4B1-E9DC7C387AAD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extends", "Extends", "{F9D78AD6-E92D-461F-9A6C-D003E4187365}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EpubWebDownloader", "Extends\EpubWebDownloader\EpubWebDownloader.csproj", "{C3FDBE02-6346-40FA-8B96-C872CE3A1450}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +92,12 @@ Global
 		{79007C95-9E18-4D50-A4B1-E9DC7C387AAD}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
 		{79007C95-9E18-4D50-A4B1-E9DC7C387AAD}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
 		{79007C95-9E18-4D50-A4B1-E9DC7C387AAD}.ReleasePro|Any CPU.Deploy.0 = Release|Any CPU
+		{C3FDBE02-6346-40FA-8B96-C872CE3A1450}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3FDBE02-6346-40FA-8B96-C872CE3A1450}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3FDBE02-6346-40FA-8B96-C872CE3A1450}.ReleaseFree|Any CPU.ActiveCfg = Release|Any CPU
+		{C3FDBE02-6346-40FA-8B96-C872CE3A1450}.ReleaseFree|Any CPU.Build.0 = Release|Any CPU
+		{C3FDBE02-6346-40FA-8B96-C872CE3A1450}.ReleasePro|Any CPU.ActiveCfg = Release|Any CPU
+		{C3FDBE02-6346-40FA-8B96-C872CE3A1450}.ReleasePro|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,6 +108,7 @@ Global
 		{D18FD634-4FD3-4927-81EF-F0B69E15AA67} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{3D3FCBCE-D92F-4A64-B5F0-F3F6EF1D14FB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{30EAA5E9-0750-43FC-A6CD-415210554AE4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{C3FDBE02-6346-40FA-8B96-C872CE3A1450} = {F9D78AD6-E92D-461F-9A6C-D003E4187365}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E975EFF4-6CC5-4B9F-B2BF-884364C54CBA}

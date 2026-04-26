@@ -84,6 +84,10 @@ Plugins should be put in the same folder of core library or CLI executable. Due 
 
 There is a project `BuildAllPlugins`, after modifying plugin source code, build this project will copy all built plugins to CLI output folder.  
 
+## Extends
+
+Extends are not plugins. They do not add new features to EpubSanitizer, but you can use them for convenience in your projects. Plugins are loaded by EpubSanitizer itself with reflection and called by EpubSanitizer when needed, and you cannot call them directly. However, extends are libraries that your project can reference and call directly, while they can utilize internal classes inside EpubSanitizer to achive some features you cannot do with only public API.  
+
 ## Copyright tips
 
 This project will never add features that removing DRM or other copyright protection. We only focus on fixing problems in Epub files with no DRM.  
