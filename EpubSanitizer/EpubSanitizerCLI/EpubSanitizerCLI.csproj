@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EpubSanitizerCore\EpubSanitizerCore.csproj" />
+    <ProjectReference Include="..\Extends\EpubWebDownloader\EpubWebDownloader.csproj" />
   </ItemGroup>
 
   <Target Name="PreBuild" Condition="'$(Configuration)|$(Platform)'=='ReleasePro|AnyCPU'" BeforeTargets="PreBuildEvent">

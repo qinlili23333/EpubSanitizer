@@ -1,4 +1,5 @@
 ﻿using EpubSanitizerCore;
+using EpubSanitizerCore.Extends.EpubWebDownloader;
 using System.Collections.Concurrent;
 using System.IO.Compression;
 using System.Text;
@@ -86,17 +87,24 @@ namespace EpubSanitizerCLI
                 Logger = Log
             };
             Instance.Config.LoadConfigString(Config);
-            if (!File.Exists(input))
+            if (Config.ContainsKey("download"))
             {
-                Error("Input file not exist!");
-                Exit(ExitCode.FILE_NOT_EXIST);
+                EpubWebDownloader.SetupProxyFS(Instance, input);
             }
-            Log("Loading file...");
-            Stream FileStream = File.OpenRead(input);
-            ZipArchive EpubFile = new(FileStream, ZipArchiveMode.Read);
-            Instance.LoadFile(EpubFile);
-            EpubFile.Dispose();
-            FileStream.Close();
+            else
+            {
+                if (!File.Exists(input))
+                {
+                    Error("Input file not exist!");
+                    Exit(ExitCode.FILE_NOT_EXIST);
+                }
+                Log("Loading file...");
+                Stream FileStream = File.OpenRead(input);
+                ZipArchive EpubFile = new(FileStream, ZipArchiveMode.Read);
+                Instance.LoadFile(EpubFile);
+                EpubFile.Dispose();
+                FileStream.Close();
+            }
             Log("Processing...");
             Instance.Process();
             Log("Saving file...");
@@ -113,11 +121,11 @@ namespace EpubSanitizerCLI
                     Exit(ExitCode.IO_ERROR);
                 }
             }
-            FileStream = File.OpenWrite(output);
-            EpubFile = new(FileStream, ZipArchiveMode.Create, true, Encoding.UTF8);
-            Instance.SaveFile(EpubFile);
-            EpubFile.Dispose();
-            FileStream.Close();
+            Stream FileOutStream = File.OpenWrite(output);
+            ZipArchive EpubOutFile = new(FileOutStream, ZipArchiveMode.Create, true, Encoding.UTF8);
+            Instance.SaveFile(EpubOutFile);
+            EpubOutFile.Dispose();
+            FileOutStream.Close();
             Log("Cleaning...");
             Instance.Dispose();
             Log("Done!");
