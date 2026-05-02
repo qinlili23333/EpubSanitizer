@@ -7,10 +7,32 @@
 		<RootNamespace>EpubSanitizerCore.Extends.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<AssemblyName>EpubSanitizerCore.Extends.$(MSBuildProjectName)</AssemblyName>
 		<Version>1.0.0</Version>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Title>Epub Web Downloader</Title>
+		<Copyright>Copyleft Qinlili 2026</Copyright>
+		<Authors>Qinlili</Authors>
+		<Product>EpubSanitizer.EpubWebDownloader</Product>
+		<Company>Qinlili Tech</Company>
+		<PackageId>Qinlili.EpubSanitizer.Extends.EpubWebDownloader</PackageId>
+		<PackageProjectUrl>https://github.com/qinlili23333/EpubSanitizer</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/qinlili23333/EpubSanitizer.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<Description>Sanitize your Epub file to comply with standard</Description>
+		<PackageTags>epub</PackageTags>
+		<NeutralLanguage>en-AU</NeutralLanguage>
+		<PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\EpubSanitizerCore\EpubSanitizerCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
