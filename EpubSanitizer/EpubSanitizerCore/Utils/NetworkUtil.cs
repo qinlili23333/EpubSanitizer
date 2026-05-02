@@ -4,6 +4,16 @@ namespace EpubSanitizerCore.Utils
 {
     internal static class NetworkUtil
     {
+        private static readonly HttpClient _httpClient = new(new SocketsHttpHandler
+        {
+            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(2),
+            PooledConnectionLifetime = TimeSpan.FromMinutes(10),
+            MaxConnectionsPerServer = 20
+        })
+        {
+            DefaultRequestVersion = System.Net.HttpVersion.Version20,
+            DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher
+        };
         /// <summary>
         /// Download file and return binary data
         /// Why don't I use async? I just don't want async in a library. Devs using library should care about threading by themselves.
@@ -12,8 +22,7 @@ namespace EpubSanitizerCore.Utils
         /// <returns>Binary data of the downloaded file</returns>
         internal static byte[] GetRemoteUrl(string url)
         {
-            using var client = new System.Net.Http.HttpClient();
-            return client.GetByteArrayAsync(url).GetAwaiter().GetResult();
+            return _httpClient.GetByteArrayAsync(url).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -24,9 +33,8 @@ namespace EpubSanitizerCore.Utils
         internal static string GetRemoteMimeType(string url)
         {
             // Only send HEAD request to get mime type, no need to download whole file
-            using var client = new System.Net.Http.HttpClient();
             using var request = new System.Net.Http.HttpRequestMessage(System.Net.Http.HttpMethod.Head, url);
-            using var response = client.SendAsync(request).GetAwaiter().GetResult();
+            using var response = _httpClient.SendAsync(request).GetAwaiter().GetResult();
             if (response.Content.Headers.ContentType != null && response.Content.Headers.ContentType.MediaType != "application/octet-stream")
             {
                 return response.Content.Headers.ContentType.MediaType;
