@@ -31,7 +31,7 @@ namespace EpubSanitizerCore
         /// </summary>
         /// <param name="url">target url</param>
         /// <returns>RemoteFile object</returns>
-        internal RemoteFile GetFulfilledFile(string url)
+        internal RemoteFile GetFulfilledFile(string url, bool getMime)
         {
             if (RemoteFiles.TryGetValue(url, out RemoteFile file))
             {
@@ -43,7 +43,14 @@ namespace EpubSanitizerCore
                 file = new RemoteFile { Url = url };
                 try
                 {
-                    file.mimetype = Utils.NetworkUtil.GetRemoteMimeType(url);
+                    if (getMime)
+                    {
+                        file.mimetype = Utils.NetworkUtil.GetRemoteMimeType(url);
+                    }
+                    else
+                    {
+                        file.mimetype = "application/octet-stream";
+                    }
                     file.BinaryData = Utils.NetworkUtil.GetRemoteUrl(url);
                     file.SHA256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(file.BinaryData));
                     RemoteFiles.TryAdd(url, file);
@@ -78,7 +85,7 @@ namespace EpubSanitizerCore
         /// <returns>A data URI string containing the file's binary data if available; otherwise, an empty string.</returns>
         internal string GetDataUriFromUrl(string url)
         {
-            RemoteFile file = GetFulfilledFile(url);
+            RemoteFile file = GetFulfilledFile(url, true);
             if (file.BinaryData.Length > 0)
             {
                 return ConvertDataUri(file);
@@ -96,7 +103,7 @@ namespace EpubSanitizerCore
         /// <returns>The absolute path of the added remote file in the EPUB storage, or an empty string if the file could not be added.</returns>
         internal string AddToEpub(string url)
         {
-            RemoteFile file = GetFulfilledFile(url);
+            RemoteFile file = GetFulfilledFile(url, true);
             if (file.BinaryData.Length > 0)
             {
                 string fileName = string.Concat(Utils.PathUtil.GetBasePath(Instance.Indexer.OpfPath), "RemoteResource/", file.SHA256, ".", MimeTypesMap.GetExtension(file.mimetype));

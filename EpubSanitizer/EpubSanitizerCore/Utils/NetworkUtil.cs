@@ -6,13 +6,11 @@ namespace EpubSanitizerCore.Utils
     {
         private static readonly HttpClient _httpClient = new(new SocketsHttpHandler
         {
-            PooledConnectionIdleTimeout = TimeSpan.FromMinutes(2),
-            PooledConnectionLifetime = TimeSpan.FromMinutes(10),
             MaxConnectionsPerServer = 20
         })
         {
-            DefaultRequestVersion = System.Net.HttpVersion.Version20,
-            DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher
+            DefaultRequestVersion = System.Net.HttpVersion.Version30,
+            DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower
         };
         /// <summary>
         /// Download file and return binary data
