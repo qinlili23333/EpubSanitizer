@@ -16,6 +16,8 @@ namespace EpubSanitizerCore.Extends.EpubWebDownloader
 
         private readonly Uri BaseURL = new(baseURL);
 
+        internal override bool LazyFS => true;
+
         internal override void Export(ZipArchive EpubFile)
         {
             // Sync XmlCache

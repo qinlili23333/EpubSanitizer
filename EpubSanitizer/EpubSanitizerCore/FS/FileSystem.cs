@@ -46,6 +46,11 @@ namespace EpubSanitizerCore.FS
         internal ConcurrentDictionary<string, XmlDocument> XmlCache = [];
 
         /// <summary>
+        /// If the file system only load accessed files, enable LazyFS. This is suitable for file system that does not load the whole file but fetch file when required. Filters may use this to skip removal of files as files won't be load without access.
+        /// </summary>
+        internal virtual bool LazyFS => false;
+
+        /// <summary>
         /// Get XmlDocument from path, will use cache if enabled
         /// </summary>
         /// <param name="path">relative path in epub</param>

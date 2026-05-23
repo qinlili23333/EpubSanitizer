@@ -11,7 +11,7 @@ namespace EpubSanitizerCore.Filters
 
         internal override void PreProcess()
         {
-            if (Instance.FileStorage.FileExists("META-INF/calibre_bookmarks.txt"))
+            if (!Instance.FileStorage.LazyFS && Instance.FileStorage.FileExists("META-INF/calibre_bookmarks.txt"))
             {
                 Instance.Logger("Found calibre bookmark file, removing it.");
                 Instance.FileStorage.DeleteFile("META-INF/calibre_bookmarks.txt");
