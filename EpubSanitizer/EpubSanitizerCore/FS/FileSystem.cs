@@ -135,25 +135,45 @@ namespace EpubSanitizerCore.FS
         /// </summary>
         /// <param name="path">relative path</param>
         /// <param name="content">string content</param>
-        public abstract void WriteString(string path, string content);
+        public virtual void WriteString(string path, string content)
+        {
+            XmlCache.TryRemove(path, out _);
+        }
         /// <summary>
         /// Read string content
         /// </summary>
         /// <param name="path">relative path</param>
         /// <returns>string content</returns>
-        public abstract string ReadString(string path);
+        public virtual string ReadString(string path)
+        {
+            if (XmlCache.TryGetValue(path, out var xml))
+            {
+                WriteBytes(path, Utils.XmlUtil.ToXmlBytes(xml, false));
+            }
+            return "";
+        }
         /// <summary>
         /// Write byte array content to target path
         /// </summary>
         /// <param name="path">relative path</param>
         /// <param name="content">byte array content</param>
-        public abstract void WriteBytes(string path, byte[] content);
+        public virtual void WriteBytes(string path, byte[] content)
+        {
+            XmlCache.TryRemove(path, out _);
+        }
         /// <summary>
         /// Read byte array content
         /// </summary>
         /// <param name="path">relative path</param>
         /// <returns>byte array content</returns>
-        public abstract byte[] ReadBytes(string path);
+        public virtual byte[] ReadBytes(string path)
+        {
+            if (XmlCache.TryGetValue(path, out var xml))
+            {
+                WriteBytes(path, Utils.XmlUtil.ToXmlBytes(xml, false));
+            }
+            return [];
+        }
         /// <summary>
         /// Remove file permanently from file system
         /// </summary>

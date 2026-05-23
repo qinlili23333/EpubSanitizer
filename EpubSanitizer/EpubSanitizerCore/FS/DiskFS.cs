@@ -61,6 +61,7 @@ namespace EpubSanitizerCore.FS
         /// <inheritdoc/>
         public override string ReadString(string path)
         {
+            base.ReadString(path);
             if (!File.Exists(Path.Combine(Folder, path.Replace('\\', '/'))))
             {
                 throw new FileNotFoundException($"File '{path}' does not exist in the file system.");
@@ -71,18 +72,21 @@ namespace EpubSanitizerCore.FS
         /// <inheritdoc/>
         public override void WriteString(string path, string content)
         {
+            base.WriteString(path, content);
             Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(Folder, path.Replace('\\', '/')))!);
             File.WriteAllText(Path.Combine(Folder, path.Replace('\\', '/')), content);
         }
         /// <inheritdoc/>
         public override void WriteBytes(string path, byte[] content)
         {
+            base.WriteBytes(path, content);
             Directory.CreateDirectory(Path.GetDirectoryName(Path.Combine(Folder, path.Replace('\\', '/')))!);
             File.WriteAllBytes(Path.Combine(Folder, path.Replace('\\', '/')), content);
         }
         /// <inheritdoc/>
         public override byte[] ReadBytes(string path)
         {
+            base.ReadBytes(path);
             return File.ReadAllBytes(Path.Combine(Folder, path.Replace('\\', '/')));
         }
         /// <inheritdoc/>
