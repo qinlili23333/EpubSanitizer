@@ -91,7 +91,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                     {
                         string path = ConvertUrlToPath(decl.Value);
                         // Ignore data URLs and absolute URLs
-                        if (path.StartsWith("data"))
+                        if (path.StartsWith("data:"))
                         {
                             continue;
                         }
@@ -122,7 +122,7 @@ namespace EpubSanitizerCore.Plugins.CssPlugin
                         // Simple check for invalid URL, can be improved
                         string path = ConvertUrlToPath(decl.Value);
                         // Ignore data URLs and absolute URLs
-                        if (path.StartsWith("data"))
+                        if (path.StartsWith("data:"))
                         {
                             continue;
                         }

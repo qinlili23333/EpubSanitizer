@@ -101,7 +101,7 @@ namespace EpubSanitizerCore.Filters
                 if (element.HasAttribute("href"))
                 {
                     string href = element.GetAttribute("href");
-                    if(Utils.PathUtil.IsHttpOrHttpsUrl(href) || href.StartsWith("data"))
+                    if(Utils.PathUtil.IsHttpOrHttpsUrl(href) || href.StartsWith("data:"))
                     {
                         continue;
                     }
@@ -455,7 +455,7 @@ namespace EpubSanitizerCore.Filters
                             }
                             goto checkhref;
                         }
-                        if (element.HasAttribute("href") && !element.GetAttribute("href").StartsWith("data") && !element.GetAttribute("href").StartsWith('#') && !element.GetAttribute("href").StartsWith("mailto:") && !element.GetAttribute("href").StartsWith('#') && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href")).Split('#')[0]))
+                        if (element.HasAttribute("href") && !element.GetAttribute("href").StartsWith("data:") && !element.GetAttribute("href").StartsWith('#') && !element.GetAttribute("href").StartsWith("mailto:") && !element.GetAttribute("href").StartsWith('#') && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href")).Split('#')[0]))
                         {
                             Instance.Logger($"Remove URL not exist: {element.GetAttribute("href")}");
                             element.RemoveAttribute("href");
@@ -764,7 +764,7 @@ namespace EpubSanitizerCore.Filters
         {
             foreach (XmlElement element in doc.GetElementsByTagName("img").Cast<XmlElement>().ToArray())
             {
-                if (element.HasAttribute("src") && !Instance.FileStorage.FileExists(PathUtil.ComposeFromRelativePath(file, element.GetAttribute("src"))) && !Utils.PathUtil.IsHttpOrHttpsUrl(element.GetAttribute("src")) && !element.GetAttribute("src").StartsWith("data"))
+                if (element.HasAttribute("src") && !Instance.FileStorage.FileExists(PathUtil.ComposeFromRelativePath(file, element.GetAttribute("src"))) && !Utils.PathUtil.IsHttpOrHttpsUrl(element.GetAttribute("src")) && !element.GetAttribute("src").StartsWith("data:"))
                 {
                     Instance.Logger($"Removed invalid image {element.GetAttribute("src")} in {file}");
                     if (element.HasAttribute("alt") && element.GetAttribute("alt") != string.Empty)
