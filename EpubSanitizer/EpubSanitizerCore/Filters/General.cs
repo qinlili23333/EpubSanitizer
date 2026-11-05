@@ -113,6 +113,10 @@ namespace EpubSanitizerCore.Filters
                     }
                     if (!Utils.OpfUtil.IsBlessedItemType(hrefFile.mimetype, Instance.TargetEpubVer))
                     {
+                        if(!hrefFile.mimetype.StartsWith("image/"))
+                        {
+                            Instance.Logger($"Not Implemented: Cannot handle non-image resources {hrefFile.mimetype} currently");
+                        }
                         Instance.Logger($"Creating wrapper for resource link {element.GetAttribute("href")} in {file}");
                         string wrapperName = "resource_wrapper_" + hrefFile.path.Split('/').Last().Split('.').First();
                         lock (Instance.Indexer.ManifestFilesLock)
