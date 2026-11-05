@@ -116,14 +116,15 @@ namespace EpubSanitizerCore.Filters
                         if(!hrefFile.mimetype.StartsWith("image/"))
                         {
                             Instance.Logger($"Not Implemented: Cannot handle non-image resources {hrefFile.mimetype} currently");
+                            continue;
                         }
                         Instance.Logger($"Creating wrapper for resource link {element.GetAttribute("href")} in {file}");
-                        string wrapperName = "resource_wrapper_" + hrefFile.path.Split('/').Last().Split('.').First();
+                        string wrapperName = "resource_wrapper_" + hrefFile.id;
                         lock (Instance.Indexer.ManifestFilesLock)
                         {
                             if (Utils.OpfUtil.GetItemFromManifestRelative(Instance.Indexer.ManifestFiles, wrapperName + ".xhtml") == null)
                             {
-                                XmlDocument wrapperDoc = Utils.ResourceWrapperGenerator.GenerateImageWrapper(Utils.PathUtil.ComposeRelativePath(file, element.GetAttribute("href")));
+                                XmlDocument wrapperDoc = Utils.ResourceWrapperGenerator.GenerateImageWrapper(Utils.PathUtil.ComposeRelativePath(Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, wrapperName + ".xhtml"), Utils.PathUtil.ComposeFromRelativePath(file, href)));
                                 Instance.FileStorage.WriteXml(Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, wrapperName + ".xhtml"), wrapperDoc);
                                 // Avoid duplicate wrapper
                                 OpfFile wrapperFile = new()
