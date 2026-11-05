@@ -115,28 +115,31 @@ namespace EpubSanitizerCore.Filters
                     {
                         Instance.Logger($"Creating wrapper for resource link {element.GetAttribute("href")} in {file}");
                         string wrapperName = "resource_wrapper_" + hrefFile.path.Split('/').Last().Split('.').First();
-                        if(Utils.OpfUtil.GetItemFromManifestRelative(Instance.Indexer.ManifestFiles, wrapperName + ".xhtml") == null)
+                        lock (Instance.Indexer.ManifestFilesLock)
                         {
-                            XmlDocument wrapperDoc = Utils.ResourceWrapperGenerator.GenerateImageWrapper(Utils.PathUtil.ComposeRelativePath(file, element.GetAttribute("href")));
-                            Instance.FileStorage.WriteXml(Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, wrapperName + ".xhtml"), wrapperDoc);
-                            // Avoid duplicate wrapper
-                            OpfFile wrapperFile = new()
+                            if (Utils.OpfUtil.GetItemFromManifestRelative(Instance.Indexer.ManifestFiles, wrapperName + ".xhtml") == null)
                             {
-                                opfpath = wrapperName + ".xhtml",
-                                path = Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, wrapperName + ".xhtml"),
-                                mimetype = "application/xhtml+xml",
-                                id = wrapperName,
-                                generated = true
-                            };
-                            Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, wrapperFile];
-                            // Insert Spine itemref for the wrapper
-                            lock (Instance.Indexer.OpfDoc)
-                            {
-                                XmlElement spine = Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0] as XmlElement;
-                                XmlElement itemref = Instance.Indexer.OpfDoc.CreateElement("itemref", Instance.Indexer.OpfDoc.DocumentElement.NamespaceURI);
-                                itemref.SetAttribute("idref", wrapperName);
-                                itemref.SetAttribute("linear", "no");
-                                spine.AppendChild(itemref);
+                                XmlDocument wrapperDoc = Utils.ResourceWrapperGenerator.GenerateImageWrapper(Utils.PathUtil.ComposeRelativePath(file, element.GetAttribute("href")));
+                                Instance.FileStorage.WriteXml(Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, wrapperName + ".xhtml"), wrapperDoc);
+                                // Avoid duplicate wrapper
+                                OpfFile wrapperFile = new()
+                                {
+                                    opfpath = wrapperName + ".xhtml",
+                                    path = Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, wrapperName + ".xhtml"),
+                                    mimetype = "application/xhtml+xml",
+                                    id = wrapperName,
+                                    generated = true
+                                };
+                                Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, wrapperFile];
+                                // Insert Spine itemref for the wrapper
+                                lock (Instance.Indexer.OpfDoc)
+                                {
+                                    XmlElement spine = Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0] as XmlElement;
+                                    XmlElement itemref = Instance.Indexer.OpfDoc.CreateElement("itemref", Instance.Indexer.OpfDoc.DocumentElement.NamespaceURI);
+                                    itemref.SetAttribute("idref", wrapperName);
+                                    itemref.SetAttribute("linear", "no");
+                                    spine.AppendChild(itemref);
+                                }
                             }
                         }
                         element.SetAttribute("href", Utils.PathUtil.ComposeRelativePath(file, Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, wrapperName + ".xhtml")));
