@@ -84,8 +84,73 @@ namespace EpubSanitizerCore.Filters
                 RemoveInvalidImage(xhtmlDoc, file);
                 RecordID(xhtmlDoc, file);
             }
+            WrapResourceLink(xhtmlDoc, file);
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
+        }
+
+        /// <summary>
+        /// When a link has href attribute to a resource file directly, generate a XHTML wrapper for it
+        /// </summary>
+        /// <param name="xhtmlDoc">xhtml document</param>
+        /// <param name="file">file path</param>
+        private void WrapResourceLink(XmlDocument xhtmlDoc, string file)
+        {
+            foreach (XmlElement element in xhtmlDoc.GetElementsByTagName("a").Cast<XmlElement>().ToArray())
+            {
+                if (element.HasAttribute("href"))
+                {
+                    string href = element.GetAttribute("href");
+                    if(Utils.PathUtil.IsHttpOrHttpsUrl(href) || href.StartsWith("data:"))
+                    {
+                        continue;
+                    }
+                    OpfFile hrefFile = Utils.OpfUtil.GetItemFromManifestAbsolute(Instance.Indexer.ManifestFiles, Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href")).Split('#')[0]);
+                    if(hrefFile == null)
+                    {
+                        Instance.Logger($"Resource link {element.GetAttribute("href")} in {file} not found in manifest, skipping...");
+                        continue;
+                    }
+                    if (!Utils.OpfUtil.IsBlessedItemType(hrefFile.mimetype, Instance.TargetEpubVer))
+                    {
+                        if(!hrefFile.mimetype.StartsWith("image/"))
+                        {
+                            Instance.Logger($"Not Implemented: Cannot handle non-image resources {hrefFile.mimetype} currently");
+                            continue;
+                        }
+                        Instance.Logger($"Creating wrapper for resource link {element.GetAttribute("href")} in {file}");
+                        string wrapperName = "resource_wrapper_" + hrefFile.id;
+                        lock (Instance.Indexer.ManifestFilesLock)
+                        {
+                            if (Utils.OpfUtil.GetItemFromManifestRelative(Instance.Indexer.ManifestFiles, wrapperName + ".xhtml") == null)
+                            {
+                                XmlDocument wrapperDoc = Utils.ResourceWrapperGenerator.GenerateImageWrapper(Utils.PathUtil.ComposeRelativePath(Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, wrapperName + ".xhtml"), Utils.PathUtil.ComposeFromRelativePath(file, href)));
+                                Instance.FileStorage.WriteXml(Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, wrapperName + ".xhtml"), wrapperDoc);
+                                // Avoid duplicate wrapper
+                                OpfFile wrapperFile = new()
+                                {
+                                    opfpath = wrapperName + ".xhtml",
+                                    path = Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, wrapperName + ".xhtml"),
+                                    mimetype = "application/xhtml+xml",
+                                    id = wrapperName,
+                                    generated = true
+                                };
+                                Instance.Indexer.ManifestFiles = [.. Instance.Indexer.ManifestFiles, wrapperFile];
+                                // Insert Spine itemref for the wrapper
+                                lock (Instance.Indexer.OpfDoc)
+                                {
+                                    XmlElement spine = Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0] as XmlElement;
+                                    XmlElement itemref = Instance.Indexer.OpfDoc.CreateElement("itemref", Instance.Indexer.OpfDoc.DocumentElement.NamespaceURI);
+                                    itemref.SetAttribute("idref", wrapperName);
+                                    itemref.SetAttribute("linear", "no");
+                                    spine.AppendChild(itemref);
+                                }
+                            }
+                        }
+                        element.SetAttribute("href", Utils.PathUtil.ComposeRelativePath(file, Utils.PathUtil.ComposeFromRelativePath(Instance.Indexer.OpfPath, wrapperName + ".xhtml")));
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -395,7 +460,7 @@ namespace EpubSanitizerCore.Filters
                             }
                             goto checkhref;
                         }
-                        if (element.HasAttribute("href") && !element.GetAttribute("href").StartsWith("data") && !element.GetAttribute("href").StartsWith('#') && !element.GetAttribute("href").StartsWith("mailto:") && !element.GetAttribute("href").StartsWith('#') && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href")).Split('#')[0]))
+                        if (element.HasAttribute("href") && !element.GetAttribute("href").StartsWith("data:") && !element.GetAttribute("href").StartsWith('#') && !element.GetAttribute("href").StartsWith("mailto:") && !element.GetAttribute("href").StartsWith('#') && !Instance.FileStorage.FileExists(Utils.PathUtil.ComposeFromRelativePath(file, element.GetAttribute("href")).Split('#')[0]))
                         {
                             Instance.Logger($"Remove URL not exist: {element.GetAttribute("href")}");
                             element.RemoveAttribute("href");
@@ -466,14 +531,17 @@ namespace EpubSanitizerCore.Filters
                 }
             }
             bool found = false;
-            if (Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0] is XmlElement spine)
-            {
-                foreach (XmlElement item in spine.GetElementsByTagName("itemref"))
+            lock (Instance.Indexer.OpfDoc)
+            { 
+                if (Instance.Indexer.OpfDoc.GetElementsByTagName("spine")[0] is XmlElement spine)
                 {
-                    if (item.GetAttribute("idref") == docid && item.HasAttribute("linear") && item.GetAttribute("linear").Equals("no", StringComparison.InvariantCultureIgnoreCase))
+                    foreach (XmlElement item in spine.GetElementsByTagName("itemref"))
                     {
-                        found = true;
-                        break;
+                        if (item.GetAttribute("idref") == docid && item.HasAttribute("linear") && item.GetAttribute("linear").Equals("no", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            found = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -701,7 +769,7 @@ namespace EpubSanitizerCore.Filters
         {
             foreach (XmlElement element in doc.GetElementsByTagName("img").Cast<XmlElement>().ToArray())
             {
-                if (element.HasAttribute("src") && !Instance.FileStorage.FileExists(PathUtil.ComposeFromRelativePath(file, element.GetAttribute("src"))) && !Utils.PathUtil.IsHttpOrHttpsUrl(element.GetAttribute("src")) && !element.GetAttribute("src").StartsWith("data"))
+                if (element.HasAttribute("src") && !Instance.FileStorage.FileExists(PathUtil.ComposeFromRelativePath(file, element.GetAttribute("src"))) && !Utils.PathUtil.IsHttpOrHttpsUrl(element.GetAttribute("src")) && !element.GetAttribute("src").StartsWith("data:"))
                 {
                     Instance.Logger($"Removed invalid image {element.GetAttribute("src")} in {file}");
                     if (element.HasAttribute("alt") && element.GetAttribute("alt") != string.Empty)

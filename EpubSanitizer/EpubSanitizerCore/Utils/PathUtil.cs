@@ -13,6 +13,10 @@
         /// <returns></returns>
         internal static string ComposeFromRelativePath(string basePath, string filePath)
         {
+            if(filePath.StartsWith('#'))
+            {
+                return basePath;
+            }
             if (filePath.StartsWith('/'))
             {
                 return filePath[1..];
@@ -85,7 +89,7 @@
         }
 
         /// <summary>
-        /// A static method to get all XHTML files from the EpubSanitizer instance.
+        /// A static method to get all non-generated XHTML files from the EpubSanitizer instance.
         /// </summary>
         /// <param name="instance">EpubSanitizer Instance</param>
         /// <returns>array of xhtml files</returns>
@@ -94,7 +98,7 @@
             List<string> files = [];
             foreach (var file in instance.Indexer.ManifestFiles)
             {
-                if (file.mimetype == "application/xhtml+xml")
+                if (file.mimetype == "application/xhtml+xml" && !file.generated)
                 {
                     files.Add(file.path);
                 }
