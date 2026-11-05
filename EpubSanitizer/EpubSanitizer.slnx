@@ -1,0 +1,50 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="ReleaseFree" />
+    <BuildType Name="ReleasePro" />
+  </Configurations>
+  <Folder Name="/Extends/">
+    <Project Path="Extends/EpubWebDownloader/EpubWebDownloader.csproj">
+      <BuildType Solution="ReleaseFree|*" Project="Release" />
+      <BuildType Solution="ReleasePro|*" Project="Release" />
+    </Project>
+  </Folder>
+  <Folder Name="/Plugins/">
+    <Project Path="Plugins/BuildAllPlugins/BuildAllPlugins.csproj">
+      <BuildType Solution="ReleaseFree|*" Project="Release" />
+      <BuildType Solution="ReleasePro|*" Project="Release" />
+    </Project>
+    <Project Path="Plugins/CaesiumPlugin/CaesiumPlugin.csproj">
+      <BuildType Solution="ReleaseFree|*" Project="Release" />
+      <BuildType Solution="ReleasePro|*" Project="Release" />
+    </Project>
+    <Project Path="Plugins/CssPlugin/CssPlugin.csproj">
+      <BuildType Solution="ReleaseFree|*" Project="Release" />
+      <BuildType Solution="ReleasePro|*" Project="Release" />
+    </Project>
+    <Project Path="Plugins/DemoPlugin/DemoPlugin.csproj">
+      <BuildType Solution="ReleaseFree|*" Project="Release" />
+      <BuildType Solution="ReleasePro|*" Project="Release" />
+    </Project>
+    <Project Path="Plugins/XhtmlFixPlugin/XhtmlFixPlugin.csproj">
+      <BuildType Solution="ReleaseFree|*" Project="Release" />
+      <BuildType Solution="ReleasePro|*" Project="Release" />
+    </Project>
+  </Folder>
+  <Project Path="EpubSanitizerCLI/EpubSanitizerCLI.csproj" />
+  <Project Path="EpubSanitizerCore/EpubSanitizerCore.csproj">
+    <BuildType Solution="ReleaseFree|*" Project="Release" />
+    <BuildType Solution="ReleasePro|*" Project="Release" />
+  </Project>
+  <Project Path="EpubSanitizerMAUI/EpubSanitizerMAUI.csproj">
+    <BuildType Solution="ReleaseFree|*" Project="Release" />
+    <BuildType Solution="ReleasePro|*" Project="Release" />
+    <Deploy Solution="ReleasePro|*" />
+  </Project>
+  <Project Path="EpubSanitizerWeb/EpubSanitizerWeb.csproj">
+    <BuildDependency Project="EpubSanitizerCore/EpubSanitizerCore.csproj" />
+    <BuildType Solution="ReleaseFree|*" Project="Release" />
+    <BuildType Solution="ReleasePro|*" Project="Release" />
+  </Project>
+</Solution>

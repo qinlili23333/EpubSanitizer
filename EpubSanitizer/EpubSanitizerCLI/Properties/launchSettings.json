@@ -2,7 +2,7 @@
   "profiles": {
     "EpubSanitizerCLI": {
       "commandName": "Project",
-      "commandLineArgs": "--filter=all --epubVer=3 --cache=ram --compress=3 --enablePlugins --overwrite --general.fullIdDedup=true --remoteResourceMode=embed --resourceEmbedMode=file --download \"http://localhost:8008/Z%3A/2/\" 2.epub",
+      "commandLineArgs": "--filter=all --epubVer=3 --cache=ram --compress=3 --enablePlugins --overwrite --general.fullIdDedup=true --remoteResourceMode=embed --resourceEmbedMode=file ",
       "nativeDebugging": true,
       "jsWebView2Debugging": false
     }
