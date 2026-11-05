@@ -84,6 +84,7 @@ namespace EpubSanitizerCore.Filters
                 RemoveInvalidImage(xhtmlDoc, file);
                 RecordID(xhtmlDoc, file);
             }
+
             // Write back the processed content
             Instance.FileStorage.WriteXml(file, xhtmlDoc);
         }

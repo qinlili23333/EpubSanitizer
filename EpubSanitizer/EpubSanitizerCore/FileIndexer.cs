@@ -42,6 +42,10 @@ namespace EpubSanitizerCore
         /// RemoteFile object, only when remote resource need to embed into Epub, otherwise it will be null.
         /// </summary>
         internal RemoteFile? remoteFileInfo;
+        /// <summary>
+        /// If this file is generated from EpubSanitizer itself, this value will be true, useful for filters to skip processing further.
+        /// </summary>
+        internal bool generated = false;
     }
     internal class FileIndexer
     {
