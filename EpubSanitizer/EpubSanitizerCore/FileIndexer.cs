@@ -82,6 +82,10 @@ namespace EpubSanitizerCore
         /// </summary>
         internal object ManifestFilesLock;
         /// <summary>
+        /// Lock for Opf editing
+        /// </summary>
+        internal object OpfEditLock;
+        /// <summary>
         /// Remote resource manager
         /// </summary>
         internal RemoteResourceManager RemoteManager;
@@ -89,6 +93,7 @@ namespace EpubSanitizerCore
         {
             Instance = CoreInstance;
             ManifestFilesLock = new object();
+            OpfEditLock = new object();
             RemoteManager = new(Instance);
         }
         /// <summary>

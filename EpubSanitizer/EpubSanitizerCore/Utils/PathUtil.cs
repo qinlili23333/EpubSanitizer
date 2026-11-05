@@ -13,6 +13,10 @@
         /// <returns></returns>
         internal static string ComposeFromRelativePath(string basePath, string filePath)
         {
+            if(filePath.StartsWith('#'))
+            {
+                return basePath;
+            }
             if (filePath.StartsWith('/'))
             {
                 return filePath[1..];

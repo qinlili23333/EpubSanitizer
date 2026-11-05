@@ -29,6 +29,24 @@ namespace EpubSanitizerCore.Utils
         }
 
         /// <summary>
+        /// Whether a link should be allowed
+        /// </summary>
+        /// <param name="type">mimetype</param>
+        /// <param name="version">Epub version</param>
+        /// <returns></returns>
+        public static bool IsBlessedItemType(string type, int version)
+        {
+            if (version == 2)
+            {
+                return type == "application/xhtml+xml" || type == "application/x-dtbook+xml";
+            }
+            else
+            {
+                return type == "application/xhtml+xml" || type == "image/svg+xml";
+            }
+        }
+
+        /// <summary>
         /// Epub 3 forbids empty metadata elements like <dc:format />
         /// This function removes all of them.
         /// </summary>
@@ -55,16 +73,18 @@ namespace EpubSanitizerCore.Utils
         /// <param name="newid">new id</param>
         internal static void ReplaceIdref(XmlDocument OpfDoc, string oldid, string newid)
         {
-            XmlNodeList itemrefs = OpfDoc.GetElementsByTagName("spine")[0].ChildNodes;
-            foreach (XmlElement itemref in itemrefs)
+            lock (OpfDoc)
             {
-                string idref = itemref.GetAttribute("idref");
-                if (idref == oldid)
+                XmlNodeList itemrefs = OpfDoc.GetElementsByTagName("spine")[0].ChildNodes;
+                foreach (XmlElement itemref in itemrefs)
                 {
-                    itemref.SetAttribute("idref", newid);
+                    string idref = itemref.GetAttribute("idref");
+                    if (idref == oldid)
+                    {
+                        itemref.SetAttribute("idref", newid);
+                    }
                 }
             }
-
         }
 
         /// <summary>
@@ -128,17 +148,20 @@ namespace EpubSanitizerCore.Utils
         /// <returns>string array of relative paths</returns>
         internal static string[] GetSpineArray(XmlDocument OpfDoc)
         {
-            List<string> spineArray = [];
-            XmlNodeList itemrefs = OpfDoc.GetElementsByTagName("spine")[0].ChildNodes;
-            foreach (XmlElement itemref in itemrefs)
+            lock (OpfDoc)
             {
-                string idref = itemref.GetAttribute("idref");
-                if (!string.IsNullOrEmpty(idref))
+                List<string> spineArray = [];
+                XmlNodeList itemrefs = OpfDoc.GetElementsByTagName("spine")[0].ChildNodes;
+                foreach (XmlElement itemref in itemrefs)
                 {
-                    spineArray.Add((OpfDoc.SelectSingleNode($"//*[@id='{idref}']") as XmlElement).GetAttribute("href"));
+                    string idref = itemref.GetAttribute("idref");
+                    if (!string.IsNullOrEmpty(idref))
+                    {
+                        spineArray.Add((OpfDoc.SelectSingleNode($"//*[@id='{idref}']") as XmlElement).GetAttribute("href"));
+                    }
                 }
+                return [.. spineArray];
             }
-            return [.. spineArray];
         }
 
         /// <summary>

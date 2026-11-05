@@ -44,10 +44,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Res\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="Res.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
