@@ -1,4 +1,6 @@
 ﻿using HeyRed.Mime;
+using System.Security.Cryptography;
+using System.Text;
 using System.Xml;
 using static EpubSanitizerCore.Exceptions;
 
@@ -103,9 +105,38 @@ namespace EpubSanitizerCore
                 AddManifestFile(file);
             }
             CheckMissingFile();
+            SanitizeOpfMetadata();
             DetectNcx();
         }
-
+        /// <summary>
+        /// Ensure opf metadata comply with standard
+        /// </summary>
+        private void SanitizeOpfMetadata()
+        {
+            CheckOpfIdentifier();
+        }
+        /// <summary>
+        /// Checks the OPF identifier.
+        /// </summary>
+        private void CheckOpfIdentifier()
+        {
+            string uniqueId = OpfDoc.DocumentElement.GetAttribute("unique-identifier");
+            if (uniqueId == string.Empty)
+            {
+                Instance.Logger("OPF file does not have a unique identifier, adding one...");
+                uniqueId = "epub-sanitizer-genid";
+                OpfDoc.DocumentElement.SetAttribute("unique-identifier", uniqueId);
+            }
+            XmlElement metadata = OpfDoc.GetElementsByTagName("metadata")[0] as XmlElement;
+            if (metadata.SelectSingleNode($"//*[@id='{uniqueId}']") == null)
+            {
+                Instance.Logger("Unique identifier not found in metadata, adding one...");
+                XmlElement identifier = OpfDoc.CreateElement("dc:identifier", "http://purl.org/dc/elements/1.1/");
+                identifier.SetAttribute("id", uniqueId);
+                identifier.InnerText = "urn:X-epub-sanitizer:" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(OpfDoc.ToString())));
+                metadata.AppendChild(identifier);
+            }
+        }
         /// <summary>
         /// Parse container xml file then load OPF file.
         /// </summary>
